@@ -1,10 +1,21 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Root } from './Root';
+import React from "react";
+import ReactDOM from "react-dom";
+import { Router } from "./Router";
+import { BrowserRouter } from "react-router-dom";
+import { createGlobalStyle } from "styled-components";
+
+const GlobalStyle = createGlobalStyle`
+  body {
+    margin: 0;
+  }
+`;
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Root />
-  </React.StrictMode>,
-  document.getElementById('root')
+  <>
+    <GlobalStyle />
+    <BrowserRouter>
+      <Router />
+    </BrowserRouter>
+  </>,
+  document.getElementById("root")
 );
