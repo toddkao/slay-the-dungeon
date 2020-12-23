@@ -66,8 +66,16 @@ const IntentNumber = styled(Typography).attrs({
 })`
   position: absolute;
   color: white;
-  top: 0;
-  right: 0;
+  top: -5px;
+  right: -10px;
+  background-color: black;
+  padding: 2px;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export class Monster extends Entity {
@@ -97,7 +105,7 @@ export class Monster extends Entity {
   renderIntentNumber = () => {
     switch (this.currentIntent?.type) {
       case IntentType.Attack:
-        return <> {this.damage + this.extradamage} </>;
+        return <IntentNumber> {this.damage + this.extradamage} </IntentNumber>;
       default:
         return null;
     }
@@ -127,7 +135,7 @@ export class Monster extends Entity {
             height={45}
             alt="intent"
           />
-          <IntentNumber>{this.renderIntentNumber()}</IntentNumber>
+          {this.renderIntentNumber()}
         </MonsterIntentWrapper>
         <img src={this.monster.image} width={100} height={100} alt="monster" />
         <HealthBar health={this.health} maxHealth={this.maxHealth} />
