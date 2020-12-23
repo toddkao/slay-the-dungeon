@@ -132,7 +132,9 @@ export class BattleState {
     switch (card.effect) {
       case CardEffectType.SingleTargetAttack:
         if (card.damage && this.selectedMonster) {
-          this.selectedMonster.takeDamage(card.damage);
+          this.selectedMonster.takeDamage(
+            card.damage + this.player.extradamage
+          );
           if (this.selectedMonster.health === 0) {
             this.setMonsters(
               this.monsters.filter(
@@ -144,7 +146,7 @@ export class BattleState {
         break;
       case CardEffectType.AddBlock:
         if (card.block && card.targetSelf) {
-          this.player.addBlock(card.block + this.player.block);
+          this.player.addBlock(card.block + this.player.extrablock);
         }
         break;
       default:

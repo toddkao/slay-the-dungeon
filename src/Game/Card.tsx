@@ -149,7 +149,7 @@ export class Card {
     this.card.descriptionVariables?.forEach((variable) => {
       text = text.replace(
         "{}",
-        (this.card as any)?.[variable] + (player as any)?.[variable]
+        (this.card as any)?.[variable] + (player as any)?.[`extra${variable}`]
       );
     });
     return text;

@@ -30,17 +30,22 @@ export class Entity {
 
   @computed
   get damage() {
-    return (this.entity.damage ?? 0) + this.strength;
+    return this.entity.damage ?? 0;
   }
 
   @computed
   get block() {
-    return (this.entity.block ?? 0) + this.dexterity;
+    return this.entity.block ?? 0;
   }
 
   @computed
-  get currentBlock() {
-    return this.entity.block;
+  get extradamage() {
+    return this.strength;
+  }
+
+  @computed
+  get extrablock() {
+    return this.dexterity;
   }
 
   @computed
