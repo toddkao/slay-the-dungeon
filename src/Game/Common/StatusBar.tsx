@@ -7,6 +7,7 @@ import { Typography } from "../../Typography";
 
 const Wrapper = styled(Row)`
   gap: 20px;
+  height: 30px;
 `;
 
 export enum StatusType {
