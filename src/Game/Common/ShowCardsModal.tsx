@@ -13,6 +13,7 @@ const ReturnButton = styled.div`
 `;
 
 const CardRow = styled(Row)`
+  pointer-events: none;
   max-width: 850px;
   gap: 10px;
   flex-wrap: wrap;

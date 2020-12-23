@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import cardImage from "../Images/card.png";
 import strike from "../Images/strike.png";
 import defend from "../Images/defend.png";
@@ -39,9 +39,17 @@ const CardImage = styled(Image)`
 
 const CardWrapper = styled(Column)<{ selected: boolean }>`
   position: relative;
-  ${({ selected }) => (selected ? `outline: 2px solid green;` : "")};
+  ${({ selected }) =>
+    selected
+      ? css`
+          transform: scale(1.5);
+          z-index: 2;
+        `
+      : ""};
+  transition: transform 0.2s;
   &:hover {
-    outline: 2px solid green;
+    z-index: 2;
+    transform: scale(1.5);
   }
 `;
 
@@ -134,7 +142,9 @@ export class Card {
         selected={this.card.id === battleState.selectedCardId}
       >
         <Image src={cardImage} />
-        <ManaCost>{this.card.manaCost}</ManaCost>
+        <ManaCost notEnoughMana={this.card.manaCost > battleState.currentMana}>
+          {this.card.manaCost}
+        </ManaCost>
         <RenderCardName>{this.card.name}</RenderCardName>
         <RenderCardType>{this.card.type}</RenderCardType>
         <RenderCardText>{this.parseCardText()}</RenderCardText>

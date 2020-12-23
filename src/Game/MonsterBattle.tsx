@@ -34,6 +34,7 @@ const ManaAmount = styled(ManaCost)`
 
 const Wrapper = styled(Row)`
   ${`background: url(${background})`};
+  overflow: hidden;
   background-position: bottom;
   position: relative;
   background-color: black;
@@ -91,8 +92,14 @@ export const MonsterBattle = observer(() => {
     battleState.setMonsters([Louse(uniqueId()), Louse(uniqueId())]);
   });
 
+  const onRightClick = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    battleState.selectCard(undefined);
+    console.log("right click");
+  };
+
   return (
-    <Wrapper align="center" justify="center">
+    <Wrapper align="center" justify="center" onContextMenu={onRightClick}>
       <UnitWrappers align="flex-end" justify="space-between">
         <UnitContainer>{battleState.player.render()}</UnitContainer>
         <UnitContainer>
@@ -107,7 +114,7 @@ export const MonsterBattle = observer(() => {
       <EndTurnButton onClick={() => battleState.endTurn()}>
         <Typography fontSize={25}>End Turn</Typography>
       </EndTurnButton>
-      <ManaAmount>
+      <ManaAmount notEnoughMana={battleState.currentMana === 0}>
         {battleState.currentMana}/{battleState.player.maxMana}
       </ManaAmount>
       <DrawPile onClick={() => setCardsToShow(battleState.drawPile)}>
