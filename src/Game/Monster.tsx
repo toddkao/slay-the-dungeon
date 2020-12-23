@@ -96,7 +96,7 @@ export class Monster extends Entity {
   renderIntentNumber = () => {
     switch (this.currentIntent?.type) {
       case IntentType.Attack:
-        return <> {this.damage} </>;
+        return <> {this.damage + this.extradamage} </>;
       default:
         return null;
     }

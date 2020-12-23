@@ -158,7 +158,7 @@ export class BattleState {
     this.monsters.forEach((monster) => {
       switch (monster.currentIntent?.type) {
         case IntentType.Attack:
-          this.player.takeDamage(monster.damage);
+          this.player.takeDamage(monster.damage + monster.extradamage);
           break;
         case IntentType.GainStrength:
           if (monster.currentIntent.amount) {
