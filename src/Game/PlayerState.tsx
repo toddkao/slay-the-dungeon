@@ -77,7 +77,7 @@ export class Player extends Entity {
       >
         <img src={ironclad} />
         <HealthBar
-          block={this.block}
+          block={this.currentBlock}
           health={this.health}
           maxHealth={this.maxHealth}
         />

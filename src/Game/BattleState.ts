@@ -144,7 +144,7 @@ export class BattleState {
         break;
       case CardEffectType.AddBlock:
         if (card.block && card.targetSelf) {
-          this.player.addBlock(card.block);
+          this.player.addBlock(card.block + this.player.block);
         }
         break;
       default:

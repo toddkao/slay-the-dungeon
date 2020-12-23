@@ -39,6 +39,11 @@ export class Entity {
   }
 
   @computed
+  get currentBlock() {
+    return this.entity.block;
+  }
+
+  @computed
   get health() {
     return this.entity.health ?? 0;
   }
