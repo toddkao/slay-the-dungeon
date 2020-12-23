@@ -8,6 +8,9 @@ import { BattleState } from "./BattleState";
 import { ManaCost } from "./Common";
 import { JawWorm, Louse } from "./Monster";
 import background from "../Images/background.jpg";
+import { ShowCardsModal } from "./Common/ShowCardsModal";
+import { useState } from "react";
+import { Card } from "./Card";
 
 const EndTurnButton = styled.button`
   background-color: lightgreen;
@@ -62,9 +65,26 @@ const UnitWrappers = styled(Row)`
   margin-top: 100px;
 `;
 
+const DrawPile = styled.div`
+  background-color: green;
+  padding: 20px;
+  position: absolute;
+  top: 0;
+  left: 0;
+`;
+
+const Graveyard = styled.div`
+  background-color: grey;
+  padding: 20px;
+  top: 0;
+  right: 0;
+  position: absolute;
+`;
+
 export const MonsterBattle = observer(() => {
   const battleState = new BattleState();
   const useMountEffect = (fun: () => any) => useEffect(fun, []);
+  const [cardToShow, setCardsToShow] = useState<Card[]>();
 
   useMountEffect(() => {
     const battleState = new BattleState();
@@ -90,6 +110,18 @@ export const MonsterBattle = observer(() => {
       <ManaAmount>
         {battleState.currentMana}/{battleState.player.maxMana}
       </ManaAmount>
+      <DrawPile onClick={() => setCardsToShow(battleState.drawPile)}>
+        Draw pile {battleState.drawPile.length}
+      </DrawPile>
+      <Graveyard onClick={() => setCardsToShow(battleState.graveyard)}>
+        Graveyard {battleState.graveyard.length}
+      </Graveyard>
+      {cardToShow ? (
+        <ShowCardsModal
+          cards={cardToShow}
+          onClose={() => setCardsToShow(undefined)}
+        />
+      ) : null}
       {/* <button onClick={() => player.loseHealth()}>
         Lose Health
       </button>

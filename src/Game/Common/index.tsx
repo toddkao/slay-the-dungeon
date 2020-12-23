@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Row } from "../../Layout";
 import { Typography } from "../../Typography";
 import { ShowCardsModal } from "./ShowCardsModal";
+import redEnergy from "../../Images/redenergy.png";
 
 const Bar = styled(Row)`
   position: relative;
@@ -37,34 +38,37 @@ const HealthNumber = styled(Typography).attrs({
 `;
 
 interface IHealthBarProps {
-  health: number,
-  block?: number,
-  maxHealth: number,
+  health: number;
+  block?: number;
+  maxHealth: number;
 }
 
 export const HealthBar = observer((props: IHealthBarProps) => (
   <Bar>
     <HealthNumber>
-      {props.health}{props.block? `(${props.block})` : ''} / {props.maxHealth}
+      {props.health}
+      {props.block ? `(${props.block})` : ""} / {props.maxHealth}
     </HealthNumber>
     <Health healthPercentage={(props.health / props.maxHealth) * 100} />
   </Bar>
 ));
 
-
-export const ManaCost = styled(Typography).attrs({
-  fontSize: 20,
-})`
+export const ManaCost = styled.div`
+  background: url(${redEnergy});
+  background-size: cover;
+  font-size: 22px;
   display: flex;
   justify-content: center;
   align-items: center;
-  top: 0;
-  left: 0;
+  top: -15px;
+  left: -5px;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  background-color: orange;
+  width: 60px;
+  height: 60px;
   position: absolute;
+  color: white;
+  text-shadow: -1px -1px 0 #000, 0 -1px 0 #000, 1px -1px 0 #000, 1px 0 0 #000,
+    1px 1px 0 #000, 0 1px 0 #000, -1px 1px 0 #000, -1px 0 0 #000;
 `;
 
 export const CardsModal = ShowCardsModal;

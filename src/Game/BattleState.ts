@@ -96,22 +96,32 @@ export class BattleState {
     return this.battleState.drawPile;
   }
 
+  @computed
+  get graveyard() {
+    return this.battleState.graveyard;
+  }
+
   private getCardFromId = (cardId: string) => {
     return this.player.deck.find((card) => card.id === cardId);
   };
 
   private drawCards = action((cards: Card[]) => {
-    cards.forEach((card) => {
-      this.battleState.drawPile = this.player.deck.filter(
-        (card) => !cards.map((card) => card.id).includes(card.id)
-      );
-      this.battleState.currentHand.push(card);
-    });
+    if (this.battleState.drawPile.length === 0) {
+      this.initializeHand();
+    } else {
+      cards.forEach((card) => {
+        this.battleState.drawPile = this.battleState.drawPile.filter(
+          (card) => !cards.map((card) => card.id).includes(card.id)
+        );
+        this.battleState.currentHand.push(card);
+      });
+    }
   });
 
   private initializeHand = action(() => {
     this.battleState.drawPile = this.player.deck;
     this.drawRandomCards(5);
+    this.battleState.graveyard = [];
   });
 
   private drawRandomCards = action((number: number) => {
