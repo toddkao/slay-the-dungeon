@@ -26,11 +26,14 @@ const HealthNumber = styled(Typography).attrs({
   position: absolute;
   transform: translateX(-50%);
   left: 50%;
-  top: -5px;
+  top: -7px;
   margin: 0;
   color: white;
   white-space: nowrap;
   z-index: 1;
+  background-color: black;
+  border-radius: 5px;
+  padding: 3px;
 `;
 
 interface IHealthBarProps {

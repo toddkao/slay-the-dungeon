@@ -26,7 +26,7 @@ const EndTurnButton = styled.button`
 const ManaAmount = styled(ManaCost)`
   position: absolute;
   left: 15%;
-  top: 33%;
+  top: 40%;
 `;
 
 const Wrapper = styled(Row)`
@@ -41,9 +41,8 @@ const Wrapper = styled(Row)`
 const UnitContainer = styled(Row).attrs({
   align: "flex-end",
 })`
-  top: 50vh;
-  gap: 10px;
-  height: 200px;
+  top: 80vh;
+  gap: 30px;
 `;
 
 const CurrentHandContainer = styled(Row).attrs({
@@ -58,6 +57,11 @@ const CurrentHandContainer = styled(Row).attrs({
   left: 50%;
 `;
 
+const UnitWrappers = styled(Row)`
+  width: 100%;
+  margin-top: 100px;
+`;
+
 export const MonsterBattle = observer(() => {
   const battleState = new BattleState();
   const useMountEffect = (fun: () => any) => useEffect(fun, []);
@@ -66,14 +70,17 @@ export const MonsterBattle = observer(() => {
     const battleState = new BattleState();
     battleState.setMonsters([Louse(uniqueId()), Louse(uniqueId())]);
   });
+
   return (
-    <Wrapper align="center" justify="space-between">
-      <UnitContainer>{battleState.player.render()}</UnitContainer>
-      <UnitContainer>
-        {new BattleState().monsters.map((monster) =>
-          monster.render(monster.id)
-        )}
-      </UnitContainer>
+    <Wrapper align="center" justify="center">
+      <UnitWrappers align="flex-end" justify="space-between">
+        <UnitContainer>{battleState.player.render()}</UnitContainer>
+        <UnitContainer>
+          {new BattleState().monsters.map((monster) =>
+            monster.render(monster.id)
+          )}
+        </UnitContainer>
+      </UnitWrappers>
       <CurrentHandContainer>
         {battleState.currentHand.map((card) => card.render(card.id))}
       </CurrentHandContainer>

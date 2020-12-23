@@ -42,7 +42,8 @@ interface IMonster {
 
 const MonsterWrapper = styled(Column)<{ selected: boolean; disabled: boolean }>`
   position: relative;
-  height: 110px;
+  height: 100%;
+  width: 100%;
   ${({ selected }) => (selected ? "outline: 2px solid green;" : "")}
   ${({ disabled }) =>
     disabled
