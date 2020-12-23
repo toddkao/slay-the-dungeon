@@ -13,11 +13,22 @@ const GlobalStyle = createGlobalStyle`
         url('../src/Typography/Kreon-VariableFont_wght.ttf') format('truetype'), /* Safari, Android, iOS */
   }
 
-  body {
+  body, html {
     margin: 0;
   }
+  
   * {
     font-family: 'Kreon, serif';
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+
+    /*
+      Introduced in IE 10.
+      See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+    */
+    -ms-user-select: none;
+    user-select: none;
   }
 `;
 

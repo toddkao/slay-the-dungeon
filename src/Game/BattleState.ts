@@ -210,7 +210,7 @@ export class BattleState {
     this.drawRandomCards(5);
   });
 
-  selectCard = action((id: string) => {
+  selectCard = action((id: string | undefined) => {
     this.battleState.selectedCardId = id;
     this.selectMonster(undefined);
   });

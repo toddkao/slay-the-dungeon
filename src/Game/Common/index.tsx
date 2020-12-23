@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { Row } from "../../Layout";
 import { Typography } from "../../Typography";
 import { ShowCardsModal } from "./ShowCardsModal";
@@ -53,7 +53,7 @@ export const HealthBar = observer((props: IHealthBarProps) => (
   </Bar>
 ));
 
-export const ManaCost = styled.div`
+export const ManaCost = styled.div<{ notEnoughMana: boolean }>`
   background: url(${redEnergy});
   background-size: cover;
   font-size: 22px;
@@ -66,7 +66,14 @@ export const ManaCost = styled.div`
   width: 60px;
   height: 60px;
   position: absolute;
-  color: white;
+  ${({ notEnoughMana }) =>
+    notEnoughMana
+      ? css`
+          color: red;
+        `
+      : css`
+          color: white;
+        `};
   text-shadow: -1px -1px 0 #000, 0 -1px 0 #000, 1px -1px 0 #000, 1px 0 0 #000,
     1px 1px 0 #000, 0 1px 0 #000, -1px 1px 0 #000, -1px 0 0 #000;
 `;
