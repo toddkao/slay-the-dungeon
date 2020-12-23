@@ -114,6 +114,10 @@ export class Entity {
     this.entity.block += amount;
   });
 
+  clearBlock = action(() => {
+    this.entity.block = 0;
+  });
+
   constructor(
     private entity: DeepPartial<IEntity> = {
       health: 0,

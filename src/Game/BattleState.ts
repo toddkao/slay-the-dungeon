@@ -196,6 +196,7 @@ export class BattleState {
     this.resolveMonsterActions();
     this.battleState.currentMana = this.player.maxMana;
     this.removeCardsFromHand(this.currentHand);
+    this.player.clearBlock();
     this.drawRandomCards(5);
   });
 
