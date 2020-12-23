@@ -45,8 +45,8 @@ export class Player extends Entity {
     }
   ) {
     super({ ...stats });
-    times(5, () => stats.deck.push(Strike(uniqueId())));
-    times(5, () => stats.deck.push(Defend(uniqueId())));
+    times(6, () => stats.deck.push(Strike(uniqueId())));
+    times(6, () => stats.deck.push(Defend(uniqueId())));
     this.gainStrength(1);
     this.gainDexterity(1);
   }
