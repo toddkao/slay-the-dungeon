@@ -1739,6 +1739,11 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
+"@types/chance@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@types/chance/-/chance-1.1.1.tgz#2e06aeaf58130470f2dfe96017cdbc403de002f9"
+  integrity sha512-Ze94JMnM33+dj/tQCWxXWaQ80uYmV9HwydTyrbHAiBa91ETQuI+3iF5OFPicDpQx+md+/6rDpTp9I2VKOGOtpw==
+
 "@types/eslint@^7.2.4":
   version "7.2.5"
   resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-7.2.5.tgz#92172ecf490c2fce4b076739693d75f30376d610"
