@@ -1,11 +1,15 @@
-import { observable } from "mobx";
+import { computed } from "mobx";
 import { Card, Defend, Strike } from "./Card";
-import { sampleSize, times } from "lodash";
+import { times, uniqueId } from "lodash";
 import ironclad from "../Images/ironclad.png";
 import { Singleton } from "@taipescripeto/singleton";
-import { Column } from "../Layout";
+import { Column, Spacer } from "../Layout";
 import React from "react";
 import { HealthBar } from "./Common";
+import styled, { css } from "styled-components";
+import { BattleState } from "./BattleState";
+import { Entity } from "./Common/entity";
+import { StatusBar } from "./Common/StatusBar";
 
 export enum PlayerClass {
   Ironclad,
@@ -13,53 +17,73 @@ export enum PlayerClass {
 }
 
 interface IPlayer {
+  maxMana: number;
   health: number;
-  maxHealth: number;
-  mana: number;
   class: PlayerClass;
   deck: Card[];
-
-  // While playing
-  drawPile: Card[];
-  hand: Card[];
-  graveyard: Card[];
 }
 
+const PlayerWrapper = styled(Column)<{ disable: boolean }>`
+  ${({ disable }) =>
+    disable
+      ? ""
+      : css`
+          &:hover {
+            outline: 2px solid green;
+          }
+        `}
+`;
+
 @Singleton()
-export class Player {
+export class Player extends Entity {
+  constructor(
+    private stats: IPlayer = {
+      health: 80,
+      maxMana: 3,
+      class: PlayerClass.Ironclad,
+      deck: [],
+    }
+  ) {
+    super({ ...stats });
+    times(5, () => stats.deck.push(Strike(uniqueId())));
+    times(5, () => stats.deck.push(Defend(uniqueId())));
+    this.gainStrength(1);
+    this.gainDexterity(1);
+  }
+
+  @computed
+  get maxMana() {
+    return this.stats.maxMana;
+  }
+
+  @computed
+  get deck() {
+    return this.stats.deck;
+  }
 
   render = () => {
+    const battleState = new BattleState();
+    if (this.health === 0) {
+      return null;
+    }
     return (
-      <Column>
+      <PlayerWrapper
+        disable={battleState.targetSelf}
+        onClick={() => {
+          if (battleState.targetSelf) {
+            battleState.playSelectedCard();
+          }
+        }}
+      >
         <img src={ironclad} />
-        <HealthBar health={this.stats.health} maxHealth={this.stats.maxHealth} />
-      </Column>
+        <HealthBar
+          block={this.block}
+          health={this.health}
+          maxHealth={this.maxHealth}
+        />
+        <Spacer size={10} />
+        <StatusBar statuses={this.statuses} />
+      </PlayerWrapper>
     );
   };
-
-  newHand = () => {
-    const randomCards = sampleSize(this.stats.deck, 5);
-    randomCards.forEach(card => {
-      this.stats.hand.push(card)
-    })
-  };
-
-  newTurn = () => {};
-
-  constructor(
-    public stats: IPlayer = observable({
-      health: 80,
-      maxHealth: 80,
-      mana: 3,
-      deck: [],
-      class: PlayerClass.Ironclad,
-      hand: [],
-      drawPile: [],
-      graveyard: [],
-    })
-  ) {
-
-    times(5, () => stats.deck.push(Strike));
-    times(5, () => stats.deck.push(Defend));
-  }
 }
