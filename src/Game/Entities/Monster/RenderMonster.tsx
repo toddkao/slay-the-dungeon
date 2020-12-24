@@ -4,7 +4,7 @@ import styled, { css } from "styled-components";
 import { Column, Spacer } from "../../../Layout";
 import { Typography } from "../../../Typography";
 import { Battle } from "../../Battle/Battle";
-import { HealthBar } from "../../Common";
+import { HealthBar } from "../../Common/HealthBar";
 import { StatusBar } from "../../Common/StatusBar";
 import { IntentType, Monster } from "./Monster";
 
@@ -13,7 +13,11 @@ export const RenderMonster = observer(
     const battleState = new Battle();
 
     const {
-      get: { id, currentIntent, damage, health, maxHealth, image, statuses },
+      get: { id, currentIntent, damage, image },
+      statuses,
+      health,
+      maxHealth,
+      extradamage,
     } = monsterState;
 
     if (health === 0) {
@@ -24,7 +28,7 @@ export const RenderMonster = observer(
       switch (currentIntent?.type) {
         case IntentType.Attack:
           return (
-            <IntentNumber> {damage + monsterState.extradamage} </IntentNumber>
+            <IntentNumber> {damage + extradamage} </IntentNumber>
           );
         default:
           return null;
@@ -60,7 +64,7 @@ export const RenderMonster = observer(
           draggable={false}
           alt="monster"
         />
-        <HealthBar health={monsterState.get.health} maxHealth={maxHealth} />
+        <HealthBar health={health} maxHealth={maxHealth} />
         <Spacer size={10} />
         <StatusBar statuses={statuses as any} />
       </MonsterWrapper>

@@ -20,7 +20,7 @@ export function StartMenu() {
           Select your character
         </Typography>
         <Link to="/battle" >
-          <RenderPlayer />
+          <RenderPlayer playerState={player} />
         </Link>
       </Column>
     </Wrapper>
