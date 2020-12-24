@@ -22,7 +22,7 @@ export class Battle {
     private battleState: IBattleState = observable({
       selectedCardId: undefined,
       selectedMonsterId: undefined,
-      currentMana: new Player().get.maxMana,
+      currentMana: new Player().maxMana,
       monsters: [],
       currentHand: [],
       drawPile: [],
@@ -227,7 +227,7 @@ export class Battle {
   });
 
   private resolveGameActions = action(() => {
-    this.battleState.currentMana = this.player.get.maxMana;
+    this.battleState.currentMana = this.player.maxMana;
     this.removeCardsFromHand(this.currentHand);
     this.drawRandomCards(5);
   });

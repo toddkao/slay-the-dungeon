@@ -38,7 +38,7 @@ export const RenderBattle = observer(() => {
     <Wrapper align="center" justify="center" onContextMenu={onRightClick}>
       <UnitWrappers align="flex-end" justify="space-between">
         <UnitContainer>
-          <RenderPlayer />
+          <RenderPlayer playerState={battleState.player} />
         </UnitContainer>
         <UnitContainer>
           {new Battle().monsters.map((monster) => (
@@ -55,7 +55,7 @@ export const RenderBattle = observer(() => {
         <Typography fontSize={25}>End Turn</Typography>
       </EndTurnButton>
       <ManaAmount notEnoughMana={battleState.currentMana === 0}>
-        {battleState.currentMana}/{battleState.player.get.maxMana}
+        {battleState.currentMana}/{battleState.player.maxMana}
       </ManaAmount>
       <DrawPile onClick={() => setCardsToShow(battleState.drawPile)}>
         {/* {battleState.drawPile.length} */}

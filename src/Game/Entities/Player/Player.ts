@@ -38,6 +38,11 @@ export class Player extends Entity {
   get get() {
     return this.stats;
   }
+
+  @computed
+  get maxMana() {
+    return this.stats.maxMana;
+  }
 }
 
 interface IPlayer extends IEntity {
