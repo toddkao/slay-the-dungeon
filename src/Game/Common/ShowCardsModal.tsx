@@ -5,6 +5,7 @@ import { Row } from "../../Layout";
 import { Card } from "../Cards/Card";
 import { Modal } from "./Modal";
 import cancelButton from "../../Images/cancel-button.png";
+import { RenderCard } from "../Cards/RenderCard";
 
 const ReturnButton = styled.div`
   font-size: 30px;
@@ -41,9 +42,7 @@ export const ShowCardsModal = observer((props: IProps) => {
   return (
     <Modal>
       <ReturnButton onClick={props.onClose}>Return</ReturnButton>
-      <CardRow>
-        {props.cards.map((card) => card.render(`show-cards-${card.id}`))}
-      </CardRow>
+      <CardRow>{props.cards.map((card) => <RenderCard cardState={card} />)}</CardRow>
     </Modal>
   );
 });

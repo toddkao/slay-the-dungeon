@@ -40,7 +40,7 @@ export class BattleState {
   @computed
   get targetSelf() {
     return (
-      this.selectedCard?.targetEnemy === false ||
+      this.selectedCard?.get.targetEnemy === false ||
       this.selectedCardId === undefined
     );
   }
@@ -48,7 +48,7 @@ export class BattleState {
   @computed
   get targetEnemy() {
     return (
-      this.selectedCard?.targetEnemy === true ||
+      this.selectedCard?.get.targetEnemy === true ||
       this.selectedCardId === undefined
     );
   }
@@ -67,7 +67,7 @@ export class BattleState {
 
   @computed
   get selectedCardManaCost(): number {
-    return this.selectedCard?.manaCost ?? 0;
+    return this.selectedCard?.get.manaCost ?? 0;
   }
 
   @computed
@@ -103,7 +103,7 @@ export class BattleState {
   }
 
   private getCardFromId = (cardId: string) => {
-    return this.player.deck.find((card) => card.id === cardId);
+    return this.player.deck.find((card) => card.get.id === cardId);
   };
 
   private drawCards = action((cards: Card[]) => {
@@ -112,7 +112,7 @@ export class BattleState {
     } else {
       cards.forEach((card) => {
         this.battleState.drawPile = this.battleState.drawPile.filter(
-          (card) => !cards.map((card) => card.id).includes(card.id)
+          (card) => !cards.map((card) => card.get.id).includes(card.get.id)
         );
         this.battleState.currentHand.push(card);
       });
@@ -133,19 +133,28 @@ export class BattleState {
   private removeCardsFromHand = (cards: Card[]) => {
     cards.forEach((cardToRemove) => {
       this.battleState.currentHand = this.battleState.currentHand.filter(
-        (card) => card.id !== cardToRemove.id
+        (card) => card.get.id !== cardToRemove.get.id
       );
       this.battleState.graveyard.push(cardToRemove);
     });
   };
 
   private resolveTargetedCard = action((card: Card) => {
-    switch (card.effect) {
+    switch (card.get.effect) {
       case CardEffectType.SingleTarget:
-        if (card.damage && this.selectedMonster) {
-          this.selectedMonster.takeDamage(this.calculateDamage({ damage: card.damage, extradamage: this.player.extradamage, statuses: this.selectedMonster.statuses }));
-          if (card.status && this.selectedMonster) {
-            this.selectedMonster.addStatus(card.status.type, card.status.amount);
+        if (card.get.damage && this.selectedMonster) {
+          this.selectedMonster.takeDamage(
+            this.calculateDamage({
+              damage: card.get.damage,
+              extradamage: this.player.extradamage,
+              statuses: this.selectedMonster.statuses,
+            })
+          );
+          if (card.get.status && this.selectedMonster) {
+            this.selectedMonster.addStatus(
+              card.get.status.type,
+              card.get.status.amount
+            );
           }
           if (this.selectedMonster.health === 0) {
             this.setMonsters(
@@ -157,8 +166,8 @@ export class BattleState {
         }
         break;
       case CardEffectType.AddBlock:
-        if (card.block && card.targetSelf) {
-          this.player.addBlock(card.block + this.player.extrablock);
+        if (card.get.block && card.get.targetSelf) {
+          this.player.addBlock(card.get.block + this.player.extrablock);
         }
         break;
       default:
@@ -166,16 +175,28 @@ export class BattleState {
     }
   });
 
-  private calculateDamage = action(({ damage, extradamage = 0, statuses }: { damage: number, extradamage?: number, statuses: IStatus[] }) => {
-    let amount = damage + extradamage;
-    const vulnerable = statuses?.find(s => s.type === StatusType.vulnerable);
-    if (vulnerable && vulnerable.amount && vulnerable.amount >= 1) {
-      amount = Math.floor(amount * 1.5);
-    }
+  private calculateDamage = action(
+    ({
+      damage,
+      extradamage = 0,
+      statuses,
+    }: {
+      damage: number;
+      extradamage?: number;
+      statuses: IStatus[];
+    }) => {
+      let amount = damage + extradamage;
+      const vulnerable = statuses?.find(
+        (s) => s.type === StatusType.vulnerable
+      );
+      if (vulnerable && vulnerable.amount && vulnerable.amount >= 1) {
+        amount = Math.floor(amount * 1.5);
+      }
 
-    console.log("test", amount, vulnerable);
-    return amount;
-  });
+      console.log("test", amount, vulnerable);
+      return amount;
+    }
+  );
 
   private resolveMonsterActions = action(() => {
     this.monsters.forEach((monster) => {
@@ -185,7 +206,10 @@ export class BattleState {
           break;
         case IntentType.GainStrength:
           if (monster.currentIntent.amount) {
-            monster.addStatus(StatusType.strength, monster.currentIntent.amount)
+            monster.addStatus(
+              StatusType.strength,
+              monster.currentIntent.amount
+            );
           }
           break;
         default:
