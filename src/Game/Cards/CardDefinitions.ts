@@ -2,6 +2,8 @@ import strike from "../../Images/strike.png";
 import defend from "../../Images/defend.png";
 import { Card, CardEffectType, CardType } from "./Card";
 import { StatusType } from "../Common/StatusBar";
+// @ts-ignore
+import fastAtk from '../../Audio/fastAtk.ogg';
 
 const Strike = (id: string) =>
     new Card({
@@ -15,6 +17,7 @@ const Strike = (id: string) =>
         description: `Deal {} damage`,
         descriptionVariables: ["damage"],
         targetEnemy: true,
+        audio: fastAtk,
     });
 
 const Bash = (id: string) =>
