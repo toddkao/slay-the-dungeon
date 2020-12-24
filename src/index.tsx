@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { Router } from "./Router";
 import { BrowserRouter } from "react-router-dom";
 import { createGlobalStyle } from "styled-components";
+import cursor from './Images/cursor.png';
 
 const GlobalStyle = createGlobalStyle`
   @font-face {
@@ -15,6 +16,7 @@ const GlobalStyle = createGlobalStyle`
 
   body, html {
     margin: 0;
+    cursor: url(${cursor}), default;
   }
   
   * {
