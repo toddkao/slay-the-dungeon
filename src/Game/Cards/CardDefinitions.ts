@@ -93,4 +93,8 @@ const Defend = (id: string) =>
     audio: addBlock,
   });
 
-export const cardList = { strike: Strike, defend: Defend, bash: Bash };
+export const cardMap = {
+  strike: Strike,
+  defend: Defend,
+  bash: Bash
+};

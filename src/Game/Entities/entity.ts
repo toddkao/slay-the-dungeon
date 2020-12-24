@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed } from "mobx";
 import { IStatus, StatusType, StatusTypeToIStatus } from "../Common/StatusBar";
 
 export interface IEntity {
@@ -12,74 +12,73 @@ export interface IEntity {
 
 export class Entity {
   @computed
-  get id() {
-    return this.entity.id;
-  }
-
-  @computed
-  get damage() {
-    return this.entity.damage ?? 0;
-  }
-
-  @computed
-  get block() {
-    return this.entity.block ?? 0;
+  get get() {
+    return this.entity;
   }
 
   @computed
   get extradamage() {
-    return this.statuses.find(findStatus => findStatus.type === StatusType.strength)?.amount ?? 0;
+    return (
+      this.get.statuses.find(
+        (findStatus) => findStatus.type === StatusType.strength
+      )?.amount ?? 0
+    );
   }
 
   @computed
   get extrablock() {
-    return this.statuses.find(findStatus => findStatus.type === StatusType.dexterity)?.amount ?? 0;;
-  }
-
-  @computed
-  get health() {
-    return this.entity.health ?? 0;
-  }
-
-  @computed
-  get maxHealth() {
-    return this.entity.maxHealth ?? 0;
-  }
-
-  @computed
-  get statuses() {
-    return this.entity.statuses;
+    return (
+      this.get.statuses.find(
+        (findStatus) => findStatus.type === StatusType.dexterity
+      )?.amount ?? 0
+    );
   }
 
   public addStatus = action((type: StatusType, amount: number = 1) => {
-    const statusFound = this.statuses.find(status => status.type === type);
+    const statusFound = this.get.statuses.find(
+      (status) => status.type === type
+    );
     if (statusFound) {
-      this.entity.statuses = this.statuses.map(status => status.type === type ? { ...status, amount: status.amount + amount } : status)
-    }
-    else {
-      this.entity.statuses.push({ type, amount, degrades: StatusTypeToIStatus[type].degrades });
+      this.entity.statuses = this.get.statuses.map((status) =>
+        status.type === type
+          ? { ...status, amount: status.amount + amount }
+          : status
+      );
+    } else {
+      this.entity.statuses.push({
+        type,
+        amount,
+        degrades: StatusTypeToIStatus[type].degrades,
+      });
     }
   });
 
   public updateStatuses = action(() => {
-    this.entity.statuses = this.statuses.map(status => status.degrades ? ({ ...status, amount: (status.amount ?? 0) - 1 }) : status);
+    this.entity.statuses = this.get.statuses.map((status) =>
+      status.degrades ? { ...status, amount: (status.amount ?? 0) - 1 } : status
+    );
   });
 
   public takeDamage = action((amount: number) => {
-    if (this.entity.block === undefined || this.entity.health === undefined || this.entity.statuses === undefined) {
+    if (
+      this.entity.block === undefined ||
+      this.entity.health === undefined ||
+      this.entity.statuses === undefined
+    ) {
       return;
     }
 
-    const currentBlock = this.block;
+    const currentBlock = this.get.block;
 
     if (currentBlock > amount) {
       this.entity.block -= amount;
-    } else if (currentBlock + this.health > amount) {
+    } else if (currentBlock + this.get.health > amount) {
       this.entity.block = 0;
       this.entity.health -= amount - currentBlock;
     } else {
       this.entity.health = 0;
     }
+
   });
 
   public cleanupStatuses = action(() => {
@@ -87,7 +86,9 @@ export class Entity {
       return;
     }
 
-    this.entity.statuses = this.entity.statuses.filter(status => (status.amount ?? 0) > 0);
+    this.entity.statuses = this.entity.statuses.filter(
+      (status) => (status.amount ?? 0) > 0
+    );
   });
 
   public addBlock = action((amount: number) => {
@@ -102,14 +103,14 @@ export class Entity {
   });
 
   constructor(
-    private entity: IEntity = observable({
+    private entity: IEntity = {
       health: 0,
       block: 0,
       damage: 0,
       id: "",
       maxHealth: 0,
       statuses: [],
-    })
+    }
   ) {
   }
 }

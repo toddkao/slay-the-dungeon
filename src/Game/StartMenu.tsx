@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { Column, Row } from '../Layout';
 import { Typography } from '../Typography';
 import { Link } from 'react-router-dom';
-import { Player } from './Entities/Player';
+import { Player } from './Entities/Player/Player';
+import { RenderPlayer } from './Entities/Player/RenderPlayer';
 
 const Wrapper = styled(Row)`
   width: 100vw;
@@ -19,7 +20,7 @@ export function StartMenu() {
           Select your character
         </Typography>
         <Link to="/battle" >
-          { player.render() }
+          <RenderPlayer />
         </Link>
       </Column>
     </Wrapper>

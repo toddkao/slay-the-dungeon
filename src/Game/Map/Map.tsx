@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { Column, Row } from "../../Layout";
 import { Modal } from "../Common/Modal";
-import { Player } from "../Entities/Player";
+import { Player } from "../Entities/Player/Player";
 import { range } from "lodash";
 import { ArrowArea } from "react-arrow-master";
 

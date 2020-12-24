@@ -1,10 +1,10 @@
 import { Singleton } from "@taipescripeto/singleton";
 import { sampleSize } from "lodash";
 import { action, computed, observable } from "mobx";
-import { Card, CardEffectType } from "./Cards/Card";
-import { IStatus, StatusType } from "./Common/StatusBar";
-import { IntentType, Monster } from "./Entities/Monster";
-import { Player } from "./Entities/Player";
+import { Card, CardEffectType } from "../Cards/Card";
+import { IStatus, StatusType } from "../Common/StatusBar";
+import { IntentType, Monster } from "../Entities/Monster/Monster";
+import { Player } from "../Entities/Player/Player";
 
 interface IBattleState {
   selectedCardId: string | undefined;
@@ -16,13 +16,13 @@ interface IBattleState {
   graveyard: Card[];
 }
 @Singleton()
-export class BattleState {
+export class Battle {
   player = new Player();
   constructor(
     private battleState: IBattleState = observable({
       selectedCardId: undefined,
       selectedMonsterId: undefined,
-      currentMana: new Player().maxMana,
+      currentMana: new Player().get.maxMana,
       monsters: [],
       currentHand: [],
       drawPile: [],
@@ -78,7 +78,7 @@ export class BattleState {
   @computed
   get selectedMonster() {
     return this.monsters.find(
-      (monster) => monster.id === this.battleState.selectedMonsterId
+      (monster) => monster.get.id === this.battleState.selectedMonsterId
     );
   }
 
@@ -103,7 +103,7 @@ export class BattleState {
   }
 
   private getCardFromId = (cardId: string) => {
-    return this.player.deck.find((card) => card.get.id === cardId);
+    return this.player.get.deck.find((card) => card.get.id === cardId);
   };
 
   private drawCards = action((cards: Card[]) => {
@@ -120,7 +120,7 @@ export class BattleState {
   });
 
   private initializeHand = action(() => {
-    this.battleState.drawPile = this.player.deck;
+    this.battleState.drawPile = this.player.get.deck;
     this.drawRandomCards(5);
     this.battleState.graveyard = [];
   });
@@ -147,7 +147,7 @@ export class BattleState {
             this.calculateDamage({
               damage: card.get.damage,
               extradamage: this.player.extradamage,
-              statuses: this.selectedMonster.statuses,
+              statuses: this.selectedMonster.get.statuses,
             })
           );
           if (card.get.status && this.selectedMonster) {
@@ -156,10 +156,10 @@ export class BattleState {
               card.get.status.amount
             );
           }
-          if (this.selectedMonster.health === 0) {
+          if (this.selectedMonster.get.health === 0) {
             this.setMonsters(
               this.monsters.filter(
-                (monster) => monster.id !== this.selectedMonsterId
+                (monster) => monster.get.id !== this.selectedMonsterId
               )
             );
           }
@@ -193,22 +193,21 @@ export class BattleState {
         amount = Math.floor(amount * 1.5);
       }
 
-      console.log("test", amount, vulnerable);
       return amount;
     }
   );
 
   private resolveMonsterActions = action(() => {
     this.monsters.forEach((monster) => {
-      switch (monster.currentIntent?.type) {
+      switch (monster.get.currentIntent?.type) {
         case IntentType.Attack:
-          this.player.takeDamage(this.calculateDamage(monster));
+          this.player.takeDamage(this.calculateDamage(monster.get));
           break;
         case IntentType.GainStrength:
-          if (monster.currentIntent.amount) {
+          if (monster.get.currentIntent.amount) {
             monster.addStatus(
               StatusType.strength,
-              monster.currentIntent.amount
+              monster.get.currentIntent.amount
             );
           }
           break;
@@ -228,7 +227,7 @@ export class BattleState {
   });
 
   private resolveGameActions = action(() => {
-    this.battleState.currentMana = this.player.maxMana;
+    this.battleState.currentMana = this.player.get.maxMana;
     this.removeCardsFromHand(this.currentHand);
     this.drawRandomCards(5);
   });
