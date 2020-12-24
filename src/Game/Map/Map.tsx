@@ -33,8 +33,8 @@ export function Map() {
                 <MapNode
                   key={index}
                   style={{
-                    left: (Math.floor(Math.random() * 30) + 150) * (index + 1),
-                    top: (Math.floor(Math.random() * 30) + 100),
+                    left: (Math.floor(Math.random() * 60) + 150) * (index + 1),
+                    top: (Math.floor(Math.random() * 60) + 100),
                   }}
                 />
               ))}
