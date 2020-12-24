@@ -12,6 +12,7 @@ import { ShowCardsModal } from "./Common/ShowCardsModal";
 import { useState } from "react";
 import { Deck } from "./Common/deck";
 import { Card } from "./Cards/Card";
+import { RenderCard } from "./Cards/RenderCard";
 
 const EndTurnButton = styled.button`
   background-color: lightgreen;
@@ -105,7 +106,9 @@ export const MonsterBattle = observer(() => {
         </UnitContainer>
       </UnitWrappers>
       <CurrentHandContainer>
-        {battleState.currentHand.map((card) => card.render(card.id))}
+        {battleState.currentHand.map((card) => (
+          <RenderCard cardState={card} />
+        ))}
       </CurrentHandContainer>
       <EndTurnButton onClick={() => battleState.endTurn()}>
         <Typography fontSize={25}>End Turn</Typography>
