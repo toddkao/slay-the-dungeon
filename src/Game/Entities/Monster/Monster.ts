@@ -4,7 +4,7 @@ import { Entity, IEntity } from "../entity";
 
 export class Monster extends Entity {
   constructor(private monster: IMonster) {
-    super({ ...monster });
+    super(monster);
     this.pickRandomIntent();
   }
 

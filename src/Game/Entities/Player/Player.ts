@@ -26,7 +26,7 @@ export class Player extends Entity {
       id: uniqueId(),
     })
   ) {
-    super({...stats});
+    super(stats);
     times(6, () => stats.deck.push(cardMap.bash(uniqueId())));
     times(6, () => stats.deck.push(cardMap.strike(uniqueId())));
     times(6, () => stats.deck.push(cardMap.defend(uniqueId())));

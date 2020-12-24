@@ -250,6 +250,7 @@ export class Battle {
     this.useMana(this.selectedCardManaCost);
     this.selectedCard.playAudioClip();
     this.resolveTargetedCard(this.selectedCard);
+    this.selectCard(undefined);
   });
 
   public endTurn = action(() => {
