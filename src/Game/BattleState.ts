@@ -1,9 +1,10 @@
 import { Singleton } from "@taipescripeto/singleton";
 import { sampleSize } from "lodash";
 import { action, computed, observable } from "mobx";
-import { Card, CardEffectType } from "./Card";
-import { IntentType, Monster } from "./Monster";
-import { Player } from "./PlayerState";
+import { Card, CardEffectType } from "./Cards/Card";
+import { IStatus, StatusType } from "./Common/StatusBar";
+import { IntentType, Monster } from "./Entities/Monster";
+import { Player } from "./Entities/Player";
 
 interface IBattleState {
   selectedCardId: string | undefined;
@@ -140,11 +141,12 @@ export class BattleState {
 
   private resolveTargetedCard = action((card: Card) => {
     switch (card.effect) {
-      case CardEffectType.SingleTargetAttack:
+      case CardEffectType.SingleTarget:
         if (card.damage && this.selectedMonster) {
-          this.selectedMonster.takeDamage(
-            card.damage + this.player.extradamage
-          );
+          this.selectedMonster.takeDamage(this.calculateDamage({ damage: card.damage, extradamage: this.player.extradamage, statuses: this.selectedMonster.statuses }));
+          if (card.status && this.selectedMonster) {
+            this.selectedMonster.addStatus(card.status.type, card.status.amount);
+          }
           if (this.selectedMonster.health === 0) {
             this.setMonsters(
               this.monsters.filter(
@@ -164,22 +166,47 @@ export class BattleState {
     }
   });
 
+  private calculateDamage = action(({ damage, extradamage = 0, statuses }: { damage: number, extradamage?: number, statuses: IStatus[] }) => {
+    let amount = damage + extradamage;
+    const vulnerable = statuses?.find(s => s.type === StatusType.vulnerable);
+    if (vulnerable && vulnerable.amount && vulnerable.amount >= 1) {
+      amount = Math.floor(amount * 1.5);
+    }
+
+    console.log("test", amount, vulnerable);
+    return amount;
+  });
+
   private resolveMonsterActions = action(() => {
     this.monsters.forEach((monster) => {
       switch (monster.currentIntent?.type) {
         case IntentType.Attack:
-          this.player.takeDamage(monster.damage + monster.extradamage);
+          this.player.takeDamage(this.calculateDamage(monster));
           break;
         case IntentType.GainStrength:
           if (monster.currentIntent.amount) {
-            monster.gainStrength(monster.currentIntent.amount);
+            monster.addStatus(StatusType.strength, monster.currentIntent.amount)
           }
           break;
         default:
           break;
       }
+      monster.updateStatuses();
+      monster.cleanupStatuses();
       monster.pickRandomIntent();
     });
+  });
+
+  private resolvePlayerActions = action(() => {
+    this.player.cleanupStatuses();
+    this.player.updateStatuses();
+    this.player.clearBlock();
+  });
+
+  private resolveGameActions = action(() => {
+    this.battleState.currentMana = this.player.maxMana;
+    this.removeCardsFromHand(this.currentHand);
+    this.drawRandomCards(5);
   });
 
   private useMana = action((amount: number) => {
@@ -188,7 +215,7 @@ export class BattleState {
     }
   });
 
-  playSelectedCard = action(() => {
+  public playSelectedCard = action(() => {
     if (
       !this.selectedCardId ||
       this.selectedCardManaCost > this.currentMana ||
@@ -201,13 +228,10 @@ export class BattleState {
     this.resolveTargetedCard(this.selectedCard);
   });
 
-  endTurn = action(() => {
-    console.log(this);
+  public endTurn = action(() => {
     this.resolveMonsterActions();
-    this.battleState.currentMana = this.player.maxMana;
-    this.removeCardsFromHand(this.currentHand);
-    this.player.clearBlock();
-    this.drawRandomCards(5);
+    this.resolvePlayerActions();
+    this.resolveGameActions();
   });
 
   selectCard = action((id: string | undefined) => {
