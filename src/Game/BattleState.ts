@@ -225,6 +225,7 @@ export class BattleState {
     }
     this.removeCardsFromHand([this.selectedCard]);
     this.useMana(this.selectedCardManaCost);
+    this.selectedCard.playAudioClip();
     this.resolveTargetedCard(this.selectedCard);
   });
 

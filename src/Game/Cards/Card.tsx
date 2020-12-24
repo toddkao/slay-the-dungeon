@@ -8,6 +8,10 @@ import { BattleState } from "../BattleState";
 import { computed } from "mobx";
 import { Player } from "../Entities/Player";
 import { IStatus } from "../Common/StatusBar";
+import { Howl } from 'howler';
+
+// @ts-ignore
+import { OGVPlayer } from 'ogv';
 
 export enum CardType {
   Attack = "Attack",
@@ -89,11 +93,14 @@ export interface ICard {
   damage?: number;
   status?: IStatus;
   block?: number;
-  image: string;
+
   targetEnemy: boolean;
 
   description: string;
   descriptionVariables?: string[];
+  // assets
+  image: string;
+  audio?: string;
 }
 
 export class Card {
@@ -137,6 +144,21 @@ export class Card {
   @computed
   get status() {
     return this.card.status;
+  }
+
+  @computed
+  get audioClip() {
+    return this.card.audio;
+  }
+
+  public playAudioClip = () => {
+    console.log(this.audioClip)
+    if (this.audioClip) {
+      const sound = new Howl({
+        src: this.audioClip,
+      })
+      sound.play();
+    }
   }
 
   render = (key: any) => {
