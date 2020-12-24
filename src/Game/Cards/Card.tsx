@@ -8,10 +8,11 @@ import { BattleState } from "../BattleState";
 import { computed } from "mobx";
 import { Player } from "../Entities/Player";
 import { IStatus } from "../Common/StatusBar";
-import { Howl } from 'howler';
+import { Howl } from "howler";
+import { CARD_WIDTH, CARD_HEIGHT } from "./CardDefinitions";
 
 // @ts-ignore
-import { OGVPlayer } from 'ogv';
+import { Sprite } from "react-spritesheet";
 
 export enum CardType {
   Attack = "Attack",
@@ -32,16 +33,15 @@ const Image = styled.div<{ src: string }>`
   height: 250px;
 `;
 
-const CardImage = styled(Image)`
+const CardSpriteContainer = styled.div`
   z-index: -1;
   position: absolute;
-  width: 150px;
-  height: 219px;
-  left: 20px;
-  top: 34px;
+  left: 46px;
+  top: 55px;
+  zoom: 0.58;
 `;
 
-const CardWrapper = styled(Column) <{ selected: boolean }>`
+const CardWrapper = styled(Column)<{ selected: boolean }>`
   position: relative;
   ${({ selected }) =>
     selected
@@ -99,12 +99,17 @@ export interface ICard {
   description: string;
   descriptionVariables?: string[];
   // assets
-  image: string;
+  image: {
+    src: string;
+    position: [number, number];
+    width: number;
+    height: number;
+  };
   audio?: string;
 }
 
 export class Card {
-  constructor(private card: ICard) { }
+  constructor(private card: ICard) {}
 
   @computed
   get id() {
@@ -152,17 +157,20 @@ export class Card {
   }
 
   public playAudioClip = () => {
-    console.log(this.audioClip)
+    console.log(this.audioClip);
     if (this.audioClip) {
       const sound = new Howl({
         src: this.audioClip,
-      })
+        volume: 0.5,
+      });
       sound.play();
     }
-  }
+  };
 
   render = (key: any) => {
     const battleState = new BattleState();
+    const { position, width, height} = this.card.image;
+    const [x, y] = position;
     return (
       <CardWrapper
         key={key}
@@ -176,7 +184,15 @@ export class Card {
         <RenderCardName>{this.card.name}</RenderCardName>
         <RenderCardType>{this.card.type}</RenderCardType>
         <RenderCardText>{this.parseCardText()}</RenderCardText>
-        <CardImage src={this.card.image} />
+        <CardSpriteContainer>
+          <Sprite
+            filename={this.card.image.src}
+            x={x * width}
+            y={y * height}
+            width={width}
+            height={height}
+          />
+        </CardSpriteContainer>
       </CardWrapper>
     );
   };

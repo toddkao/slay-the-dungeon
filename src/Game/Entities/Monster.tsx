@@ -37,6 +37,7 @@ interface IMonster extends IEntity {
 
 const MonsterWrapper = styled(Column) <{ selected: boolean; disabled: boolean }>`
   position: relative;
+  z-index: 0;
   height: 100%;
   width: 100%;
   ${({ selected }) => (selected ? "outline: 2px solid green;" : "")}

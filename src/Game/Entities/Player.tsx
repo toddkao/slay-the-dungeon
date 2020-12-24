@@ -10,7 +10,7 @@ import styled, { css } from "styled-components";
 import { BattleState } from "../BattleState";
 import { Entity } from "../Entities/entity";
 import { StatusBar, StatusType } from "../Common/StatusBar";
-import { cards } from "../Cards/CardDefinitions";
+import { cardList } from "../Cards/CardDefinitions";
 
 export enum PlayerClass {
   Ironclad,
@@ -25,6 +25,7 @@ interface IPlayer {
 }
 
 const PlayerWrapper = styled(Column) <{ disable: boolean }>`
+  z-index: 0;
   ${({ disable }) =>
     disable
       ? ""
@@ -53,9 +54,9 @@ export class Player extends Entity {
       maxHealth: stats.health,
       statuses: []
     });
-    times(6, () => stats.deck.push(cards["bash"](uniqueId())));
-    times(6, () => stats.deck.push(cards["strike"](uniqueId())));
-    times(6, () => stats.deck.push(cards["defend"](uniqueId())));
+    times(6, () => stats.deck.push(cardList.bash(uniqueId())));
+    times(6, () => stats.deck.push(cardList.strike(uniqueId())));
+    times(6, () => stats.deck.push(cardList.defend(uniqueId())));
     this.addStatus(StatusType.strength);
     this.addStatus(StatusType.dexterity);
   }
