@@ -9,13 +9,16 @@ const Wrapper = styled(Row)`
 `;
 
 const MapNode = styled.div`
+  background-color: black;
+  height: 40px;
+  width: 40px;
 `;
 
 export function Map() {
   const player = new Player();
   return (
-    <Wrapper align="center" justify="center">
+    <Modal>
       <MapNode />
-    </Wrapper>
+    </Modal>
   );
 }

@@ -6,10 +6,11 @@ import { Row } from "../Layout";
 import { Typography } from "../Typography";
 import { BattleState } from "./BattleState";
 import { ManaCost } from "./Common";
-import { JawWorm, Louse } from "./Entities/Monster";
+import { Louse } from "./Entities/Monster";
 import background from "../Images/background.jpg";
 import { ShowCardsModal } from "./Common/ShowCardsModal";
 import { useState } from "react";
+import { Deck } from "./Common/deck";
 import { Card } from "./Cards/Card";
 
 const EndTurnButton = styled.button`
@@ -66,17 +67,13 @@ const UnitWrappers = styled(Row)`
   margin-top: 100px;
 `;
 
-const DrawPile = styled.div`
-  background-color: green;
-  padding: 20px;
+const DrawPile = styled(Deck)`
   position: absolute;
   top: 0;
   left: 0;
 `;
 
-const Graveyard = styled.div`
-  background-color: grey;
-  padding: 20px;
+const Graveyard = styled(Deck)`
   top: 0;
   right: 0;
   position: absolute;
@@ -117,10 +114,10 @@ export const MonsterBattle = observer(() => {
         {battleState.currentMana}/{battleState.player.maxMana}
       </ManaAmount>
       <DrawPile onClick={() => setCardsToShow(battleState.drawPile)}>
-        Draw pile {battleState.drawPile.length}
+        {/* {battleState.drawPile.length} */}
       </DrawPile>
       <Graveyard onClick={() => setCardsToShow(battleState.graveyard)}>
-        Graveyard {battleState.graveyard.length}
+        {/* {battleState.graveyard.length} */}
       </Graveyard>
       {cardToShow ? (
         <ShowCardsModal
