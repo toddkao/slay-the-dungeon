@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { StartMenu } from './Game/StartMenu';
-import { Map } from './Game/Map';
+import { Map } from './Game/Map/Map';
 import { MonsterBattle } from './Game/MonsterBattle';
 
 export function Router() {

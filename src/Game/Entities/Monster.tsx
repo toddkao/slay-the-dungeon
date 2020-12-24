@@ -35,7 +35,7 @@ interface IMonster extends IEntity {
   effect?: any;
 }
 
-const MonsterWrapper = styled(Column) <{ selected: boolean; disabled: boolean }>`
+const MonsterWrapper = styled(Column)<{ selected: boolean; disabled: boolean }>`
   position: relative;
   z-index: 0;
   height: 100%;
@@ -52,8 +52,22 @@ const MonsterWrapper = styled(Column) <{ selected: boolean; disabled: boolean }>
 `;
 
 const MonsterIntentWrapper = styled.div`
+  @keyframes bounce {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  animation: bounce 1.5s ease-in-out infinite reverse;
+
   position: absolute;
-  transform: translateX(-50%);
+  top: -20px;
   left: 50%;
 `;
 
@@ -62,9 +76,11 @@ const IntentNumber = styled(Typography).attrs({
 })`
   position: absolute;
   color: white;
-  top: -5px;
-  right: -10px;
-  background-color: black;
+  bottom: 0;
+  left: -10px;
+  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black,
+    1px 1px 0 black;
+
   padding: 2px;
   border-radius: 50%;
   width: 20px;
@@ -133,7 +149,7 @@ export class Monster extends Entity {
           />
           {this.renderIntentNumber()}
         </MonsterIntentWrapper>
-        <img src={this.monster.image} width={100} height={100} alt="monster" />
+        <img src={this.monster.image} width={150} height={150} alt="monster" />
         <HealthBar health={this.health} maxHealth={this.maxHealth} />
         <Spacer size={10} />
         <StatusBar statuses={this.statuses as any} />

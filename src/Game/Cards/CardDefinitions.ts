@@ -5,6 +5,10 @@ import { Card, CardEffectType, CardType } from "./Card";
 import { StatusType } from "../Common/StatusBar";
 // @ts-ignore
 import fastAtk from "../../Audio/fastAtk.ogg";
+// @ts-ignore
+import heavyAtk from "../../Audio/heavyAtk.ogg";
+// @ts-ignore
+import addBlock from "../../Audio/addBlock.ogg";
 
 export const spriteToCardSize = {
   cards: {
@@ -38,7 +42,7 @@ const Strike = (id: string) =>
     },
     type: CardType.Attack,
     effect: CardEffectType.SingleTarget,
-    description: `Deal {} damage`,
+    description: `Deal {} damage.`,
     descriptionVariables: ["damage"],
     targetEnemy: true,
     audio: fastAtk,
@@ -66,6 +70,7 @@ const Bash = (id: string) =>
     description: `Deal {} damage.\nApply 2 vulnerable.`,
     descriptionVariables: ["damage"], //TODO: how to change 2 to status.amount?
     targetEnemy: true,
+    audio: heavyAtk,
   });
 
 const Defend = (id: string) =>
@@ -82,9 +87,10 @@ const Defend = (id: string) =>
     },
     type: CardType.Skill,
     effect: CardEffectType.AddBlock,
-    description: "Gain {} Block",
+    description: "Gain {} Block.",
     descriptionVariables: ["block"],
     targetEnemy: false,
+    audio: addBlock,
   });
 
 export const cardList = { strike: Strike, defend: Defend, bash: Bash };
