@@ -25,16 +25,22 @@ export function Map() {
   return (
     <Modal>
       <Column style={{ gap: 200, maxHeight: "80vh", overflow: "auto" }}>
-        {layersOfNodes.map((layer) => {
-          const randomNumberOfNodes = Math.floor(Math.random() * 3) + 2;
+        {layersOfNodes.map((layer, index) => {
+          console.log(index);
+          const randomNumberOfNodes =
+            index === 0
+              ? 1
+              : index === 15
+              ? 4
+              : Math.floor(Math.random() * 3) + 2;
           return (
-            <Row style={{ gap: 100, position: "relative", width: "40vw" }}>
+            <Row style={{ gap: 100, position: "relative", width: "60vw" }}>
               {range(0, randomNumberOfNodes).map((index) => (
                 <MapNode
                   key={index}
                   style={{
-                    left: (Math.floor(Math.random() * 60) + 150) * (index + 1),
-                    top: (Math.floor(Math.random() * 60) + 100),
+                    left: (Math.floor(Math.random() * 40) + 150) * (index + 1),
+                    top: Math.floor(Math.random() * 60) + 100,
                   }}
                 />
               ))}
