@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Row } from '../Layout';
+import { Modal } from './Common/Modal';
 import { Player } from './Entities/Player';
 
 const Wrapper = styled(Row)`
