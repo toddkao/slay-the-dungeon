@@ -27,12 +27,13 @@ const HealthNumber = styled(Typography).attrs({
   position: absolute;
   transform: translateX(-50%);
   left: 50%;
-  top: -7px;
+  top: -13px;
   margin: 0;
   color: white;
   white-space: nowrap;
   z-index: 1;
-  background-color: black;
+  text-shadow: -1px -1px 0 #000, 0 -1px 0 #000, 1px -1px 0 #000, 1px 0 0 #000,
+    1px 1px 0 #000, 0 1px 0 #000, -1px 1px 0 #000, -1px 0 0 #000;
   border-radius: 5px;
   padding: 3px;
 `;
@@ -53,10 +54,10 @@ export const HealthBar = observer((props: IHealthBarProps) => (
   </Bar>
 ));
 
-export const ManaCost = styled.div<{ notEnoughMana: boolean }>`
+export const ManaCost = styled(Typography)<{ notEnoughMana: boolean }>`
   background: url(${redEnergy});
   background-size: cover;
-  font-size: 22px;
+  font-size: 24px;
   display: flex;
   justify-content: center;
   align-items: center;

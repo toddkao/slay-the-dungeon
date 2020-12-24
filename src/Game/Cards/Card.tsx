@@ -9,7 +9,6 @@ import { computed } from "mobx";
 import { Player } from "../Entities/Player";
 import { IStatus } from "../Common/StatusBar";
 import { Howl } from "howler";
-import { CARD_WIDTH, CARD_HEIGHT } from "./CardDefinitions";
 
 // @ts-ignore
 import { Sprite } from "react-spritesheet";
@@ -58,8 +57,11 @@ const CardWrapper = styled(Column)<{ selected: boolean }>`
 `;
 
 const RenderCardName = styled(Typography)`
+  color: white;
+  text-shadow: -1px -1px 0 #000, 0 -1px 0 #000, 1px -1px 0 #000, 1px 0 0 #000,
+    1px 1px 0 #000, 0 1px 0 #000, -1px 1px 0 #000, -1px 0 0 #000;
   font-size: 16px;
-  top: 7%;
+  top: 17px;
   transform: translateX(-50%);
   left: 50%;
   position: absolute;
@@ -169,7 +171,7 @@ export class Card {
 
   render = (key: any) => {
     const battleState = new BattleState();
-    const { position, width, height} = this.card.image;
+    const { position, width, height } = this.card.image;
     const [x, y] = position;
     return (
       <CardWrapper
