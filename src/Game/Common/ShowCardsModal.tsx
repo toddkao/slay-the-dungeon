@@ -2,7 +2,7 @@ import { observer } from "mobx-react";
 import React from "react";
 import styled from "styled-components";
 import { Row } from "../../Layout";
-import { Card } from "../Card";
+import { Card } from "../Cards/Card";
 import { Modal } from "./Modal";
 
 const ReturnButton = styled.div`
@@ -27,7 +27,6 @@ interface IProps {
 }
 
 export const ShowCardsModal = observer((props: IProps) => {
-  console.log("show cards");
   return (
     <Modal>
       <ReturnButton onClick={props.onClose}>Return</ReturnButton>

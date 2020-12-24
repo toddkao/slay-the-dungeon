@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Row } from '../Layout';
-import { Player } from './PlayerState';
+import { Player } from './Entities/Player';
 
 const Wrapper = styled(Row)`
   width: 100vw;
@@ -13,7 +13,6 @@ const MapNode = styled.div`
 
 export function Map() {
   const player = new Player();
-  console.log(player);
   return (
     <Wrapper align="center" justify="center">
       <MapNode />

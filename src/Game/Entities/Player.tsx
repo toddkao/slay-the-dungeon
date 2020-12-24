@@ -1,15 +1,16 @@
 import { computed } from "mobx";
-import { Card, Defend, Strike } from "./Card";
+import { Card } from "../Cards/Card";
 import { times, uniqueId } from "lodash";
-import ironclad from "../Images/ironclad.png";
+import ironclad from "../../Images/ironclad.png";
 import { Singleton } from "@taipescripeto/singleton";
-import { Column, Spacer } from "../Layout";
+import { Column, Spacer } from "../../Layout";
 import React from "react";
-import { HealthBar } from "./Common";
+import { HealthBar } from "../Common";
 import styled, { css } from "styled-components";
-import { BattleState } from "./BattleState";
-import { Entity } from "./Common/entity";
-import { StatusBar } from "./Common/StatusBar";
+import { BattleState } from "../BattleState";
+import { Entity } from "../Entities/entity";
+import { StatusBar, StatusType } from "../Common/StatusBar";
+import { cards } from "../Cards/CardDefinitions";
 
 export enum PlayerClass {
   Ironclad,
@@ -23,7 +24,7 @@ interface IPlayer {
   deck: Card[];
 }
 
-const PlayerWrapper = styled(Column)<{ disable: boolean }>`
+const PlayerWrapper = styled(Column) <{ disable: boolean }>`
   ${({ disable }) =>
     disable
       ? ""
@@ -39,16 +40,24 @@ export class Player extends Entity {
   constructor(
     private stats: IPlayer = {
       health: 80,
-      maxMana: 3,
+      maxMana: 99,
       class: PlayerClass.Ironclad,
       deck: [],
     }
   ) {
-    super({ ...stats });
-    times(6, () => stats.deck.push(Strike(uniqueId())));
-    times(6, () => stats.deck.push(Defend(uniqueId())));
-    this.gainStrength(1);
-    this.gainDexterity(1);
+    super({
+      block: 0,
+      damage: 0,
+      health: stats.health,
+      id: uniqueId(),
+      maxHealth: stats.health,
+      statuses: []
+    });
+    times(6, () => stats.deck.push(cards["bash"](uniqueId())));
+    times(6, () => stats.deck.push(cards["strike"](uniqueId())));
+    times(6, () => stats.deck.push(cards["defend"](uniqueId())));
+    this.addStatus(StatusType.strength);
+    this.addStatus(StatusType.dexterity);
   }
 
   @computed
@@ -82,7 +91,7 @@ export class Player extends Entity {
           maxHealth={this.maxHealth}
         />
         <Spacer size={10} />
-        <StatusBar statuses={this.statuses} />
+        <StatusBar statuses={this.statuses as any} />
       </PlayerWrapper>
     );
   };

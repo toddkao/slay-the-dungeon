@@ -1,18 +1,18 @@
-import louse from "../Images/louse.png";
-import jawworm from "../Images/jawworm.png";
+import louse from "../../Images/louse.png";
+import jawworm from "../../Images/jawworm.png";
 import React from "react";
-import { Column, Spacer } from "../Layout";
-import { HealthBar } from "./Common";
+import { Column, Spacer } from "../../Layout";
+import { HealthBar } from "../Common";
 import styled, { css } from "styled-components";
 import { action, computed, observable } from "mobx";
-import { BattleState } from "./BattleState";
+import { BattleState } from "../BattleState";
 import { random } from "lodash";
-import attackIntent from "../Images/attack-intent.png";
-import spellIntent from "../Images/spell-intent.png";
+import attackIntent from "../../Images/attack-intent.png";
+import spellIntent from "../../Images/spell-intent.png";
 import Chance from "chance";
-import { Typography } from "../Typography";
-import { StatusBar } from "./Common/StatusBar";
-import { Entity } from "./Common/entity";
+import { Typography } from "../../Typography";
+import { StatusBar } from "../Common/StatusBar";
+import { Entity, IEntity } from "./entity";
 
 export enum IntentType {
   Attack,
@@ -27,20 +27,15 @@ interface IIntent {
   amount?: number;
 }
 
-interface IMonster {
-  id: string;
+interface IMonster extends IEntity {
   name: string;
   image: string;
-  damage?: number;
-  health: number;
-  strength: number;
-  dexterity: number;
   intent: IIntent[];
   currentIntent?: IIntent;
   effect?: any;
 }
 
-const MonsterWrapper = styled(Column)<{ selected: boolean; disabled: boolean }>`
+const MonsterWrapper = styled(Column) <{ selected: boolean; disabled: boolean }>`
   position: relative;
   height: 100%;
   width: 100%;
@@ -140,14 +135,14 @@ export class Monster extends Entity {
         <img src={this.monster.image} width={100} height={100} alt="monster" />
         <HealthBar health={this.health} maxHealth={this.maxHealth} />
         <Spacer size={10} />
-        <StatusBar statuses={this.statuses} />
+        <StatusBar statuses={this.statuses as any} />
       </MonsterWrapper>
     );
   };
 }
 
 export const Louse = (id: string) => {
-  const health = random(10, 15);
+  const health = random(10, 9999);
   return new Monster(
     observable({
       id,
@@ -157,7 +152,9 @@ export const Louse = (id: string) => {
       strength: 0,
       dexterity: 0,
       damage: 6,
+      block: 0,
       image: louse,
+      statuses: [],
       intent: [
         {
           type: IntentType.Attack,
@@ -183,9 +180,11 @@ export const JawWorm = (id: string) => {
       id,
       name: "JawWorm",
       health,
+      block: 0,
       maxHealth: health,
       strength: 0,
       dexterity: 0,
+      statuses: [],
       damage: 11,
       image: jawworm,
       intent: [

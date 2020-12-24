@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Column, Row } from '../Layout';
 import { Typography } from '../Typography';
 import { Link } from 'react-router-dom';
-import { Player } from './PlayerState';
+import { Player } from './Entities/Player';
 
 const Wrapper = styled(Row)`
   width: 100vw;

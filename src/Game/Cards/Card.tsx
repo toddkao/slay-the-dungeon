@@ -1,14 +1,13 @@
 import styled, { css } from "styled-components";
-import cardImage from "../Images/card.png";
-import strike from "../Images/strike.png";
-import defend from "../Images/defend.png";
-import { Column } from "../Layout";
-import { Typography } from "../Typography";
+import cardImage from "../../Images/card.png";
+import { Column } from "../../Layout";
+import { Typography } from "../../Typography";
 import React from "react";
-import { ManaCost } from "./Common";
-import { BattleState } from "./BattleState";
+import { ManaCost } from "../Common";
+import { BattleState } from "../BattleState";
 import { computed } from "mobx";
-import { Player } from "./PlayerState";
+import { Player } from "../Entities/Player";
+import { IStatus } from "../Common/StatusBar";
 
 export enum CardType {
   Attack = "Attack",
@@ -16,7 +15,8 @@ export enum CardType {
 }
 
 export enum CardEffectType {
-  SingleTargetAttack,
+  SingleTarget,
+  MultiTarget,
   AddBlock,
 }
 
@@ -37,7 +37,7 @@ const CardImage = styled(Image)`
   top: 34px;
 `;
 
-const CardWrapper = styled(Column)<{ selected: boolean }>`
+const CardWrapper = styled(Column) <{ selected: boolean }>`
   position: relative;
   ${({ selected }) =>
     selected
@@ -87,6 +87,7 @@ export interface ICard {
   type: CardType;
   effect: CardEffectType;
   damage?: number;
+  status?: IStatus;
   block?: number;
   image: string;
   targetEnemy: boolean;
@@ -96,7 +97,7 @@ export interface ICard {
 }
 
 export class Card {
-  constructor(private card: ICard) {}
+  constructor(private card: ICard) { }
 
   @computed
   get id() {
@@ -133,6 +134,11 @@ export class Card {
     return this.card.damage;
   }
 
+  @computed
+  get status() {
+    return this.card.status;
+  }
+
   render = (key: any) => {
     const battleState = new BattleState();
     return (
@@ -165,31 +171,3 @@ export class Card {
     return text;
   }
 }
-
-export const Strike = (id: string) =>
-  new Card({
-    id,
-    name: "Strike",
-    manaCost: 1,
-    damage: 6,
-    image: strike,
-    type: CardType.Attack,
-    effect: CardEffectType.SingleTargetAttack,
-    description: `Deal {} damage`,
-    descriptionVariables: ["damage"],
-    targetEnemy: true,
-  });
-
-export const Defend = (id: string) =>
-  new Card({
-    id,
-    name: "Defend",
-    manaCost: 1,
-    block: 5,
-    image: defend,
-    type: CardType.Skill,
-    effect: CardEffectType.AddBlock,
-    description: "Gain {} Block",
-    descriptionVariables: ["block"],
-    targetEnemy: false,
-  });

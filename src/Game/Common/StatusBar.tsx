@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Row } from "../../Layout";
 import strength from "../../Images/strength.png";
 import dexterity from "../../Images/dexterity.png";
+import vulnerable from "../../Images/vulnerable.png";
 import { Typography } from "../../Typography";
 
 const Wrapper = styled(Row)`
@@ -13,7 +14,14 @@ const Wrapper = styled(Row)`
 export enum StatusType {
   strength = "strength",
   dexterity = "dexterity",
+  vulnerable = "vulnerable"
 }
+
+export const StatusTypeToIStatus = {
+  [StatusType.strength]: { degrades: false },
+  [StatusType.dexterity]: { degrades: false },
+  [StatusType.vulnerable]: { degrades: true },
+};
 
 type IStatusIconMap = {
   [index in StatusType]: string;
@@ -22,10 +30,12 @@ type IStatusIconMap = {
 const StatusIconMap: IStatusIconMap = {
   [StatusType.strength]: strength,
   [StatusType.dexterity]: dexterity,
+  [StatusType.vulnerable]: vulnerable,
 };
 
 export interface IStatus {
   type: StatusType;
+  degrades: boolean;
   amount: number;
 }
 
@@ -44,13 +54,15 @@ const StatusAmount = styled(Typography)`
   color: white;
 `;
 
-export const StatusBar = observer((props: IProps) => (
-  <Wrapper>
-    {props.statuses.map((status) => (
-      <RenderStatus key={status.type} status={status} />
-    ))}
-  </Wrapper>
-));
+export const StatusBar = observer((props: IProps) => {
+  return (
+    <Wrapper>
+      {props.statuses.map((status) => (
+        <RenderStatus key={status.type} status={status} />
+      ))}
+    </Wrapper>
+  );
+});
 
 const RenderStatus = ({ status }: { status: IStatus }) => {
   return (

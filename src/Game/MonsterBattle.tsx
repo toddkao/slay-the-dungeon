@@ -6,11 +6,11 @@ import { Row } from "../Layout";
 import { Typography } from "../Typography";
 import { BattleState } from "./BattleState";
 import { ManaCost } from "./Common";
-import { JawWorm, Louse } from "./Monster";
+import { JawWorm, Louse } from "./Entities/Monster";
 import background from "../Images/background.jpg";
 import { ShowCardsModal } from "./Common/ShowCardsModal";
 import { useState } from "react";
-import { Card } from "./Card";
+import { Card } from "./Cards/Card";
 
 const EndTurnButton = styled.button`
   background-color: lightgreen;
@@ -95,7 +95,6 @@ export const MonsterBattle = observer(() => {
   const onRightClick = (e: { preventDefault: () => void }) => {
     e.preventDefault();
     battleState.selectCard(undefined);
-    console.log("right click");
   };
 
   return (
