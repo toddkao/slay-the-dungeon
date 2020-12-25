@@ -30,7 +30,10 @@ const CardRow = styled(Row)`
   align-items: center;
   justify-content: flex-start;
   overflow-x: hidden;
-  max-height: 85vh;
+  max-height: 75vh;
+  // @Todd 
+  // leave some space for the zoom effect to not be cut off
+  padding: 100px;
 `;
 
 interface IProps {

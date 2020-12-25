@@ -5,10 +5,16 @@ import { Typography } from '../Typography';
 import { Link } from 'react-router-dom';
 import { Player } from './Entities/Player/Player';
 import { RenderPlayer } from './Entities/Player/RenderPlayer';
+import background from "../Images/background.jpg";
+import { RenderMap } from './Map/RenderMap';
 
 const Wrapper = styled(Row)`
-  width: 100vw;
+  ${`background: url(${background})`};
+  overflow: hidden;
+  background-position: bottom;
+  position: relative;
   height: 100vh;
+  width: 100vw;
 `;
 
 export function StartMenu() {
@@ -23,6 +29,7 @@ export function StartMenu() {
           <RenderPlayer playerState={player} />
         </Link>
       </Column>
+      <RenderMap onClose={() => undefined} hideReturn />
     </Wrapper>
   );
 }

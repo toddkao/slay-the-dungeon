@@ -15,11 +15,14 @@ import { RenderCard } from "../Cards/RenderCard";
 import { RenderPlayer } from "../Entities/Player/RenderPlayer";
 import { RenderMonster } from "../Entities/Monster/RenderMonster";
 import { monsterMap } from "../Entities/Monster/MonsterDefinitions";
+import { RenderMap } from "../Map/RenderMap";
 
 export const RenderBattle = observer(() => {
   const battleState = new Battle();
   const useMountEffect = (fun: () => any) => useEffect(fun, []);
   const [cardToShow, setCardsToShow] = useState<Card[]>();
+
+  const [showMap, setShowMap] = useState<boolean>();
 
   useMountEffect(() => {
     const battleState = new Battle();
@@ -63,12 +66,19 @@ export const RenderBattle = observer(() => {
       <Graveyard onClick={() => setCardsToShow(battleState.graveyard)}>
         {/* {battleState.graveyard.length} */}
       </Graveyard>
+
+      <Map onClick={() => setShowMap(true)}>
+        {/* {battleState.graveyard.length} */}
+      </Map>
+
       {cardToShow ? (
         <ShowCardsModal
           cards={cardToShow}
           onClose={() => setCardsToShow(undefined)}
         />
       ) : null}
+
+      {showMap ? <RenderMap onClose={() => setShowMap(undefined)} /> : null}
       {/* <button onClick={() => player.loseHealth()}>
         Lose Health
       </button>
@@ -150,4 +160,10 @@ const Graveyard = styled(Deck)`
   top: 0;
   right: 0;
   position: absolute;
+`;
+
+const Map = styled(Deck)`
+  position: absolute;
+  left: 0;
+  bottom: 0;
 `;
