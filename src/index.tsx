@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { Router } from "./Router";
 import { BrowserRouter } from "react-router-dom";
 import { createGlobalStyle } from "styled-components";
-import cursor from './Images/cursor.png';
+import cursor from "./Images/cursor.png";
 
 const GlobalStyle = createGlobalStyle`
   @font-face {
@@ -24,6 +24,10 @@ const GlobalStyle = createGlobalStyle`
     -moz-user-select: -moz-none;
     -khtml-user-select: none;
     -webkit-user-select: none;
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    -ms-overflow-style: none;
 
     /*
       Introduced in IE 10.
