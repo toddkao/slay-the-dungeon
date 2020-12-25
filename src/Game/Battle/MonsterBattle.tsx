@@ -24,14 +24,6 @@ export const RenderBattle = observer(() => {
 
   const [showMap, setShowMap] = useState<boolean>();
 
-  useMountEffect(() => {
-    const battleState = new Battle();
-    battleState.setMonsters([
-      monsterMap.louse(uniqueId()),
-      monsterMap.jawWorm(uniqueId()),
-    ]);
-  });
-
   const onRightClick = (e: { preventDefault: () => void }) => {
     e.preventDefault();
     battleState.selectCard(undefined);
@@ -78,7 +70,12 @@ export const RenderBattle = observer(() => {
         />
       ) : null}
 
-      {showMap ? <RenderMap onClose={() => setShowMap(undefined)} /> : null}
+      {battleState.wonBattle || showMap ? (
+        <RenderMap
+          onClose={() => setShowMap(undefined)}
+          hideReturn={battleState.wonBattle}
+        />
+      ) : null}
       {/* <button onClick={() => player.loseHealth()}>
         Lose Health
       </button>

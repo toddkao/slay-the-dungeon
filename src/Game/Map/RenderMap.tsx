@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import styled, { css } from "styled-components";
 import { Column, Row } from "../../Layout";
 import { Modal } from "../Common/Modal";
@@ -6,15 +6,28 @@ import Xarrow from "react-xarrows";
 import cancelButton from "../../Images/cancel-button.png";
 import { mapNodeType, mapNodeTypeToImage, Map } from "./Map";
 import { observer } from "mobx-react";
+import { useHistory } from "react-router-dom";
 
 export const RenderMap = observer(
   ({
     onClose,
     hideReturn = false,
   }: {
-    onClose?: () => void,
-    hideReturn?: boolean,
+    onClose?: () => void;
+    hideReturn?: boolean;
   }) => {
+    const history = useHistory();
+    const useMountEffect = (fun: () => any) => useEffect(fun, []);
+    const mapRef = useRef(null);
+
+    const scrollToBottom = () => {
+      (mapRef.current as any).scrollTop = (mapRef.current as any).scrollHeight;
+    };
+
+    useMountEffect(() => {
+      scrollToBottom();
+    });
+
     const map = new Map();
 
     const { matrix, paths } = map.currentFloor;
@@ -27,7 +40,10 @@ export const RenderMap = observer(
             <ReturnButton onClick={onClose}>Return</ReturnButton>
           )}
 
-          <Column style={{ gap: 200, maxHeight: "80vh", overflow: "auto" }}>
+          <Column
+            ref={mapRef}
+            style={{ gap: 200, maxHeight: "80vh", overflow: "auto" }}
+          >
             {matrix.map((row, rowIndex) => {
               return (
                 <Row
@@ -38,7 +54,12 @@ export const RenderMap = observer(
                     <MapNode
                       id={node.id}
                       key={node.id}
-                      onClick={() => selectNode(node.id)}
+                      onClick={() => {
+                        if (selectableNodeIds.includes(node.id)) {
+                          history.push(`/battle/${node.id}`);
+                          selectNode(node.id);
+                        }
+                      }}
                       style={{
                         left: node.left,
                         top: node.top,

@@ -1,9 +1,10 @@
 import { Singleton } from "@taipescripeto/singleton";
-import { sampleSize } from "lodash";
+import { sampleSize, uniqueId } from "lodash";
 import { action, computed, observable } from "mobx";
 import { Card, CardEffectType } from "../Cards/Card";
 import { IStatus, StatusType } from "../Common/StatusBar";
 import { IntentType, Monster } from "../Entities/Monster/Monster";
+import { monsterMap } from "../Entities/Monster/MonsterDefinitions";
 import { Player } from "../Entities/Player/Player";
 
 export interface IBattleState {
@@ -30,6 +31,12 @@ export class Battle {
     })
   ) {
     this.initializeHand();
+    this.initializeMonsters();
+  }
+
+  @computed
+  get wonBattle() {
+    return this.monsters.length === 0;
   }
 
   @computed
@@ -119,7 +126,15 @@ export class Battle {
     }
   });
 
+  private initializeMonsters = action(() => {
+    this.setMonsters([
+      monsterMap.louse(uniqueId()),
+      monsterMap.jawWorm(uniqueId()),
+    ]);
+  })
+
   private initializeHand = action(() => {
+    this.removeCardsFromHand(this.currentHand);
     this.battleState.drawPile = this.player.get.deck;
     this.drawRandomCards(5);
     this.battleState.graveyard = [];
@@ -260,6 +275,11 @@ export class Battle {
     this.resolveMonsterActions();
     this.resolvePlayerActions();
     this.resolveGameActions();
+  });
+
+  resetBattleState = action(() => {
+    this.initializeMonsters();
+    this.initializeHand();
   });
 
   selectCard = action((id: string | undefined) => {

@@ -7,6 +7,7 @@ import event from "../../Images/event.png";
 import { range } from "lodash";
 import { action, computed, observable } from "mobx";
 import { clone } from "lodash";
+import { Battle } from "../Battle/Battle";
 
 interface IMapNode {
   id: string;
@@ -123,12 +124,13 @@ export class Map {
     return this.map.traversedNodeIds;
   }
 
-
   selectNode = action((id: string) => {
     this.map.currentNode = id;
     if (this.currentNode !== undefined) {
       this.map.traversedNodeIds.push(this.currentNode);
     }
+    const battleState = new Battle();
+    battleState.resetBattleState();
   });
 }
 

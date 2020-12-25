@@ -6,7 +6,7 @@ export function Router() {
   return (
     <Switch>
       <Route exact path="/" component={StartMenu} />
-      <Route exact path="/battle" component={RenderBattle} />
+      <Route exact path="/battle/:nodeID" component={RenderBattle} />
     </Switch>
   );
 }
