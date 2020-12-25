@@ -20,10 +20,10 @@ export class Card {
   }
 
   public select = () => {
-    const newLocal = new Battle();
-    newLocal.selectCard(undefined);
+    const battle = new Battle();
+    battle.selectCard(undefined);
     if (this.selectable()) {
-      newLocal.selectCard(this.get.id);
+      battle.selectCard(this.get.id);
     }
   }
 

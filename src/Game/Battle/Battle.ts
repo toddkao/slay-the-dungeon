@@ -14,7 +14,7 @@ export interface IBattleState {
   currentMana: number;
   drawPile: Card[];
   graveyard: Card[];
-  endTurnActions:Function[];
+  endTurnActions: Function[];
 }
 @Singleton()
 export class Battle {
