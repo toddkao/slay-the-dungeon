@@ -3,7 +3,7 @@ import { IStatus } from "../Common/StatusBar";
 import { Howl } from "howler";
 
 export class Card {
-  constructor(private card: ICard) {};
+  constructor(private card: ICard) { };
 
   @computed
   public get get() {
@@ -21,6 +21,10 @@ export class Card {
       });
       sound.play();
     }
+  };
+
+  public evaluateDamage = (arg0: any) => {
+    return ((typeof this.card.damage === 'function' ? this.card.damage(arg0) : this.card.damage) ?? 0);
   };
 }
 
@@ -41,9 +45,10 @@ export interface ICard {
   manaCost: number;
   type: CardType;
   effect: CardEffectType;
-  damage?: number;
+  damage?: number | ((arg0: any) => number);
   status?: IStatus;
   block?: number;
+  special?: Function;
 
   targetEnemy: boolean;
 
