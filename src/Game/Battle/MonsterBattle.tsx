@@ -1,4 +1,3 @@
-import { uniqueId } from "lodash";
 import { observer } from "mobx-react";
 import React, { useEffect } from "react";
 import styled from "styled-components";
@@ -14,15 +13,25 @@ import { Card } from "../Cards/Card";
 import { RenderCard } from "../Cards/RenderCard";
 import { RenderPlayer } from "../Entities/Player/RenderPlayer";
 import { RenderMonster } from "../Entities/Monster/RenderMonster";
-import { monsterMap } from "../Entities/Monster/MonsterDefinitions";
 import { RenderMap } from "../Map/RenderMap";
+import { Map } from "../Map/Map";
+import { useHistory } from "react-router-dom";
 
 export const RenderBattle = observer(() => {
   const battleState = new Battle();
   const useMountEffect = (fun: () => any) => useEffect(fun, []);
+  const history = useHistory();
   const [cardToShow, setCardsToShow] = useState<Card[]>();
 
   const [showMap, setShowMap] = useState<boolean>();
+
+  useMountEffect(() => {
+    const mapState = new Map();
+    // redirects you to base path if currentNode is undefined (if you refresh the page)
+    if (mapState.currentNode === undefined) {
+      history.push('/');
+    }
+  });
 
   const onRightClick = (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -59,9 +68,9 @@ export const RenderBattle = observer(() => {
         {/* {battleState.graveyard.length} */}
       </Graveyard>
 
-      <Map onClick={() => setShowMap(true)}>
+      <MapIcon onClick={() => setShowMap(true)}>
         {/* {battleState.graveyard.length} */}
-      </Map>
+      </MapIcon>
 
       {cardToShow ? (
         <ShowCardsModal
@@ -159,7 +168,7 @@ const Graveyard = styled(Deck)`
   position: absolute;
 `;
 
-const Map = styled(Deck)`
+const MapIcon = styled(Deck)`
   position: absolute;
   left: 0;
   bottom: 0;

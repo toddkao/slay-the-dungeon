@@ -1,12 +1,11 @@
 import { Singleton } from "@taipescripeto/singleton";
-import { sampleSize, uniqueId } from "lodash";
+import { sampleSize } from "lodash";
 import { action, computed, observable } from "mobx";
 import { Card, CardEffectType } from "../Cards/Card";
 import { IStatus, StatusType } from "../Common/StatusBar";
 import { IntentType, Monster } from "../Entities/Monster/Monster";
-import { monsterMap } from "../Entities/Monster/MonsterDefinitions";
 import { Player } from "../Entities/Player/Player";
-
+import { Map } from "../Map/Map";
 export interface IBattleState {
   selectedCardId: string | undefined;
   selectedMonsterId: string | undefined;
@@ -31,10 +30,7 @@ export class Battle {
       graveyard: [],
       endTurnActions: [],
     })
-  ) {
-    this.initializeHand();
-    this.initializeMonsters();
-  }
+  ) {}
 
   @computed
   get wonBattle() {
@@ -68,7 +64,7 @@ export class Battle {
   }
 
   @computed
-  get endTurnActions(){
+  get endTurnActions() {
     return this.battleState.endTurnActions;
   }
 
@@ -134,11 +130,9 @@ export class Battle {
   });
 
   private initializeMonsters = action(() => {
-    this.setMonsters([
-      monsterMap.louse(uniqueId()),
-      monsterMap.jawWorm(uniqueId()),
-    ]);
-  })
+    const mapState = new Map();
+    this.setMonsters(mapState.currentEncounter);
+  });
 
   private initializeHand = action(() => {
     this.removeCardsFromHand(this.currentHand);
@@ -164,11 +158,14 @@ export class Battle {
   private resolveTargetedCard = action((card: Card) => {
     switch (card.get.effect) {
       case CardEffectType.SingleTarget:
-        this.resolveSingleTargetDamage({ card, selectedMonster: this.selectedMonster as Monster });
+        this.resolveSingleTargetDamage({
+          card,
+          selectedMonster: this.selectedMonster as Monster,
+        });
         break;
       case CardEffectType.MultiTarget:
         this.monsters.forEach((monster) => {
-          this.resolveSingleTargetDamage({ card, selectedMonster: monster })
+          this.resolveSingleTargetDamage({ card, selectedMonster: monster });
         });
         break;
       case CardEffectType.AddBlock:
@@ -206,7 +203,13 @@ export class Battle {
     }
   );
 
-  private resolveSingleTargetDamage({ card, selectedMonster }: { card: Card, selectedMonster: Monster }) {
+  private resolveSingleTargetDamage({
+    card,
+    selectedMonster,
+  }: {
+    card: Card;
+    selectedMonster: Monster;
+  }) {
     if (card.get.damage && selectedMonster) {
       selectedMonster.takeDamage(
         this.calculateDamage({
@@ -216,10 +219,7 @@ export class Battle {
         })
       );
       if (card.get.status && selectedMonster) {
-        selectedMonster.addStatus(
-          card.get.status.type,
-          card.get.status.amount
-        );
+        selectedMonster.addStatus(card.get.status.type, card.get.status.amount);
       }
       if (selectedMonster.get.health === 0) {
         this.setMonsters(
@@ -267,7 +267,7 @@ export class Battle {
   });
 
   private resolveEndTurnActions() {
-    this.battleState.endTurnActions.forEach(action => action());
+    this.battleState.endTurnActions.forEach((action) => action());
     this.battleState.endTurnActions = [];
   }
 
@@ -299,7 +299,8 @@ export class Battle {
     this.resolveEndTurnActions();
   });
 
-  resetBattleState = action(() => {
+  public initialize = action(() => {
+    this.resolveGameActions();
     this.initializeMonsters();
     this.initializeHand();
   });
@@ -313,7 +314,9 @@ export class Battle {
     this.battleState.selectedMonsterId = id;
   });
 
-  setMonsters = action((monsters: Monster[]) => {
-    this.battleState.monsters = monsters;
+  setMonsters = action((monsters: Monster[] | undefined) => {
+    if (monsters) {
+      this.battleState.monsters = monsters;
+    }
   });
 }

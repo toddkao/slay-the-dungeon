@@ -4,16 +4,20 @@ import chest from "../../Images/chest.png";
 import rest from "../../Images/rest.png";
 import shop from "../../Images/shop.png";
 import event from "../../Images/event.png";
-import { range } from "lodash";
+import elite from "../../Images/elite.png";
+import { random, range, uniqueId } from "lodash";
 import { action, computed, observable } from "mobx";
 import { clone } from "lodash";
 import { Battle } from "../Battle/Battle";
+import { Monster } from "../Entities/Monster/Monster";
+import { mapEncounterType } from "./MapEncounterDefinition";
 
 interface IMapNode {
   id: string;
   type: mapNodeType;
   left: number;
   top: number;
+  encounter: Monster[];
 }
 
 interface INodePath {
@@ -29,8 +33,9 @@ interface IMap {
       paths: INodePath[];
     };
   };
-  currentNode: string | undefined;
+  currentNode: IMapNode | undefined;
   traversedNodeIds: string[];
+  currentEncounter: Monster[] | undefined;
 }
 
 @Singleton()
@@ -46,6 +51,7 @@ export class Map {
       },
       currentNode: undefined,
       traversedNodeIds: [],
+      currentEncounter: undefined,
     })
   ) {
     this.map.floors[1].matrix = range(0, 16).map((layer, rowIndex) => {
@@ -57,7 +63,8 @@ export class Map {
           : Math.floor(Math.random() * 3) + 2;
       return range(0, randomNumberOfNodes).map((node, colIndex) => ({
         id: `row=${rowIndex}col=${colIndex}`,
-        type: mapNodeType.monster,
+        type: this.generateNodeType(rowIndex),
+        encounter: this.generateEncounter(rowIndex),
         left:
           rowIndex === 0 && colIndex === 0
             ? 500
@@ -101,6 +108,11 @@ export class Map {
   }
 
   @computed
+  get currentEncounter() {
+    return this.map.currentEncounter;
+  }
+
+  @computed
   get selectableNodeIds() {
     if (this.map.currentNode === undefined) {
       return this.currentFloor.matrix[this.currentFloor.matrix.length - 1].map(
@@ -109,7 +121,7 @@ export class Map {
     }
     return this.currentFloor.paths
       .filter((path) => {
-        return path.start === this.map.currentNode;
+        return path.start === this.map.currentNode?.id;
       })
       .map((node) => node.end);
   }
@@ -124,13 +136,37 @@ export class Map {
     return this.map.traversedNodeIds;
   }
 
-  selectNode = action((id: string) => {
-    this.map.currentNode = id;
+  generateNodeType = (rowIndex: number) => {
+    return rowIndex === 8 ? mapNodeType.rest : mapNodeType.monster;
+  }
+
+  generateEncounter = (rowIndex: number) => {
+    const randomFirstThreeEncounterIndex = random(
+      0,
+      parseInt((mapEncounterType.firstThreeEncounters.length - 1) as any)
+    );
+    const randomNormalEncounterIndex = random(
+      0,
+      parseInt((mapEncounterType.normalEncounters.length - 1) as any)
+    );
+
+    return rowIndex >= 13
+      ? mapEncounterType.firstThreeEncounters[
+          randomFirstThreeEncounterIndex
+        ].map((createMob) => createMob(uniqueId()))
+      : mapEncounterType.normalEncounters[
+          randomNormalEncounterIndex
+        ].map((createMob) => createMob(uniqueId()));
+  };
+
+  selectNode = action((node: IMapNode) => {
+    this.map.currentNode = node;
     if (this.currentNode !== undefined) {
-      this.map.traversedNodeIds.push(this.currentNode);
+      this.map.traversedNodeIds.push(this.currentNode?.id);
     }
+    this.map.currentEncounter = this.currentNode?.encounter;
     const battleState = new Battle();
-    battleState.resetBattleState();
+    battleState.initialize();
   });
 }
 
@@ -140,6 +176,7 @@ export enum mapNodeType {
   rest,
   shop,
   event,
+  elite,
 }
 
 export const mapNodeTypeToImage = {
@@ -148,4 +185,5 @@ export const mapNodeTypeToImage = {
   [mapNodeType.rest]: rest,
   [mapNodeType.shop]: shop,
   [mapNodeType.event]: event,
+  [mapNodeType.elite]: elite,
 };

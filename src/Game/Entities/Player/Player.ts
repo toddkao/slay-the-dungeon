@@ -18,7 +18,7 @@ export class Player extends Entity {
       health: 80,
       maxHealth: 80,
       statuses: [],
-      maxMana: 9,
+      maxMana: 3,
       class: PlayerClass.Ironclad,
       deck: [],
       block: 0,
@@ -36,8 +36,8 @@ export class Player extends Entity {
     times(6, () => stats.deck.push(cardMap.cleave(uniqueId())));
     times(6, () => stats.deck.push(cardMap.clothesline(uniqueId())));
     times(6, () => stats.deck.push(cardMap.flex(uniqueId())));
-    this.addStatus(StatusType.strength, 2);
-    this.addStatus(StatusType.dexterity);
+    // this.addStatus(StatusType.strength, 2);
+    // this.addStatus(StatusType.dexterity);
   }
 
   @computed

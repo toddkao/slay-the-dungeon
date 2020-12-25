@@ -7,6 +7,7 @@ import cancelButton from "../../Images/cancel-button.png";
 import { mapNodeType, mapNodeTypeToImage, Map } from "./Map";
 import { observer } from "mobx-react";
 import { useHistory } from "react-router-dom";
+import { Battle } from "../Battle/Battle";
 
 export const RenderMap = observer(
   ({
@@ -16,6 +17,7 @@ export const RenderMap = observer(
     onClose?: () => void;
     hideReturn?: boolean;
   }) => {
+    const battleState = new Battle();
     const history = useHistory();
     const useMountEffect = (fun: () => any) => useEffect(fun, []);
     const mapRef = useRef(null);
@@ -55,9 +57,9 @@ export const RenderMap = observer(
                       id={node.id}
                       key={node.id}
                       onClick={() => {
-                        if (selectableNodeIds.includes(node.id)) {
+                        if (battleState.wonBattle && selectableNodeIds.includes(node.id)) {
                           history.push(`/battle/${node.id}`);
-                          selectNode(node.id);
+                          selectNode(node);
                         }
                       }}
                       style={{
