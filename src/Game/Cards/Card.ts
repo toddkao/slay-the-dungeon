@@ -1,6 +1,7 @@
 import { computed } from "mobx";
 import { IStatus } from "../Common/StatusBar";
 import { Howl } from "howler";
+import { Battle, IBattleState } from "../Battle/Battle";
 
 export class Card {
   constructor(private card: ICard) { };
@@ -12,6 +13,19 @@ export class Card {
       targetSelf: !this.card.targetEnemy,
     };
   };
+
+
+  public selectable = () => {
+    return this.card.prerequisite ? this.card.prerequisite(new Battle()) : true;
+  }
+
+  public select = () => {
+    const battle = new Battle();
+    battle.selectCard(undefined);
+    if (this.selectable()) {
+      battle.selectCard(this.get.id);
+    }
+  }
 
   public playAudioClip = () => {
     if (this.get.audio) {
@@ -45,7 +59,8 @@ export interface ICard {
   manaCost: number;
   type: CardType;
   effect: CardEffectType;
-  damage?: number | ((arg0: any) => number);
+  damage?: number | ((argument: any) => number);
+  prerequisite?: (battleState: IBattleState) => boolean;
   status?: IStatus;
   block?: number;
   special?: Function;

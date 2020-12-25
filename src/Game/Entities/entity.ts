@@ -76,6 +76,10 @@ export class Entity {
     }
   });
 
+  public removeStatus = action((type: StatusType, amount: number = -1) => {
+    this.addStatus(type, amount*-1);
+  });
+
   public updateStatuses = action(() => {
     this.entity.statuses = this.statuses.map((status) =>
       status.degrades ? { ...status, amount: (status.amount ?? 0) - 1 } : status
@@ -133,5 +137,5 @@ export class Entity {
       maxHealth: 0,
       statuses: [],
     })
-  ) {}
+  ) { }
 }

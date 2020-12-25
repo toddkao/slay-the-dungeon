@@ -11,7 +11,7 @@ import fastAtk from "../../Audio/fastAtk.ogg";
 import heavyAtk from "../../Audio/heavyAtk.ogg";
 // @ts-ignore
 import addBlock from "../../Audio/addBlock.ogg";
-import { IBattleState } from "../Battle/Battle";
+import { Battle, IBattleState } from "../Battle/Battle";
 import { uniqueId } from "lodash";
 import { Player } from "../Entities/Player/Player";
 
@@ -118,7 +118,7 @@ const Anger = (id: string) =>
     manaCost: 0,
     damage: 6,
     image: getImage({ sheetNumber: 3, position: [4, 3] }),
-    special: (battleState: Partial<IBattleState>) => {
+    special: (battleState: IBattleState) => {
       if (!battleState.graveyard) {
         return;
       }
@@ -144,12 +144,7 @@ const BodySlam = (id: string) =>
     damage: (player: Player) => {
       return player.block;
     },
-    image: {
-      src: cards3,
-      position: [5, 2],
-      width: spriteToCardSize["cards3"].CARD_WIDTH,
-      height: spriteToCardSize["cards3"].CARD_HEIGHT,
-    },
+    image: getImage({ sheetNumber: 3, position: [5, 2] }),
     type: CardType.Attack,
     effect: CardEffectType.SingleTarget,
     description: `Deal damage equal to your current block`,
@@ -158,6 +153,78 @@ const BodySlam = (id: string) =>
     audio: heavyAtk,//TODO: sound effect
   });
 
+const Clash = (id: string) =>
+  new Card({
+    id,
+    name: "Clash",
+    manaCost: 0,
+    damage: 14,
+    prerequisite: (battleState: IBattleState) => {
+      return battleState.currentHand.every(card => card.get.type == CardType.Attack);
+    },
+    image: getImage({ sheetNumber: 3, position: [4, 1] }),
+    type: CardType.Attack,
+    effect: CardEffectType.SingleTarget,
+    description: `Can only be played if every card in your hand is an Attack.\nDeal {} damage.`,
+    descriptionVariables: ["damage"],
+    targetEnemy: true,
+    audio: heavyAtk,//TODO: sound effect
+  });
+
+const Cleave = (id: string) =>
+  new Card({
+    id,
+    name: "Cleave",
+    manaCost: 1,
+    damage: 8,
+    image: getImage({ sheetNumber: 3, position: [6, 1] }),
+    type: CardType.Attack,
+    effect: CardEffectType.MultiTarget,
+    description: `Deal 8 damage to ALL enemies.`,
+    descriptionVariables: ["damage"],
+    targetEnemy: true,
+    audio: heavyAtk,//TODO: sound effect
+  });
+
+const Clothesline = (id: string) =>
+  new Card({
+    id,
+    name: "Clothesline",
+    manaCost: 2,
+    damage: 12,
+    status: {
+      type: StatusType.weak,
+      amount: 2,
+      degrades: true,
+    },
+    image: getImage({ sheetNumber: 3, position: [7, 1] }),
+    type: CardType.Attack,
+    effect: CardEffectType.SingleTarget,
+    description: `Deal {} damage. Apply 2 Weak.`, //TODO: add weak to descriptionvariable
+    descriptionVariables: ["damage"],
+    targetEnemy: true,
+    audio: heavyAtk,//TODO: sound effect
+  });
+
+const Flex = (id: string) =>
+  new Card({
+    id,
+    name: "Flex",
+    manaCost: 0,
+    image: getImage({ sheetNumber: 1, position: [0, 0] }),
+    special: () => {
+      let battle = new Battle();
+      battle.player.addStatus(StatusType.strength, 2);
+      battle.endTurnActions.push(() => {
+        new Battle().player.removeStatus(StatusType.strength, 2);
+      })
+    },
+    type: CardType.Attack,
+    effect: CardEffectType.SingleTarget,
+    description: `Gain 2 Strength. At the end of your turn, lose 2 Strength.`,
+    descriptionVariables: [""],
+    targetEnemy: false,
+  });
 
 export const cardMap = {
   strike: Strike,
@@ -165,4 +232,8 @@ export const cardMap = {
   bash: Bash,
   anger: Anger,
   bodySlam: BodySlam,
+  clash: Clash,
+  cleave: Cleave,
+  clothesline: Clothesline,
+  flex: Flex,
 };

@@ -15,6 +15,7 @@ export interface IBattleState {
   currentMana: number;
   drawPile: Card[];
   graveyard: Card[];
+  endTurnActions: Function[];
 }
 @Singleton()
 export class Battle {
@@ -28,6 +29,7 @@ export class Battle {
       currentHand: [],
       drawPile: [],
       graveyard: [],
+      endTurnActions: [],
     })
   ) {
     this.initializeHand();
@@ -63,6 +65,11 @@ export class Battle {
   @computed
   get selectedCardId() {
     return this.battleState.selectedCardId;
+  }
+
+  @computed
+  get endTurnActions(){
+    return this.battleState.endTurnActions;
   }
 
   @computed
@@ -157,28 +164,12 @@ export class Battle {
   private resolveTargetedCard = action((card: Card) => {
     switch (card.get.effect) {
       case CardEffectType.SingleTarget:
-        if (card.get.damage && this.selectedMonster) {
-          this.selectedMonster.takeDamage(
-            this.calculateDamage({
-              damage: card.evaluateDamage(this.player),
-              extradamage: this.player.extradamage,
-              statuses: this.selectedMonster.get.statuses,
-            })
-          );
-          if (card.get.status && this.selectedMonster) {
-            this.selectedMonster.addStatus(
-              card.get.status.type,
-              card.get.status.amount
-            );
-          }
-          if (this.selectedMonster.get.health === 0) {
-            this.setMonsters(
-              this.monsters.filter(
-                (monster) => monster.get.id !== this.selectedMonsterId
-              )
-            );
-          }
-        }
+        this.resolveSingleTargetDamage({ card, selectedMonster: this.selectedMonster as Monster });
+        break;
+      case CardEffectType.MultiTarget:
+        this.monsters.forEach((monster) => {
+          this.resolveSingleTargetDamage({ card, selectedMonster: monster })
+        });
         break;
       case CardEffectType.AddBlock:
         if (card.get.block && card.get.targetSelf) {
@@ -215,6 +206,31 @@ export class Battle {
     }
   );
 
+  private resolveSingleTargetDamage({ card, selectedMonster }: { card: Card, selectedMonster: Monster }) {
+    if (card.get.damage && selectedMonster) {
+      selectedMonster.takeDamage(
+        this.calculateDamage({
+          damage: card.evaluateDamage(this.player),
+          extradamage: this.player.extradamage,
+          statuses: selectedMonster.get.statuses,
+        })
+      );
+      if (card.get.status && selectedMonster) {
+        selectedMonster.addStatus(
+          card.get.status.type,
+          card.get.status.amount
+        );
+      }
+      if (selectedMonster.get.health === 0) {
+        this.setMonsters(
+          this.monsters.filter(
+            (monster) => monster.get.id !== selectedMonster.id
+          )
+        );
+      }
+    }
+  }
+
   private resolveMonsterActions = action(() => {
     this.monsters.forEach((monster) => {
       switch (monster.get.currentIntent?.type) {
@@ -250,6 +266,11 @@ export class Battle {
     this.drawRandomCards(5);
   });
 
+  private resolveEndTurnActions() {
+    this.battleState.endTurnActions.forEach(action => action());
+    this.battleState.endTurnActions = [];
+  }
+
   private useMana = action((amount: number) => {
     if (amount <= this.currentMana) {
       this.battleState.currentMana -= amount;
@@ -275,6 +296,7 @@ export class Battle {
     this.resolveMonsterActions();
     this.resolvePlayerActions();
     this.resolveGameActions();
+    this.resolveEndTurnActions();
   });
 
   resetBattleState = action(() => {

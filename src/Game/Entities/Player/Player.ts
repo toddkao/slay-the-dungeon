@@ -32,6 +32,10 @@ export class Player extends Entity {
     times(6, () => stats.deck.push(cardMap.defend(uniqueId())));
     times(6, () => stats.deck.push(cardMap.anger(uniqueId())));
     times(6, () => stats.deck.push(cardMap.bodySlam(uniqueId())));
+    times(6, () => stats.deck.push(cardMap.clash(uniqueId())));
+    times(6, () => stats.deck.push(cardMap.cleave(uniqueId())));
+    times(6, () => stats.deck.push(cardMap.clothesline(uniqueId())));
+    times(6, () => stats.deck.push(cardMap.flex(uniqueId())));
     this.addStatus(StatusType.strength, 2);
     this.addStatus(StatusType.dexterity);
   }
