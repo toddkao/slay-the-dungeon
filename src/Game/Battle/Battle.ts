@@ -6,7 +6,7 @@ import { IStatus, StatusType } from "../Common/StatusBar";
 import { IntentType, Monster } from "../Entities/Monster/Monster";
 import { Player } from "../Entities/Player/Player";
 
-interface IBattleState {
+export interface IBattleState {
   selectedCardId: string | undefined;
   selectedMonsterId: string | undefined;
   monsters: Monster[];
@@ -145,7 +145,7 @@ export class Battle {
         if (card.get.damage && this.selectedMonster) {
           this.selectedMonster.takeDamage(
             this.calculateDamage({
-              damage: card.get.damage,
+              damage: card.evaluateDamage(this.player),
               extradamage: this.player.extradamage,
               statuses: this.selectedMonster.get.statuses,
             })
@@ -172,6 +172,9 @@ export class Battle {
         break;
       default:
         break;
+    }
+    if (card.get.special) {
+      card.get.special(this.battleState);
     }
   });
 

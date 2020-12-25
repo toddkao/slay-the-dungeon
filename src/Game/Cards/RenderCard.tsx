@@ -35,6 +35,7 @@ export const RenderCard = observer(({ cardState }: { cardState: Card }) => {
     scale: 1,
   }));
 
+  // @ts-ignore
   const bind = useDrag(({ down, movement: [x, y] }) => {
     set({
       x: down ? x : 0,
@@ -44,7 +45,7 @@ export const RenderCard = observer(({ cardState }: { cardState: Card }) => {
     });
   });
 
-  const { position, width, height, src } = cardState.get.image;
+  const { src, position, width, height } = cardState.get.image;
   const [x, y] = position;
 
   return (

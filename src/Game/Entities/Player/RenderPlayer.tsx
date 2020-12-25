@@ -24,7 +24,7 @@ export const RenderPlayer = observer(
           }
         }}
       >
-        <img src={ironclad} draggable={false} />
+        <img src={ironclad} draggable={false} alt="Player"/>
         <HealthBar block={block} health={health} maxHealth={maxHealth} />
         <Spacer size={10} />
         <StatusBar statuses={statuses as any} />
