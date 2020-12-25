@@ -28,7 +28,7 @@ export const RenderMonster = observer(
       switch (currentIntent?.type) {
         case IntentType.Attack:
           return (
-            <IntentNumber> {damage + extradamage} </IntentNumber>
+            <IntentNumber> {monsterState.damage + extradamage} </IntentNumber>
           );
         default:
           return null;

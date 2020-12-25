@@ -23,7 +23,7 @@ export const RenderCard = observer(({ cardState }: { cardState: Card }) => {
       text = text.replace(
         "{}",
         (cardState as any)?.get?.[variable] +
-          (player as any)?.[`extra${variable}`]
+        (player as any)?.[`extra${variable}`]
       );
     });
     return text;
@@ -51,7 +51,7 @@ export const RenderCard = observer(({ cardState }: { cardState: Card }) => {
   return (
     <CardWrapper
       key={cardState.get.id}
-      onClick={() => battleState.selectCard(cardState.get.id)}
+      onClick={cardState.select}
       selected={cardState.get.id === battleState.selectedCardId}
       {...bind()}
       style={props}
@@ -95,7 +95,7 @@ const CardSpriteContainer = styled.div`
   zoom: 0.58;
 `;
 
-const CardWrapper = styled(animated.div)<{ selected: boolean }>`
+const CardWrapper = styled(animated.div) <{ selected: boolean }>`
   display: flex;
   flex-direction: column;
   position: relative;
@@ -104,6 +104,7 @@ const CardWrapper = styled(animated.div)<{ selected: boolean }>`
       ? css`
           transform: scale(1.5);
           z-index: 2;
+          outline:5px solid green;
         `
       : ""};
   transition: transform 0.2s;

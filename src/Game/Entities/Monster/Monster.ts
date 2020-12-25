@@ -1,6 +1,7 @@
 import { action, computed } from "mobx";
 import Chance from "chance";
 import { Entity, IEntity } from "../entity";
+import { StatusType } from "../../Common/StatusBar";
 
 export class Monster extends Entity {
   constructor(private monster: IMonster) {
@@ -11,6 +12,12 @@ export class Monster extends Entity {
   @computed
   public get get() {
     return this.monster;
+  }
+
+  @computed
+  public get damage() {
+    let weakStatus = this.monster.statuses.find(status => status.type === StatusType.weak);
+    return  weakStatus ? (weakStatus?.amount >= 1 ? Math.floor(this.monster.damage * .75) : this.monster.damage) : this.monster.damage;
   }
 
   public pickRandomIntent = action(() => {

@@ -4,6 +4,7 @@ import { Row } from "../../Layout";
 import strength from "../../Images/strength.png";
 import dexterity from "../../Images/dexterity.png";
 import vulnerable from "../../Images/vulnerable.png";
+import weak from "../../Images/weak.png";
 import { Typography } from "../../Typography";
 
 const Wrapper = styled(Row)`
@@ -11,16 +12,19 @@ const Wrapper = styled(Row)`
   height: 30px;
 `;
 
+
 export enum StatusType {
   strength = "strength",
   dexterity = "dexterity",
-  vulnerable = "vulnerable"
+  vulnerable = "vulnerable",
+  weak = "Weak"
 }
 
 export const StatusTypeToIStatus = {
   [StatusType.strength]: { degrades: false },
   [StatusType.dexterity]: { degrades: false },
   [StatusType.vulnerable]: { degrades: true },
+  [StatusType.weak]: { degrades: true },
 };
 
 type IStatusIconMap = {
@@ -31,6 +35,7 @@ const StatusIconMap: IStatusIconMap = {
   [StatusType.strength]: strength,
   [StatusType.dexterity]: dexterity,
   [StatusType.vulnerable]: vulnerable,
+  [StatusType.weak]: weak,
 };
 
 export interface IStatus {
