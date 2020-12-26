@@ -1,5 +1,5 @@
 import { Singleton } from "@taipescripeto/singleton";
-import { sampleSize } from "lodash";
+import { random, range, shuffle } from "lodash";
 import { action, computed, observable } from "mobx";
 import { Card, CardEffectType } from "../Cards/Card";
 import { IStatus, StatusType } from "../Common/StatusBar";
@@ -13,7 +13,8 @@ export interface IBattleState {
   currentHand: Card[];
   currentMana: number;
   drawPile: Card[];
-  graveyard: Card[];
+  discardPile: Card[];
+  exhaustPile: Card[];
   endTurnActions: Function[];
 }
 @Singleton()
@@ -27,10 +28,11 @@ export class Battle {
       monsters: [],
       currentHand: [],
       drawPile: [],
-      graveyard: [],
+      discardPile: [],
+      exhaustPile: [],
       endTurnActions: [],
     })
-  ) {}
+  ) { }
 
   @computed
   get wonBattle() {
@@ -108,23 +110,35 @@ export class Battle {
   }
 
   @computed
-  get graveyard() {
-    return this.battleState.graveyard;
+  get discardPile() {
+    return this.battleState.discardPile;
   }
+
+  @computed
+  get exhaustPile() {
+    return this.battleState.exhaustPile;
+  }
+
+  public log = () => {
+    console.log("draw", this.battleState.drawPile.map(card => card.get.id));
+    console.log("hand", this.battleState.currentHand.map(card => card.get.id));
+    console.log("discard", this.battleState.discardPile.map(card => card.get.id));
+    console.log("exhaust", this.battleState.exhaustPile.map(card => card.get.id));
+  };
 
   private getCardFromId = (cardId: string) => {
     return this.player.get.deck.find((card) => card.get.id === cardId);
   };
 
   private drawCards = action((cards: Card[]) => {
-    if (this.battleState.drawPile.length === 0) {
-      this.initializeHand();
+    console.log(cards, this.battleState.drawPile);
+    console.log(cards.map(card => card.get.id), this.battleState.drawPile.map(card => card.get.id));
+    if (!cards.every(card => this.battleState.drawPile.map(drawCard => drawCard.get.id).includes(card.get.id))) {
+      throw new Error("Trying to draw cards that don't exist in draw pile");
     } else {
       cards.forEach((card) => {
-        this.battleState.drawPile = this.battleState.drawPile.filter(
-          (card) => !cards.map((card) => card.get.id).includes(card.get.id)
-        );
-        this.battleState.currentHand.push(card);
+        this.battleState.currentHand = [...this.battleState.currentHand, card];
+        this.battleState.drawPile = this.battleState.drawPile.filter(drawCard => drawCard.get.id !== card.get.id);
       });
     }
   });
@@ -134,16 +148,35 @@ export class Battle {
     this.setMonsters(mapState.currentEncounter);
   });
 
-  private initializeHand = action(() => {
-    this.removeCardsFromHand(this.currentHand);
-    this.battleState.drawPile = this.player.get.deck;
-    this.drawRandomCards(5);
-    this.battleState.graveyard = [];
+  private reshuffleDiscardPile = action(() => {
+    this.battleState.drawPile = this.battleState.discardPile;
+    this.battleState.discardPile = [];
   });
 
-  private drawRandomCards = action((number: number) => {
-    const randomCards = sampleSize(this.drawPile, number);
-    this.drawCards(randomCards);
+  private initializeHand = action(() => {
+    this.battleState.currentHand = [];
+    this.battleState.exhaustPile = [];
+    this.battleState.discardPile = [];
+    this.battleState.drawPile = this.player.get.deck;
+    this.battleState.drawPile = shuffle(this.battleState.drawPile);
+    this.draw(5);
+  });
+
+  public draw = action((count: number = 1) => {
+    let cards: Card[] = [];
+
+    let shuffleIndex = 0;
+    range(0, count).forEach((index) => {
+      if (this.battleState.drawPile.length === 0) {
+        this.reshuffleDiscardPile();
+        shuffleIndex = index;
+      }
+
+      cards.push(this.drawPile[index - shuffleIndex]);
+    });
+
+    this.drawCards(cards);
+    return cards;
   });
 
   private removeCardsFromHand = (cards: Card[]) => {
@@ -151,34 +184,49 @@ export class Battle {
       this.battleState.currentHand = this.battleState.currentHand.filter(
         (card) => card.get.id !== cardToRemove.get.id
       );
-      this.battleState.graveyard.push(cardToRemove);
+      this.battleState.discardPile.push(cardToRemove);
     });
   };
 
-  private resolveTargetedCard = action((card: Card) => {
-    switch (card.get.effect) {
-      case CardEffectType.SingleTarget:
-        this.resolveSingleTargetDamage({
-          card,
-          selectedMonster: this.selectedMonster as Monster,
-        });
-        break;
-      case CardEffectType.MultiTarget:
-        this.monsters.forEach((monster) => {
-          this.resolveSingleTargetDamage({ card, selectedMonster: monster });
-        });
-        break;
-      case CardEffectType.AddBlock:
-        if (card.get.block && card.get.targetSelf) {
-          this.player.addBlock(card.get.block + this.player.extrablock);
-        }
-        break;
-      default:
-        break;
-    }
-    if (card.get.special) {
-      card.get.special(this.battleState);
-    }
+  public exhaustCards(cards: Card[]) {
+    cards.forEach(card => {
+      this.battleState.drawPile = this.battleState.drawPile.filter(drawCard => drawCard.get.id !== card.get.id);
+      this.battleState.currentHand = this.battleState.currentHand.filter(handCard => handCard.get.id !== card.get.id);
+      this.battleState.discardPile = this.battleState.discardPile.filter(exhaustCard => exhaustCard.get.id !== card.get.id);
+      this.battleState.exhaustPile = [...this.battleState.exhaustPile, card];
+    });
+  }
+
+  public resolveTargetedCard = action((cards: Card[]) => {
+    cards.forEach(card => {
+      switch (card.get.effect) {
+        case CardEffectType.SingleTarget:
+          if (card.get.damage) //TODO: add a new card type for cards that has no damage
+            this.resolveSingleTargetDamage({
+              card: card,
+              selectedMonster: this.selectedMonster,
+            });
+          break;
+        case CardEffectType.MultiTarget:
+          this.monsters.forEach((monster) => {
+            if (card.get.damage) {
+              this.resolveSingleTargetDamage({ card: card, selectedMonster: monster });
+            }
+          });
+          break;
+        case CardEffectType.AddBlock:
+          if (card.get.block && card.get.targetSelf) {
+            this.player.addBlock(card.get.block + this.player.extrablock);
+          }
+          break;
+        default:
+          break;
+      }
+      if (card.get.special) {
+        card.get.special(this.battleState);
+      }
+    });
+
   });
 
   private calculateDamage = action(
@@ -208,8 +256,12 @@ export class Battle {
     selectedMonster,
   }: {
     card: Card;
-    selectedMonster: Monster;
+    selectedMonster?: Monster;
   }) {
+    if (!selectedMonster) {
+      selectedMonster = this.monsters[random(0, this.monsters.length - 1)];
+    }
+
     if (card.get.damage && selectedMonster) {
       selectedMonster.takeDamage(
         this.calculateDamage({
@@ -224,7 +276,7 @@ export class Battle {
       if (selectedMonster.get.health === 0) {
         this.setMonsters(
           this.monsters.filter(
-            (monster) => monster.get.id !== selectedMonster.id
+            (monster) => monster.get.id !== selectedMonster?.id
           )
         );
       }
@@ -263,7 +315,7 @@ export class Battle {
   private resolveGameActions = action(() => {
     this.battleState.currentMana = this.player.maxMana;
     this.removeCardsFromHand(this.currentHand);
-    this.drawRandomCards(5);
+    this.draw(5);
   });
 
   private resolveEndTurnActions() {
@@ -285,10 +337,10 @@ export class Battle {
     ) {
       return;
     }
-    this.removeCardsFromHand([this.selectedCard]);
     this.useMana(this.selectedCardManaCost);
     this.selectedCard.playAudioClip();
-    this.resolveTargetedCard(this.selectedCard);
+    this.resolveTargetedCard([this.selectedCard]);
+    this.removeCardsFromHand([this.selectedCard]);
     this.selectCard(undefined);
   });
 
@@ -300,9 +352,9 @@ export class Battle {
   });
 
   public initialize = action(() => {
-    this.resolveGameActions();
     this.initializeMonsters();
     this.initializeHand();
+    this.battleState.currentMana = this.player.maxMana;
   });
 
   selectCard = action((id: string | undefined) => {
