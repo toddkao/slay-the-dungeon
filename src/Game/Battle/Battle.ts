@@ -1,5 +1,5 @@
 import { Singleton } from "@taipescripeto/singleton";
-import { random, range, shuffle } from "lodash";
+import { random, range, sampleSize, shuffle } from "lodash";
 import { action, computed, observable } from "mobx";
 import { Card, CardEffectType } from "../Cards/Card";
 import { IStatus, StatusType } from "../Common/StatusBar";
@@ -182,18 +182,21 @@ export class Battle {
 
   public draw = action((count: number = 1) => {
     let cards: Card[] = [];
+    const cardsFromDrawPile = sampleSize(this.drawPile, count);
+    this.drawCards(cardsFromDrawPile);
+    const remainingCardsToDraw = count - cardsFromDrawPile.length;
+    cards = [...cards, ...cardsFromDrawPile];
+    
+    if (remainingCardsToDraw) {
+      this.reshuffleDiscardPile();
+      const cardsFromDrawPileAfterReshuffling = sampleSize(
+        this.drawPile,
+        remainingCardsToDraw
+      );
+      this.drawCards(cardsFromDrawPileAfterReshuffling);
+      cards = [...cards, ...cardsFromDrawPileAfterReshuffling];
+    }
 
-    let shuffleIndex = 0;
-    range(0, count).forEach((index) => {
-      if (this.battleState.drawPile.length === 0) {
-        this.reshuffleDiscardPile();
-        shuffleIndex = index;
-      }
-
-      cards.push(this.drawPile[index - shuffleIndex]);
-    });
-
-    this.drawCards(cards);
     return cards;
   });
 
