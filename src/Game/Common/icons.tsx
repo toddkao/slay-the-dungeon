@@ -3,6 +3,8 @@ import deck from "../../Images/UI/deck.png";
 import drawPile from "../../Images/UI/drawPile.png";
 import discardPile from "../../Images/UI/discardPile.png";
 import map from "../../Images/UI/map.png";
+import { RelativeWrapper } from '../../Layout/index';
+import React from 'react';
 
 export const DeckWithNumber = ({
   amount,
@@ -55,15 +57,13 @@ const IconWithBadge = ({
     <div {...props}>
       <RelativeWrapper>
         {renderIcon}
-        {amount ? <NumberBadge right={right}>{amount}</NumberBadge> : null}
+        {amount !== undefined ? (
+          <NumberBadge right={right}>{amount}</NumberBadge>
+        ) : null}
       </RelativeWrapper>
     </div>
   );
 };
-
-const RelativeWrapper = styled.div`
-  position: relative;
-`;
 
 const NumberBadge = styled.div<{ right: boolean }>`
   display: flex;

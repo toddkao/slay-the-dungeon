@@ -36,6 +36,7 @@ interface IMap {
   currentNode: IMapNode | undefined;
   traversedNodeIds: string[];
   currentEncounter: Monster[] | undefined;
+  showingMap: boolean;
 }
 
 @Singleton()
@@ -52,6 +53,7 @@ export class Map {
       currentNode: undefined,
       traversedNodeIds: [],
       currentEncounter: undefined,
+      showingMap: false,
     })
   ) {
     this.map.floors[1].matrix = range(0, 16).map((layer, rowIndex) => {
@@ -98,6 +100,11 @@ export class Map {
   }
 
   @computed
+  get showingMap() {
+    return this.map.showingMap;
+  }
+
+  @computed
   get floors() {
     return this.map.floors;
   }
@@ -135,6 +142,10 @@ export class Map {
   get traversedNodeIds() {
     return this.map.traversedNodeIds;
   }
+
+  setShowingMap = action((showingMap: boolean) => {
+    this.map.showingMap = showingMap;
+  });
 
   generateNodeType = (rowIndex: number) => {
     return rowIndex === 8 ? mapNodeType.rest : mapNodeType.monster;

@@ -1,7 +1,7 @@
 import { observer } from "mobx-react";
 import React, { useEffect } from "react";
 import styled from "styled-components";
-import { Row } from "../../Layout";
+import { horizontalCenterAbsolute, Row } from "../../Layout";
 import { Typography } from "../../Typography";
 import { Battle } from "./Battle";
 import { ManaCost } from "../Common";
@@ -22,14 +22,15 @@ import { RenderMonster } from "../Entities/Monster/RenderMonster";
 import { RenderMap } from "../Map/RenderMap";
 import { Map } from "../Map/Map";
 import { useHistory } from "react-router-dom";
+import { RenderRewardsModal } from "./Rewards/RenderRewardsModal";
+import { map } from "lodash";
 
 export const RenderBattle = observer(() => {
   const battleState = new Battle();
   const useMountEffect = (fun: () => any) => useEffect(fun, []);
   const history = useHistory();
   const [cardToShow, setCardsToShow] = useState<Card[]>();
-
-  const [showMap, setShowMap] = useState<boolean>();
+  const mapState = new Map();
 
   useMountEffect(() => {
     const mapState = new Map();
@@ -67,16 +68,23 @@ export const RenderBattle = observer(() => {
       <ManaAmount notEnoughMana={battleState.currentMana === 0}>
         {battleState.currentMana}/{battleState.player.maxMana}
       </ManaAmount>
+
       <DrawPile
         onClick={() => setCardsToShow(battleState.drawPile)}
         amount={battleState.drawPile.length}
       />
-      <Graveyard
+
+      <ExhaustPile
+        onClick={() => setCardsToShow(battleState.exhaustPile)}
+        amount={battleState.exhaustPile.length}
+      />
+
+      <DiscardPile
         onClick={() => setCardsToShow(battleState.discardPile)}
         amount={battleState.discardPile.length}
       />
 
-      <OpenMap onClick={() => setShowMap(true)} />
+      <OpenMap onClick={() => mapState.setShowingMap(true)} />
 
       {cardToShow ? (
         <ShowCardsModal
@@ -85,13 +93,14 @@ export const RenderBattle = observer(() => {
         />
       ) : null}
 
-      {battleState.wonBattle || showMap ? (
+      {mapState.showingMap ? (
         <RenderMap
-          onClose={() => setShowMap(undefined)}
-          hideReturn={battleState.wonBattle}
+          onClose={() => mapState.setShowingMap(false)}
         />
       ) : null}
-
+      {battleState.wonBattle ? (
+        <RenderRewardsModal onClickProceed={() => mapState.setShowingMap(true)} />
+      ) : null}
     </Wrapper>
   );
 });
@@ -137,12 +146,10 @@ const CurrentHandContainer = styled(Row).attrs({
   align: "center",
   justify: "center",
 })`
-  position: absolute;
+  ${horizontalCenterAbsolute};
   width: 80vw;
   bottom: 0;
   height: 260px;
-  transform: translateX(-50%);
-  left: 50%;
 `;
 
 const UnitWrappers = styled(Row)`
@@ -156,9 +163,15 @@ const DrawPile = styled(DrawPileWithNumber)`
   left: 0;
 `;
 
-const Graveyard = styled(DiscardPileWithNumber)`
+const DiscardPile = styled(DiscardPileWithNumber)`
   bottom: 0;
   right: 0;
+  position: absolute;
+`;
+
+const ExhaustPile = styled(DiscardPileWithNumber)`
+  bottom: 0;
+  right: 100px;
   position: absolute;
 `;
 

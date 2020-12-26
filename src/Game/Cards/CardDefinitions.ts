@@ -3,7 +3,7 @@ import cards2 from "../../Images/cards2.png";
 import cards3 from "../../Images/cards3.png";
 import cards4 from "../../Images/cards4.png";
 import cards5 from "../../Images/cards5.png";
-import { Card, CardEffectType, CardType } from "./Card";
+import { Card, CardEffectType, CardRarity, CardType } from "./Card";
 import { StatusType } from "../Common/StatusBar";
 // @ts-ignore
 import fastAtk from "../../Audio/fastAtk.ogg";
@@ -71,6 +71,7 @@ const Bash = (id: string) =>
   new Card({
     id,
     name: "Bash",
+    rarity: CardRarity.common,
     manaCost: 2,
     damage: 8,
     status: {
@@ -91,6 +92,7 @@ const Defend = (id: string) =>
   new Card({
     id,
     name: "Defend",
+    rarity: CardRarity.common,
     manaCost: 1,
     block: 5,
     image: getImage({ sheetNumber: 1, position: [6, 4] }),
@@ -106,6 +108,7 @@ const Strike = (id: string) =>
   new Card({
     id,
     name: "Strike",
+    rarity: CardRarity.common,
     manaCost: 1,
     damage: 6,
     image: getImage({ sheetNumber: 5, position: [4, 2] }),
@@ -121,6 +124,7 @@ const Anger = (id: string) =>
   new Card({
     id,
     name: "Anger",
+    rarity: CardRarity.common,
     manaCost: 0,
     damage: 6,
     image: getImage({ sheetNumber: 3, position: [4, 3] }),
@@ -146,6 +150,7 @@ const BodySlam = (id: string) =>
   new Card({
     id,
     name: "Body Slam",
+    rarity: CardRarity.common,
     manaCost: 1,
     damage: () => {
       let battle = new Battle();
@@ -164,6 +169,7 @@ const Clash = (id: string) =>
   new Card({
     id,
     name: "Clash",
+    rarity: CardRarity.common,
     manaCost: 0,
     damage: 14,
     prerequisite: (battleState: IBattleState) => {
@@ -182,6 +188,7 @@ const Cleave = (id: string) =>
   new Card({
     id,
     name: "Cleave",
+    rarity: CardRarity.common,
     manaCost: 1,
     damage: 8,
     image: getImage({ sheetNumber: 3, position: [6, 1] }),
@@ -197,6 +204,7 @@ const Clothesline = (id: string) =>
   new Card({
     id,
     name: "Clothesline",
+    rarity: CardRarity.common,
     manaCost: 2,
     damage: 12,
     status: {
@@ -217,6 +225,7 @@ const Flex = (id: string) =>
   new Card({
     id,
     name: "Flex",
+    rarity: CardRarity.common,
     manaCost: 0,
     image: getImage({ sheetNumber: 1, position: [0, 0] }),
     special: () => {
@@ -237,6 +246,7 @@ const Havoc = (id: string) =>
   new Card({
     id,
     name: "Havoc",
+    rarity: CardRarity.common,
     manaCost: 1,
     image: getImage({ sheetNumber: 2, position: [2, 10] }),
     special: () => {

@@ -6,6 +6,7 @@ import dexterity from "../../Images/dexterity.png";
 import vulnerable from "../../Images/vulnerable.png";
 import weak from "../../Images/weak.png";
 import { Typography } from "../../Typography";
+import React from 'react';
 
 const Wrapper = styled(Row)`
   gap: 20px;

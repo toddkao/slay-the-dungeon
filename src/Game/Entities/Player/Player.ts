@@ -1,4 +1,4 @@
-import { computed, observable } from "mobx";
+import { action, computed, observable } from "mobx";
 import { Card } from "../../Cards/Card";
 import { range, times, uniqueId } from "lodash";
 import { Singleton } from "@taipescripeto/singleton";
@@ -56,6 +56,10 @@ export class Player extends Entity {
   get maxMana() {
     return this.stats.maxMana;
   }
+
+  addCardToDeck = action((card: Card) => {
+    this.stats.deck = [...this.stats.deck, card];
+  });
 }
 
 interface IPlayer extends IEntity {

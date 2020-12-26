@@ -1,11 +1,12 @@
 import { observer } from "mobx-react";
 import styled from "styled-components";
-import { Row } from "../../Layout";
+import { horizontalCenterAbsolute, Row } from "../../Layout";
 import { Typography } from "../../Typography";
+import React from 'react';
 
 export const HealthBar = observer((props: IHealthBarProps) => (
   <Bar>
-    <HealthNumber>
+    <HealthNumber fontSize={18} outline>
       {props.health}
       {props.block ? `(${props.block})` : ""} / {props.maxHealth}
     </HealthNumber>
@@ -22,19 +23,13 @@ const Health = styled.div<{ healthPercentage: number }>`
   height: 5px;
 `;
 
-const HealthNumber = styled(Typography).attrs({
-  fontSize: 18,
-})`
-  position: absolute;
-  transform: translateX(-50%);
-  left: 50%;
+const HealthNumber = styled(Typography)`
+  ${horizontalCenterAbsolute};
   top: -13px;
   margin: 0;
   color: white;
   white-space: nowrap;
   z-index: 1;
-  text-shadow: -1px -1px 0 #000, 0 -1px 0 #000, 1px -1px 0 #000, 1px 0 0 #000,
-    1px 1px 0 #000, 0 1px 0 #000, -1px 1px 0 #000, -1px 0 0 #000;
   border-radius: 5px;
   padding: 3px;
 `;

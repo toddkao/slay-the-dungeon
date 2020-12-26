@@ -12,9 +12,31 @@ import { Player } from "../Entities/Player/Player";
 
 // @ts-ignore
 import { Sprite } from "react-spritesheet";
+import { horizontalCenterAbsolute } from "../../Layout";
 
-export const RenderCard = observer(({ cardState }: { cardState: Card }) => {
-  const battleState = new Battle();
+export const RenderCard = observer(
+  ({
+    cardState,
+    onClick,
+    showIfCastable = true,
+  }: {
+    cardState: Card;
+    onClick?: () => void;
+    showIfCastable?: boolean;
+  }) => {
+    const battleState = new Battle();
+    const parseCardText = () => {
+      const player = new Player();
+      let text = cardState.get.description;
+      cardState.get.descriptionVariables?.forEach((variable) => {
+        text = text.replace(
+          "{}",
+          (cardState as any)?.get?.[variable] +
+            (player as any)?.[`extra${variable}`]
+        );
+      });
+      return text;
+    };
 
   const parseCardText = () => {
     const player = new Player();
@@ -36,49 +58,53 @@ export const RenderCard = observer(({ cardState }: { cardState: Card }) => {
     scale: 1,
   }));
 
-  // @ts-ignore
-  const bind = useDrag(({ down, movement: [x, y] }) => {
-    set({
-      x: down ? x : 0,
-      y: down ? y : 0,
-      scale: down ? 1.2 : 1,
-      immediate: down,
+    // @ts-ignore
+    const bind = useDrag(({ down, movement: [x, y] }) => {
+      set({
+        x: down ? x : 0,
+        y: down ? y : 0,
+        scale: down ? 1.2 : 1,
+        immediate: down,
+      });
     });
-  });
 
-  const { src, position, width, height } = cardState.get.image;
-  const [x, y] = position;
+    const { src, position, width, height } = cardState.get.image;
+    const [x, y] = position;
 
-  return (
-    <CardWrapper
-      key={cardState.get.id}
-      onClick={cardState.select}
-      selected={cardState.get.id === battleState.selectedCardId}
-      {...bind()}
-      style={props}
-    >
-      <Image src={cardImage} />
-      <ManaCost
-        notEnoughMana={cardState.get.manaCost > battleState.currentMana}
+    return (
+      <CardWrapper
+        key={cardState.get.id}
+        onClick={onClick ?? cardState.select}
+        selected={cardState.get.id === battleState.selectedCardId}
+        {...bind()}
+        style={props}
       >
-        {cardState.get.manaCost}
-      </ManaCost>
-      <RenderCardName>{cardState.get.name}</RenderCardName>
-      <RenderCardType>{cardState.get.type}</RenderCardType>
-      <RenderCardText>{parseCardText()}</RenderCardText>
-      <CardSpriteContainer>
-        <Sprite
-          filename={src}
-          x={x * width}
-          y={y * height}
-          width={width}
-          height={height}
-        />
-      </CardSpriteContainer>
-    </CardWrapper>
-  );
-});
-
+        <Image src={cardImage} />
+        <ManaCost
+          notEnoughMana={
+            showIfCastable
+              ? cardState.get.manaCost > battleState.currentMana
+              : false
+          }
+        >
+          {cardState.get.manaCost}
+        </ManaCost>
+        <RenderCardName outline>{cardState.get.name}</RenderCardName>
+        <RenderCardType>{cardState.get.type}</RenderCardType>
+        <RenderCardText>{parseCardText()}</RenderCardText>
+        <CardSpriteContainer>
+          <Sprite
+            filename={src}
+            x={x * width}
+            y={y * height}
+            width={width}
+            height={height}
+          />
+        </CardSpriteContainer>
+      </CardWrapper>
+    );
+  }
+);
 
 const Image = styled.div<{ src: string }>`
   background: ${({ src }) => `url(${src})`};
@@ -96,7 +122,7 @@ const CardSpriteContainer = styled.div`
   zoom: 0.58;
 `;
 
-const CardWrapper = styled(animated.div) <{ selected: boolean }>`
+const CardWrapper = styled(animated.div)<{ selected: boolean }>`
   display: flex;
   flex-direction: column;
   position: relative;
@@ -105,7 +131,7 @@ const CardWrapper = styled(animated.div) <{ selected: boolean }>`
       ? css`
           transform: scale(1.5);
           z-index: 2;
-          outline:5px solid green;
+          outline: 5px solid green;
         `
       : ""};
   transition: transform 0.2s;
@@ -117,30 +143,22 @@ const CardWrapper = styled(animated.div) <{ selected: boolean }>`
 
 const RenderCardName = styled(Typography)`
   color: white;
-  text-shadow: -1px -1px 0 #000, 0 -1px 0 #000, 1px -1px 0 #000, 1px 0 0 #000,
-    1px 1px 0 #000, 0 1px 0 #000, -1px 1px 0 #000, -1px 0 0 #000;
   font-size: 16px;
   top: 17px;
-  transform: translateX(-50%);
-  left: 50%;
-  position: absolute;
+  ${horizontalCenterAbsolute};
 `;
 
 const RenderCardType = styled(Typography)`
   font-size: 55%;
   top: 53%;
-  transform: translateX(-50%);
-  left: 50%;
-  position: absolute;
+  ${horizontalCenterAbsolute};
 `;
 
 const RenderCardText = styled(Typography)`
+  ${horizontalCenterAbsolute};
   text-align: center;
   font-size: 16px;
   color: white;
   top: 65%;
-  transform: translateX(-50%);
-  left: 50%;
-  position: absolute;
   width: 65%;
 `;
