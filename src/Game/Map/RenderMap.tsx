@@ -57,7 +57,11 @@ export const RenderMap = observer(
                       id={node.id}
                       key={node.id}
                       onClick={() => {
-                        if (battleState.wonBattle && selectableNodeIds.includes(node.id)) {
+                        if (
+                          battleState.wonBattle ||
+                          (battleState.monsters === undefined &&
+                            selectableNodeIds.includes(node.id))
+                        ) {
                           history.push(`/battle/${node.id}`);
                           selectNode(node);
                           mapState.setShowingMap(false);

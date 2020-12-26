@@ -10,14 +10,28 @@ export class Monster extends Entity {
   }
 
   @computed
+  get monsterRef(): React.MutableRefObject<any> | undefined {
+    return this.monster.ref;
+  }
+  set monsterRef(ref: React.MutableRefObject<any> | undefined) {
+    this.monster.ref = ref;
+  }
+
+  @computed
   public get get() {
     return this.monster;
   }
 
   @computed
   public get damage() {
-    let weakStatus = this.monster.statuses.find(status => status.type === StatusType.weak);
-    return  weakStatus ? (weakStatus?.amount >= 1 ? Math.floor(this.monster.damage * .75) : this.monster.damage) : this.monster.damage;
+    let weakStatus = this.monster.statuses.find(
+      (status) => status.type === StatusType.weak
+    );
+    return weakStatus
+      ? weakStatus?.amount >= 1
+        ? Math.floor(this.monster.damage * 0.75)
+        : this.monster.damage
+      : this.monster.damage;
   }
 
   public pickRandomIntent = action(() => {
@@ -53,4 +67,5 @@ interface IMonster extends IEntity {
   intent: IIntent[];
   currentIntent?: IIntent;
   effect?: any;
+  ref?: React.MutableRefObject<any>;
 }

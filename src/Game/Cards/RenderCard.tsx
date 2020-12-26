@@ -12,6 +12,7 @@ import { Player } from "../Entities/Player/Player";
 import { Sprite } from "react-spritesheet";
 import { horizontalCenterAbsolute, Row } from "../../Layout";
 import { PullRelease } from "../Common/Draggable";
+import { isCollidingWithEachOther } from "../Common/utility";
 
 export const RenderCard = observer(
   ({
@@ -47,21 +48,28 @@ export const RenderCard = observer(
       <CardWrapper
         ref={cardRef}
         key={cardState.get.id}
-        onMouseEnter={onClick ?? cardState.select}
+        onClick={onClick}
+        onMouseEnter={cardState.select}
         onMouseUp={() => {
-          const {
-            top,
-            right,
-            bottom,
-            left,
-            // @ts-ignore
-          } = cardRef?.current?.getBoundingClientRect();
+          // @ts-ignore
+          const cardBoundingRect = cardRef?.current?.getBoundingClientRect();
+          const { top, right, bottom, left } = cardBoundingRect;
           console.log(top, right, bottom, left);
 
           if (window.innerHeight / top > 1.7 && cardState.get.targetSelf) {
             console.log("play untargetted card");
             battleState.playSelectedCard();
-          } else if (false) {
+          } else {
+            const collisions = battleState.monstersWithBoundingRef?.find(
+              (monster) =>
+                isCollidingWithEachOther(cardBoundingRect, monster.boundingRect)
+            );
+            if (collisions) {
+              battleState.selectMonster(collisions.id);
+              battleState.playSelectedCard();
+            }
+            console.log(collisions);
+            console.log(battleState.monstersWithBoundingRef);
             // TODO check if card is hovering over an enemy, and
             // if card is meant to target enemies, cast the card
           }
@@ -120,11 +128,11 @@ const CardWrapper = styled(PullRelease)<{
   flex-direction: column;
   position: relative;
   ${({ selected }) =>
-  selected
-    ? css`
-        z-index: 9;
-      `
-    : ""};
+    selected
+      ? css`
+          z-index: 9;
+        `
+      : ""};
   /*
     TODO: Maybe fix this styling
     ${({ selected }) =>

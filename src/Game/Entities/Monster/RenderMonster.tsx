@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import React from "react";
+import React, { useRef } from "react";
 import styled, { css } from "styled-components";
 import { Column, Spacer } from "../../../Layout";
 import { Typography } from "../../../Typography";
@@ -19,7 +19,11 @@ export const RenderMonster = observer(
       maxHealth,
       extradamage,
     } = monsterState;
-
+    const monsterRef = useRef(null);
+    monsterState.monsterRef = monsterRef;
+    // TODO actually I think we should render a dead 
+    // monster here, and avoid removing monsters from battleState
+    // when they die
     if (health === 0) {
       return null;
     }
@@ -35,8 +39,10 @@ export const RenderMonster = observer(
           return null;
       }
     };
+
     return (
       <MonsterWrapper
+        ref={monsterRef}
         id={`monster-${id}`}
         key={`monster-${id}`}
         onClick={() => {

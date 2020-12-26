@@ -52,7 +52,7 @@ export const RenderBattle = observer(() => {
           <RenderPlayer playerState={battleState.player} />
         </UnitContainer>
         <UnitContainer>
-          {new Battle().monsters.map((monster) => (
+          {new Battle().monsters?.map((monster) => (
             <RenderMonster monsterState={monster} />
           ))}
         </UnitContainer>

@@ -1,5 +1,5 @@
 import { Singleton } from "@taipescripeto/singleton";
-import { random, range, sampleSize, shuffle } from "lodash";
+import { groupBy, keyBy, random, range, sampleSize, shuffle } from "lodash";
 import { action, computed, observable } from "mobx";
 import { Card, CardEffectType } from "../Cards/Card";
 import { IStatus, StatusType } from "../Common/StatusBar";
@@ -36,7 +36,7 @@ export class Battle {
 
   @computed
   get wonBattle() {
-    return this.monsters.length === 0;
+    return this.monsters !== undefined && this.monsters.length === 0;
   }
 
   @computed
@@ -89,14 +89,22 @@ export class Battle {
 
   @computed
   get selectedMonster() {
-    return this.monsters.find(
+    return this.monsters?.find(
       (monster) => monster.get.id === this.battleState.selectedMonsterId
     );
   }
 
   @computed
   get monsters() {
-    return this.battleState.monsters ?? [];
+    return this.battleState.monsters;
+  }
+
+  @computed
+  get monstersWithBoundingRef() {
+    return this.monsters?.map((monster) => ({
+      id: monster.id,
+      boundingRect: monster.monsterRef?.current?.getBoundingClientRect(),
+    }));
   }
 
   @computed
@@ -187,7 +195,7 @@ export class Battle {
     this.drawCards(cardsFromDrawPile);
     const remainingCardsToDraw = count - cardsFromDrawPile.length;
     cards = [...cards, ...cardsFromDrawPile];
-    
+
     if (remainingCardsToDraw) {
       this.reshuffleDiscardPile();
       const cardsFromDrawPileAfterReshuffling = sampleSize(
@@ -237,7 +245,7 @@ export class Battle {
             });
           break;
         case CardEffectType.MultiTarget:
-          this.monsters.forEach((monster) => {
+          this.monsters?.forEach((monster) => {
             if (card.get.damage) {
               this.resolveSingleTargetDamage({
                 card: card,
@@ -289,7 +297,7 @@ export class Battle {
     card: Card;
     selectedMonster?: Monster;
   }) {
-    if (!selectedMonster) {
+    if (!selectedMonster && this.monsters) {
       selectedMonster = this.monsters[random(0, this.monsters.length - 1)];
     }
 
@@ -306,7 +314,7 @@ export class Battle {
       }
       if (selectedMonster.get.health === 0) {
         this.setMonsters(
-          this.monsters.filter(
+          this.monsters?.filter(
             (monster) => monster.get.id !== selectedMonster?.id
           )
         );
@@ -315,7 +323,7 @@ export class Battle {
   }
 
   private resolveMonsterActions = action(() => {
-    this.monsters.forEach((monster) => {
+    this.monsters?.forEach((monster) => {
       switch (monster.get.currentIntent?.type) {
         case IntentType.Attack:
           this.player.takeDamage(this.calculateDamage(monster.get));
@@ -399,8 +407,6 @@ export class Battle {
   });
 
   setMonsters = action((monsters: Monster[] | undefined) => {
-    if (monsters) {
-      this.battleState.monsters = monsters;
-    }
+    this.battleState.monsters = monsters;
   });
 }

@@ -353,15 +353,16 @@ export const cardMap: ICardMap = {
     special: () => {
       let battle = new Battle();
       range(0, 3).forEach(() => {
-        let randomMonster =
-          battle.monsters[random(0, battle.monsters.length - 1)];
-        randomMonster.takeDamage(
-          battle.calculateDamage({
-            damage: 3,
-            extradamage: battle.player.extradamage,
-            statuses: randomMonster.get.statuses,
-          })
-        );
+        let randomMonster = battle.monsters?.[random(0, battle.monsters.length - 1)];
+        if (randomMonster) {
+          randomMonster.takeDamage(
+            battle.calculateDamage({
+              damage: 3,
+              extradamage: battle.player.extradamage,
+              statuses: randomMonster.get.statuses,
+            })
+          );
+        }
       });
     },
     type: CardType.Attack,
@@ -378,7 +379,7 @@ export const cardMap: ICardMap = {
     damage: 4,
     special: () => {
       let battle = new Battle();
-      battle.monsters.forEach((monster) =>
+      battle.monsters?.forEach((monster) =>
         monster.addStatus(StatusType.vulnerable)
       );
     },
