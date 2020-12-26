@@ -47,7 +47,7 @@ export class Battle {
   @computed
   get targetSelf() {
     return (
-      this.selectedCard?.get.targetEnemy === false ||
+      this.selectedCard?.get.targetSpecificEnemy === false ||
       this.selectedCardId === undefined
     );
   }
@@ -55,7 +55,7 @@ export class Battle {
   @computed
   get targetEnemy() {
     return (
-      this.selectedCard?.get.targetEnemy === true ||
+      this.selectedCard?.get.targetSpecificEnemy === true ||
       this.selectedCardId === undefined
     );
   }

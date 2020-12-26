@@ -11,7 +11,7 @@ export class Card {
   public get get() {
     return {
       ...this.card,
-      targetSelf: !this.card.targetEnemy,
+      targetSelf: !this.card.targetSpecificEnemy,
     };
   }
 
@@ -69,7 +69,7 @@ export interface ICard {
   block?: number;
   special?: Function;
   rarity: CardRarity;
-  targetEnemy: boolean;
+  targetSpecificEnemy: boolean;
 
   description: string;
   descriptionVariables?: string[];

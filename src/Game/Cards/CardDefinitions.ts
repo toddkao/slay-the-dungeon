@@ -92,7 +92,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SingleTarget,
     description: `Deal {} damage.`,
     descriptionVariables: ["damage"],
-    targetEnemy: true,
+    targetSpecificEnemy: true,
     audio: fastAtk,
   },
   defend: {
@@ -105,7 +105,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.AddBlock,
     description: "Gain {} Block.",
     descriptionVariables: ["block"],
-    targetEnemy: false,
+    targetSpecificEnemy: false,
     audio: addBlock,
   },
   bash: {
@@ -123,7 +123,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SingleTarget,
     description: `Deal {} damage.\nApply 2 vulnerable.`,
     descriptionVariables: ["damage"],
-    targetEnemy: true,
+    targetSpecificEnemy: true,
     audio: heavyAtk,
   },
   anger: {
@@ -147,7 +147,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SingleTarget,
     description: `Deal {} damage.\nAdd a copy of this card to your discard pile.`,
     descriptionVariables: ["damage"],
-    targetEnemy: true,
+    targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
   },
   //TODO Armament requires UPGRADE functionality
@@ -164,7 +164,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SingleTarget,
     description: `Deal damage equal to your current block`,
     descriptionVariables: [],
-    targetEnemy: true,
+    targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
   },
   clash: {
@@ -182,7 +182,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SingleTarget,
     description: `Can only be played if every card in your hand is an Attack.\nDeal {} damage.`,
     descriptionVariables: ["damage"],
-    targetEnemy: true,
+    targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
   },
   cleave: {
@@ -195,7 +195,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.MultiTarget,
     description: `Deal 8 damage to ALL enemies.`,
     descriptionVariables: ["damage"],
-    targetEnemy: true,
+    targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
   },
   clothesline: {
@@ -213,7 +213,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SingleTarget,
     description: `Deal {} damage. Apply 2 Weak.`, //TODO: add weak to descriptionvariable
     descriptionVariables: ["damage"],
-    targetEnemy: true,
+    targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
   },
   flex: {
@@ -231,7 +231,7 @@ export const cardMap: ICardMap = {
     type: CardType.Skill,
     effect: CardEffectType.SingleTarget,
     description: `Gain 2 Strength. At the end of your turn, lose 2 Strength.`,
-    targetEnemy: false,
+    targetSpecificEnemy: false,
     audio: heavyAtk, //TODO: sound effect
   },
   havoc: {
@@ -250,7 +250,7 @@ export const cardMap: ICardMap = {
     type: CardType.Skill,
     effect: CardEffectType.SingleTarget,
     description: `Play the top card of your draw pile and Exhaust it.`,
-    targetEnemy: false,
+    targetSpecificEnemy: false,
     audio: heavyAtk, //TODO: sound effect
   },
   //TODO: Headbutt needs card selection
@@ -267,7 +267,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SingleTarget,
     description: `Deal {} damage. Strength affects Heavy Blade 3 times.`,
     descriptionVariables: ["damage"],
-    targetEnemy: true,
+    targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
   },
   ironWave: {
@@ -284,7 +284,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SingleTarget,
     description: `Gain 5 Block. Deal {} damage.`,
     descriptionVariables: ["damage"],
-    targetEnemy: true,
+    targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
   },
   perfectedStrike: {
@@ -306,7 +306,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SingleTarget,
     description: `Deal {} damage.\n Deals an additional\n2 damage for ALL of your\ncards containing\n"Strike".`,
     descriptionVariables: ["damage"],
-    targetEnemy: true,
+    targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
   },
   pommelStrike: {
@@ -323,7 +323,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SingleTarget,
     description: `Deal {} damage. Draw 1 card(s).`,
     descriptionVariables: ["damage"],
-    targetEnemy: true,
+    targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
   },
   shrugItOff: {
@@ -340,9 +340,10 @@ export const cardMap: ICardMap = {
     type: CardType.Skill,
     effect: CardEffectType.SingleTarget,
     description: `Gain 8 Block. Draw 1 card.`,
-    targetEnemy: false,
+    targetSpecificEnemy: false,
     audio: heavyAtk, //TODO: sound effect
   },
+  // TODO: Fix bug: finishing off the encounter with this card doesn't pop the card reward screen
   swordBoomerang: {
     name: "Sword Boomerang",
     rarity: CardRarity.common,
@@ -366,7 +367,7 @@ export const cardMap: ICardMap = {
     type: CardType.Attack,
     effect: CardEffectType.SingleTarget,
     description: `Deal 3 damage to a random enemy 3 times.`,
-    targetEnemy: true,
+    targetSpecificEnemy: false,
     audio: heavyAtk, //TODO: sound effect
   },
   thunderclap: {
@@ -385,7 +386,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.MultiTarget,
     description: `Deal {} damage and apply 1 Vulnerable to ALL enemies.`,
     descriptionVariables: ["damage"],
-    targetEnemy: true,
+    targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
   },
 };

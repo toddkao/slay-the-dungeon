@@ -1,7 +1,5 @@
 import { observer } from "mobx-react";
-import React from "react";
-import { useSpring, animated } from "react-spring";
-import { useDrag } from "react-use-gesture";
+import React, { useRef } from "react";
 import styled, { css } from "styled-components";
 import { Typography } from "../../Typography";
 import { Battle } from "../Battle/Battle";
@@ -13,6 +11,7 @@ import { Player } from "../Entities/Player/Player";
 // @ts-ignore
 import { Sprite } from "react-spritesheet";
 import { horizontalCenterAbsolute, Row } from "../../Layout";
+import { PullRelease } from "../Common/Draggable";
 
 export const RenderCard = observer(
   ({
@@ -25,7 +24,7 @@ export const RenderCard = observer(
     showIfCastable?: boolean;
   }) => {
     const battleState = new Battle();
-
+    const cardRef = useRef(null);
     const parseCardText = () => {
       const player = new Player();
       let text = cardState.get.description;
@@ -41,34 +40,33 @@ export const RenderCard = observer(
       return text;
     };
 
-    const [props, set] = useSpring(() => ({
-      x: 0,
-      y: 0,
-      scale: 1,
-    }));
-
-    // @ts-ignore
-    const bind = useDrag(({ down, movement: [x, y] }) => {
-      set({
-        x: down ? x : 0,
-        y: down ? y : 0,
-        scale: down ? 1.2 : 1,
-        immediate: down,
-      });
-    });
-
     const { src, position, width, height } = cardState.get.image;
     const [x, y] = position;
 
-    console.log(props, bind)
-
     return (
       <CardWrapper
+        ref={cardRef}
         key={cardState.get.id}
-        onClick={onClick ?? cardState.select}
+        onMouseEnter={onClick ?? cardState.select}
+        onMouseUp={() => {
+          const {
+            top,
+            right,
+            bottom,
+            left,
+            // @ts-ignore
+          } = cardRef?.current?.getBoundingClientRect();
+          console.log(top, right, bottom, left);
+
+          if (window.innerHeight / top > 1.7 && cardState.get.targetSelf) {
+            console.log("play untargetted card");
+            battleState.playSelectedCard();
+          } else if (false) {
+            // TODO check if card is hovering over an enemy, and
+            // if card is meant to target enemies, cast the card
+          }
+        }}
         selected={cardState.get.id === battleState.selectedCardId}
-        {...bind()}
-        style={props}
       >
         <Image src={cardImage} />
         <ManaCost
@@ -115,23 +113,32 @@ const CardSpriteContainer = styled.div`
   zoom: 0.58;
 `;
 
-const CardWrapper = styled(animated.div)<{ selected: boolean }>`
+const CardWrapper = styled(PullRelease)<{
+  selected: boolean;
+}>`
   display: flex;
   flex-direction: column;
   position: relative;
   ${({ selected }) =>
+  selected
+    ? css`
+        z-index: 9;
+      `
+    : ""};
+  /*
+    TODO: Maybe fix this styling
+    ${({ selected }) =>
     selected
       ? css`
-          transform: scale(1.5);
-          z-index: 2;
-          outline: 5px solid green;
+          zoom: 1.5 !important;
+          z-index: 9;
         `
       : ""};
-  transition: transform 0.2s;
   &:hover {
     z-index: 2;
-    transform: scale(1.5);
+    zoom: 1.5 !important;
   }
+  */
 `;
 
 const RenderCardName = styled(Typography)`
@@ -150,7 +157,7 @@ const RenderCardType = styled(Typography)`
 `;
 
 const RenderCardText = styled(Typography).attrs({
-  as: 'pre'
+  as: "pre",
 })`
   font-size: 14px;
   color: white;
