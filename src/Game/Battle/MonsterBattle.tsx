@@ -8,7 +8,13 @@ import { ManaCost } from "../Common";
 import background from "../../Images/background.jpg";
 import { ShowCardsModal } from "../Common/ShowCardsModal";
 import { useState } from "react";
-import { DeckWithNumber, DiscardPileWithNumber, DrawPileWithNumber, MapIcon } from "../Common/deck";
+import {
+  DeckWithNumber,
+  DiscardPileWithNumber,
+  DrawPileWithNumber,
+  MapButton,
+  MapIcon,
+} from "../Common/icons";
 import { Card } from "../Cards/Card";
 import { RenderCard } from "../Cards/RenderCard";
 import { RenderPlayer } from "../Entities/Player/RenderPlayer";
@@ -70,9 +76,7 @@ export const RenderBattle = observer(() => {
         amount={battleState.graveyard.length}
       />
 
-      <MapButton onClick={() => setShowMap(true)}>
-        {/* {battleState.graveyard.length} */}
-      </MapButton>
+      <OpenMap onClick={() => setShowMap(true)} />
 
       {cardToShow ? (
         <ShowCardsModal
@@ -87,19 +91,7 @@ export const RenderBattle = observer(() => {
           hideReturn={battleState.wonBattle}
         />
       ) : null}
-      {/* <button onClick={() => player.loseHealth()}>
-        Lose Health
-      </button>
-      <button onClick={() => {
-        player.addCard();
-      }}>
-        Add Card
-      </button>
-      <button onClick={() => {
-        console.log(player.hand)
-      }}>
-        Log hand
-      </button> */}
+
     </Wrapper>
   );
 });
@@ -170,7 +162,7 @@ const Graveyard = styled(DiscardPileWithNumber)`
   position: absolute;
 `;
 
-const MapButton = styled(MapIcon)`
+const OpenMap = styled(MapButton)`
   position: absolute;
   top: 0;
   right: 0;

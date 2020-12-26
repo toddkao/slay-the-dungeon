@@ -18,8 +18,7 @@ export const DrawPileWithNumber = ({
 }: {
   amount: number;
   onClick: () => void;
-}) =>
-  IconWithBadge({ amount, props, renderIcon: <DrawPileIcon />, right: true });
+}) => IconWithBadge({ amount, props, renderIcon: <DrawPileIcon /> });
 
 export const DiscardPileWithNumber = ({
   amount,
@@ -35,13 +34,19 @@ export const DiscardPileWithNumber = ({
     right: false,
   });
 
+export const MapButton = ({ ...props }: { onClick: () => void }) =>
+  IconWithBadge({
+    props,
+    renderIcon: <MapIcon />,
+  });
+
 const IconWithBadge = ({
   amount,
   renderIcon,
   props,
-  right,
+  right = true,
 }: {
-  amount: number;
+  amount?: number;
   renderIcon: React.ReactElement;
   right?: boolean;
   props?: any;
@@ -50,9 +55,7 @@ const IconWithBadge = ({
     <div {...props}>
       <RelativeWrapper>
         {renderIcon}
-        {right !== undefined ? (
-          <NumberBadge right={right}>{amount}</NumberBadge>
-        ) : null}
+        {amount ? <NumberBadge right={right}>{amount}</NumberBadge> : null}
       </RelativeWrapper>
     </div>
   );
@@ -84,34 +87,36 @@ const NumberBadge = styled.div<{ right: boolean }>`
         `}
 `;
 
-const DrawPileIcon = styled.div`
-  background: url(${drawPile});
+const iconStyles = css`
+  &:hover {
+    transform: scale(1.2);
+  }
   background-size: contain;
   background-repeat: no-repeat;
   width: 120px;
   height: 120px;
+`;
+
+const DrawPileIcon = styled.div`
+  background: url(${drawPile});
+  ${iconStyles};
 `;
 
 const DiscardPileIcon = styled.div`
   background: url(${discardPile});
-  background-size: contain;
-  background-repeat: no-repeat;
-  width: 120px;
-  height: 120px;
+  ${iconStyles};
 `;
 
 export const DeckIcon = styled.div`
   background: url(${deck});
-  background-size: contain;
-  background-repeat: no-repeat;
+  ${iconStyles};
   width: 64px;
   height: 64px;
 `;
 
 export const MapIcon = styled.div`
   background: url(${map});
-  background-size: contain;
-  background-repeat: no-repeat;
+  ${iconStyles};
   width: 64px;
   height: 64px;
 `;
