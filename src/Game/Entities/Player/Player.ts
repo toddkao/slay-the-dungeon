@@ -1,6 +1,6 @@
 import { computed, observable } from "mobx";
 import { Card } from "../../Cards/Card";
-import { times, uniqueId } from "lodash";
+import { range, times, uniqueId } from "lodash";
 import { Singleton } from "@taipescripeto/singleton";
 import { Entity, IEntity } from "../entity";
 import { StatusType } from "../../Common/StatusBar";
@@ -27,15 +27,16 @@ export class Player extends Entity {
     })
   ) {
     super(stats);
-    times(6, () => stats.deck.push(cardMap.bash(uniqueId())));
-    times(6, () => stats.deck.push(cardMap.strike(uniqueId())));
-    times(6, () => stats.deck.push(cardMap.defend(uniqueId())));
-    times(6, () => stats.deck.push(cardMap.anger(uniqueId())));
-    times(6, () => stats.deck.push(cardMap.bodySlam(uniqueId())));
-    times(6, () => stats.deck.push(cardMap.clash(uniqueId())));
-    times(6, () => stats.deck.push(cardMap.cleave(uniqueId())));
-    times(6, () => stats.deck.push(cardMap.clothesline(uniqueId())));
-    times(6, () => stats.deck.push(cardMap.flex(uniqueId())));
+    // times(6, () => stats.deck.push(cardMap.bash(uniqueId())));
+        // times(6, () => stats.deck.push(cardMap.defend(uniqueId())));
+    // times(6, () => stats.deck.push(cardMap.anger(uniqueId())));
+    // times(6, () => stats.deck.push(cardMap.bodySlam(uniqueId())));
+    // times(6, () => stats.deck.push(cardMap.cleave(uniqueId())));
+    // times(6, () => stats.deck.push(cardMap.clothesline(uniqueId())));
+    // times(6, () => stats.deck.push(cardMap.flex(uniqueId())));
+    range(0, 6).forEach(() => stats.deck.push(cardMap.clash(uniqueId())));
+    range(0, 6).forEach(() => stats.deck.push(cardMap.havoc(uniqueId())));
+    times(1, () => stats.deck.push(cardMap.strike(uniqueId())));
     // this.addStatus(StatusType.strength, 2);
     // this.addStatus(StatusType.dexterity);
   }

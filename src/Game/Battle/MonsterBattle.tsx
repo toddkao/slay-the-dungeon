@@ -64,12 +64,14 @@ export const RenderBattle = observer(() => {
       <DrawPile onClick={() => setCardsToShow(battleState.drawPile)}>
         {/* {battleState.drawPile.length} */}
       </DrawPile>
-      <Graveyard onClick={() => setCardsToShow(battleState.graveyard)}>
-        {/* {battleState.graveyard.length} */}
-      </Graveyard>
-
+      <DiscardPile onClick={() => setCardsToShow(battleState.discardPile)}>
+        {/* {battleState.discardPile.length} */}
+      </DiscardPile>
+      <ExhaustPile onClick={() => setCardsToShow(battleState.exhaustPile)}>
+        {/* {battleState.exhaustPile.length} */}
+      </ExhaustPile>
       <MapIcon onClick={() => setShowMap(true)}>
-        {/* {battleState.graveyard.length} */}
+        {/* {battleState.exhaustPile.length} */}
       </MapIcon>
 
       {cardToShow ? (
@@ -162,8 +164,14 @@ const DrawPile = styled(Deck)`
   left: 0;
 `;
 
-const Graveyard = styled(Deck)`
+const DiscardPile = styled(Deck)`
   top: 0;
+  right: 0;
+  position: absolute;
+`;
+
+const ExhaustPile = styled(Deck)`
+  bottom: 0;
   right: 0;
   position: absolute;
 `;
