@@ -20,7 +20,7 @@ export const RenderMonster = observer(
       extradamage,
     } = monsterState;
     const monsterRef = useRef(null);
-    monsterState.monsterRef = monsterRef;
+    monsterState.ref = monsterRef;
     // TODO actually I think we should render a dead 
     // monster here, and avoid removing monsters from battleState
     // when they die

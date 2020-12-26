@@ -10,10 +10,10 @@ export class Monster extends Entity {
   }
 
   @computed
-  get monsterRef(): React.MutableRefObject<any> | undefined {
+  get ref(): React.MutableRefObject<any> | undefined {
     return this.monster.ref;
   }
-  set monsterRef(ref: React.MutableRefObject<any> | undefined) {
+  set ref(ref: React.MutableRefObject<any> | undefined) {
     this.monster.ref = ref;
   }
 

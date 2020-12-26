@@ -3,6 +3,7 @@ import { IStatus } from "../Common/StatusBar";
 import { Howl } from "howler";
 import { Battle, IBattleState } from "../Battle/Battle";
 import { uniqueId } from "lodash";
+import { isCollidingWithEachOther } from "../Common/utility";
 
 export class Card {
   constructor(private card: ICard) {}
@@ -13,6 +14,14 @@ export class Card {
       ...this.card,
       targetSelf: !this.card.targetSpecificEnemy,
     };
+  }
+
+  @computed
+  get ref(): React.MutableRefObject<any> | undefined {
+    return this.card.ref;
+  }
+  set ref(ref: React.MutableRefObject<any> | undefined) {
+    this.card.ref = ref;
   }
 
   public selectable = () => {
@@ -44,6 +53,25 @@ export class Card {
         : this.card.damage) ?? 0
     );
   };
+
+  public onReleaseDrag = () => {
+    const battleState = new Battle();
+    const cardBoundingRect = this.ref?.current?.getBoundingClientRect();
+    const { top } = cardBoundingRect;
+
+    if (window.innerHeight / top > 1.7 && this.get.targetSelf) {
+      battleState.playSelectedCard();
+    } else {
+      const collisions = battleState.monstersWithBoundingRef?.find(
+        (monster) =>
+          isCollidingWithEachOther(cardBoundingRect, monster.boundingRect)
+      );
+      if (collisions) {
+        battleState.selectMonster(collisions.id);
+        battleState.playSelectedCard();
+      }
+    }
+  }
 }
 
 export enum CardType {
@@ -81,6 +109,7 @@ export interface ICard {
     height: number;
   };
   audio?: string;
+  ref?: React.MutableRefObject<any>;
 }
 
 export enum CardRarity {

@@ -103,7 +103,7 @@ export class Battle {
   get monstersWithBoundingRef() {
     return this.monsters?.map((monster) => ({
       id: monster.id,
-      boundingRect: monster.monsterRef?.current?.getBoundingClientRect(),
+      boundingRect: monster.ref?.current?.getBoundingClientRect(),
     }));
   }
 
