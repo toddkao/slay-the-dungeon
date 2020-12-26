@@ -1,8 +1,8 @@
-import cards1 from "../../Images/cards1.png";
-import cards2 from "../../Images/cards2.png";
-import cards3 from "../../Images/cards3.png";
-import cards4 from "../../Images/cards4.png";
-import cards5 from "../../Images/cards5.png";
+import cards1 from "../../Images/cards1.jpg";
+import cards2 from "../../Images/cards2.jpg";
+import cards3 from "../../Images/cards3.jpg";
+import cards4 from "../../Images/cards4.jpg";
+import cards5 from "../../Images/cards5.jpg";
 import { Card, CardEffectType, CardRarity, CardType, ICard } from "./Card";
 import { StatusType } from "../Common/StatusBar";
 // @ts-ignore
