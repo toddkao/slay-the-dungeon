@@ -189,7 +189,6 @@ export class Battle {
     this.battleState.drawPile = this.player.get.deck;
     this.battleState.drawPile = shuffle(this.battleState.drawPile);
     this.draw(5);
-    console.log(this.player.get.deck);
   });
 
   public draw = action((count: number = 1) => {

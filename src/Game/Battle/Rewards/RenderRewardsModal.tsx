@@ -121,6 +121,7 @@ export const RenderRewardsModal = observer(
                       setSelectedReward(undefined);
                     }}
                     showIfCastable={false}
+                    draggable={false}
                   />
                 ))}
               </Row>

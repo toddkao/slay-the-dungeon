@@ -1,26 +1,32 @@
-// @ts-nocheck
 import { animated, useSpring } from "react-spring";
-import { useDrag } from "react-use-gesture";
+import { useGesture } from "react-use-gesture";
 import React from "react";
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
   children?: React.ReactElement | React.ReactElement[];
+  onDragStart?: () => void;
+  draggable?: boolean;
   ref?: React.MutableRefObject<any>;
 }
 export const PullRelease = React.forwardRef(
-  ({ className, children, ...rest }: IProps, ref) => {
+  ({ className, children, onDragStart, draggable, ...rest }: IProps, ref) => {
     const [{ x, y }, set] = useSpring(() => ({ x: 0, y: 0 }));
     // Set the drag hook and define component movement based on gesture data
-    const bind = useDrag(({ down, movement: [mx, my] }) => {
-      set({ x: down ? mx : 0, y: down ? my : 0 });
+
+    const bind = useGesture({
+      onDrag: ({ down, movement: [mx, my] }) =>
+        set({ x: down ? mx : 0, y: down ? my : 0 }),
+      onDragStart: ({ event, ...sharedState }) => onDragStart?.(),
     });
-    // Bind it to a component
+
     return (
       <animated.div
         {...bind()}
         className={className}
+        // @ts-ignore
         style={{ x, y }}
+        // @ts-ignore
         ref={ref}
         {...rest}
       >

@@ -177,6 +177,15 @@ export class Map {
 
   setShowingMap = action((showingMap: boolean) => {
     this.map.showingMap = showingMap;
+    setTimeout(() => {
+      const currentNode = document.getElementById(this.selectableNodeIds[0]);
+
+      if (currentNode) {
+        currentNode.scrollIntoView({
+          block: 'center'
+        });
+      }
+    }, 0);
   });
 
   generateNodeType = (rowIndex: number) => {

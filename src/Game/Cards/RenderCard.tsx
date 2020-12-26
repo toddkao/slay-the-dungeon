@@ -12,17 +12,18 @@ import { Player } from "../Entities/Player/Player";
 import { Sprite } from "react-spritesheet";
 import { horizontalCenterAbsolute, Row } from "../../Layout";
 import { PullRelease } from "../Common/Draggable";
-import { isCollidingWithEachOther } from "../Common/utility";
 
 export const RenderCard = observer(
   ({
     cardState,
     onClick,
     showIfCastable = true,
+    draggable = true,
   }: {
     cardState: Card;
     onClick?: () => void;
     showIfCastable?: boolean;
+    draggable?: boolean;
   }) => {
     const battleState = new Battle();
     const cardRef = useRef(null);
@@ -46,15 +47,17 @@ export const RenderCard = observer(
     const { src, position, width, height } = cardState.get.image;
     const [x, y] = position;
 
+    const CardWrapper = draggable ? DraggableWrapper : UndraggableWrapper;
+
     return (
       <CardWrapper
         ref={cardRef}
         key={cardState.get.id}
         onClick={onClick}
-        // TODO Fix this logic so it occurs when starting to drag
-        onMouseEnter={cardState.select}
+        onDragStart={cardState.select}
         onMouseUp={cardState.onReleaseDrag}
         selected={cardState.get.id === battleState.selectedCardId}
+        draggable={draggable}
       >
         <Image src={cardImage} />
         <ManaCost
@@ -101,8 +104,9 @@ const CardSpriteContainer = styled.div`
   zoom: 0.58;
 `;
 
-const CardWrapper = styled(PullRelease) <{
+const DraggableWrapper = styled(PullRelease)<{
   selected: boolean;
+  draggable?: boolean;
 }>`
   display: flex;
   flex-direction: column;
@@ -113,20 +117,16 @@ const CardWrapper = styled(PullRelease) <{
           z-index: 9;
         `
       : ""};
-  /*
-    TODO: Maybe fix this styling
-    ${({ selected }) =>
-    selected
-      ? css`
-          zoom: 1.5 !important;
-          z-index: 9;
-        `
-      : ""};
+`;
+
+const UndraggableWrapper = styled(DraggableWrapper).attrs({
+  as: 'div'
+})`
+  transition: transform 0.2s;
   &:hover {
     z-index: 2;
-    zoom: 1.5 !important;
+    transform: scale(1.2);
   }
-  */
 `;
 
 const RenderCardName = styled(Typography)`

@@ -18,19 +18,18 @@ export const RenderMap = observer(
     hideReturn?: boolean;
   }) => {
     const battleState = new Battle();
+    const mapState = new Map();
     const history = useHistory();
     const useMountEffect = (fun: () => any) => useEffect(fun, []);
     const mapRef = useRef(null);
 
     const scrollToBottom = () => {
-      (mapRef.current as any).scrollTop = (mapRef.current as any).scrollHeight;
+      (mapRef.current as any).scrollTop = (mapRef.current as any)?.scrollHeight;
     };
 
     useMountEffect(() => {
       scrollToBottom();
     });
-
-    const mapState = new Map();
 
     const { matrix, paths } = mapState.currentFloor;
     const { selectNode, selectableNodeIds, traversedNodeIds } = mapState;
