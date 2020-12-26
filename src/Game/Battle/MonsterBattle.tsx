@@ -8,7 +8,13 @@ import { ManaCost } from "../Common";
 import background from "../../Images/background.jpg";
 import { ShowCardsModal } from "../Common/ShowCardsModal";
 import { useState } from "react";
-import { Deck } from "../Common/deck";
+import {
+  DeckWithNumber,
+  DiscardPileWithNumber,
+  DrawPileWithNumber,
+  MapButton,
+  MapIcon,
+} from "../Common/icons";
 import { Card } from "../Cards/Card";
 import { RenderCard } from "../Cards/RenderCard";
 import { RenderPlayer } from "../Entities/Player/RenderPlayer";
@@ -29,7 +35,7 @@ export const RenderBattle = observer(() => {
     const mapState = new Map();
     // redirects you to base path if currentNode is undefined (if you refresh the page)
     if (mapState.currentNode === undefined) {
-      history.push('/');
+      history.push("/");
     }
   });
 
@@ -61,18 +67,16 @@ export const RenderBattle = observer(() => {
       <ManaAmount notEnoughMana={battleState.currentMana === 0}>
         {battleState.currentMana}/{battleState.player.maxMana}
       </ManaAmount>
-      <DrawPile onClick={() => setCardsToShow(battleState.drawPile)}>
-        {/* {battleState.drawPile.length} */}
-      </DrawPile>
-      <DiscardPile onClick={() => setCardsToShow(battleState.discardPile)}>
-        {/* {battleState.discardPile.length} */}
-      </DiscardPile>
-      <ExhaustPile onClick={() => setCardsToShow(battleState.exhaustPile)}>
-        {/* {battleState.exhaustPile.length} */}
-      </ExhaustPile>
-      <MapIcon onClick={() => setShowMap(true)}>
-        {/* {battleState.exhaustPile.length} */}
-      </MapIcon>
+      <DrawPile
+        onClick={() => setCardsToShow(battleState.drawPile)}
+        amount={battleState.drawPile.length}
+      />
+      <Graveyard
+        onClick={() => setCardsToShow(battleState.graveyard)}
+        amount={battleState.graveyard.length}
+      />
+
+      <OpenMap onClick={() => setShowMap(true)} />
 
       {cardToShow ? (
         <ShowCardsModal
@@ -87,19 +91,7 @@ export const RenderBattle = observer(() => {
           hideReturn={battleState.wonBattle}
         />
       ) : null}
-      {/* <button onClick={() => player.loseHealth()}>
-        Lose Health
-      </button>
-      <button onClick={() => {
-        player.addCard();
-      }}>
-        Add Card
-      </button>
-      <button onClick={() => {
-        console.log(player.hand)
-      }}>
-        Log hand
-      </button> */}
+
     </Wrapper>
   );
 });
@@ -158,26 +150,20 @@ const UnitWrappers = styled(Row)`
   margin-top: 100px;
 `;
 
-const DrawPile = styled(Deck)`
+const DrawPile = styled(DrawPileWithNumber)`
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
 `;
 
-const DiscardPile = styled(Deck)`
-  top: 0;
-  right: 0;
-  position: absolute;
-`;
-
-const ExhaustPile = styled(Deck)`
+const Graveyard = styled(DiscardPileWithNumber)`
   bottom: 0;
   right: 0;
   position: absolute;
 `;
 
-const MapIcon = styled(Deck)`
+const OpenMap = styled(MapButton)`
   position: absolute;
-  left: 0;
-  bottom: 0;
+  top: 0;
+  right: 0;
 `;
