@@ -12,8 +12,7 @@ import heavyAtk from "../../Audio/heavyAtk.ogg";
 // @ts-ignore
 import addBlock from "../../Audio/addBlock.ogg";
 import { Battle, IBattleState } from "../Battle/Battle";
-import { groupBy, random, range, uniqueId } from "lodash";
-import Chance from "chance";
+import { groupBy } from "lodash";
 interface ISpriteToCardSize {
   [index: string]: { CARD_WIDTH: number; CARD_HEIGHT: number };
 }
@@ -82,32 +81,6 @@ interface ICardMap {
 }
 
 export const cardMap: ICardMap = {
-  strike: {
-    name: "Strike",
-    rarity: CardRarity.starter,
-    manaCost: 1,
-    damage: 999,
-    image: getImage({ sheetNumber: 5, position: [4, 2] }),
-    type: CardType.Attack,
-    effect: CardEffectType.SingleTarget,
-    description: `Deal {} damage.`,
-    descriptionVariables: ["damage"],
-    targetSpecificEnemy: true,
-    audio: fastAtk,
-  },
-  defend: {
-    name: "Defend",
-    rarity: CardRarity.starter,
-    manaCost: 1,
-    block: 5,
-    image: getImage({ sheetNumber: 1, position: [6, 4] }),
-    type: CardType.Skill,
-    effect: CardEffectType.AddBlock,
-    description: "Gain {} Block.",
-    descriptionVariables: ["block"],
-    targetSpecificEnemy: false,
-    audio: addBlock,
-  },
   bash: {
     name: "Bash",
     rarity: CardRarity.starter,
@@ -120,11 +93,37 @@ export const cardMap: ICardMap = {
     },
     image: getImage({ sheetNumber: 3, position: [7, 3] }),
     type: CardType.Attack,
-    effect: CardEffectType.SingleTarget,
+    effect: CardEffectType.SpecificEnemy,
     description: `Deal {} damage.\nApply 2 vulnerable.`,
     descriptionVariables: ["damage"],
     targetSpecificEnemy: true,
     audio: heavyAtk,
+  },
+  defend: {
+    name: "Defend",
+    rarity: CardRarity.starter,
+    manaCost: 1,
+    block: 5,
+    image: getImage({ sheetNumber: 1, position: [6, 4] }),
+    type: CardType.Skill,
+    effect: CardEffectType.Self,
+    description: "Gain {} Block.",
+    descriptionVariables: ["block"],
+    targetSpecificEnemy: false,
+    audio: addBlock,
+  },
+  strike: {
+    name: "Strike",
+    rarity: CardRarity.starter,
+    manaCost: 1,
+    damage: 999,
+    image: getImage({ sheetNumber: 5, position: [4, 2] }),
+    type: CardType.Attack,
+    effect: CardEffectType.SpecificEnemy,
+    description: `Deal {} damage.`,
+    descriptionVariables: ["damage"],
+    targetSpecificEnemy: true,
+    audio: fastAtk,
   },
   anger: {
     name: "Anger",
@@ -132,20 +131,21 @@ export const cardMap: ICardMap = {
     manaCost: 0,
     damage: 6,
     image: getImage({ sheetNumber: 3, position: [4, 3] }),
-    special: (battleState: IBattleState) => {
-      if (!battleState.discardPile) {
+    special: () => {
+      let battle = new Battle();
+      if (!battle.discardPile) {
         return;
       }
 
       //TODO: need to update when implementing card upgrading
-      battleState.discardPile = [
-        ...battleState.discardPile,
+      battle.discardPile = [
+        ...battle.discardPile,
         new Card(cardMap.anger),
       ];
     },
     type: CardType.Attack,
-    effect: CardEffectType.SingleTarget,
-    description: `Deal {} damage.\nAdd a copy of this card to your discard pile.`,
+    effect: CardEffectType.SpecificEnemy,
+    description: `Deal {} damage.\nAdd a copy of this card\ninto your discard pile.`,
     descriptionVariables: ["damage"],
     targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
@@ -161,8 +161,8 @@ export const cardMap: ICardMap = {
     },
     image: getImage({ sheetNumber: 3, position: [5, 2] }),
     type: CardType.Attack,
-    effect: CardEffectType.SingleTarget,
-    description: `Deal damage equal to your current block`,
+    effect: CardEffectType.SpecificEnemy,
+    description: `Deal damage equal to\nyour block`,
     descriptionVariables: [],
     targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
@@ -179,8 +179,8 @@ export const cardMap: ICardMap = {
     },
     image: getImage({ sheetNumber: 3, position: [4, 1] }),
     type: CardType.Attack,
-    effect: CardEffectType.SingleTarget,
-    description: `Can only be played if every card in your hand is an Attack.\nDeal {} damage.`,
+    effect: CardEffectType.SpecificEnemy,
+    description: `Can only be played if\nevery card in your\nhand is an Attack.\nDeal {} damage.`,
     descriptionVariables: ["damage"],
     targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
@@ -192,8 +192,8 @@ export const cardMap: ICardMap = {
     damage: 8,
     image: getImage({ sheetNumber: 3, position: [6, 1] }),
     type: CardType.Attack,
-    effect: CardEffectType.MultiTarget,
-    description: `Deal 8 damage to ALL enemies.`,
+    effect: CardEffectType.AllEnemies,
+    description: `Deal 8 damage to ALL\n enemies.`,
     descriptionVariables: ["damage"],
     targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
@@ -210,8 +210,8 @@ export const cardMap: ICardMap = {
     },
     image: getImage({ sheetNumber: 3, position: [7, 1] }),
     type: CardType.Attack,
-    effect: CardEffectType.SingleTarget,
-    description: `Deal {} damage. Apply 2 Weak.`, //TODO: add weak to descriptionvariable
+    effect: CardEffectType.SpecificEnemy,
+    description: `Deal {} damage.\nApply 2 Weak.`, //TODO: add weak to descriptionvariable
     descriptionVariables: ["damage"],
     targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
@@ -229,8 +229,8 @@ export const cardMap: ICardMap = {
       });
     },
     type: CardType.Skill,
-    effect: CardEffectType.SingleTarget,
-    description: `Gain 2 Strength. At the end of your turn, lose 2 Strength.`,
+    effect: CardEffectType.Self,
+    description: `Gain 2 Strength.\nAt the end of this turn,\nlose 2 Strength.`,
     targetSpecificEnemy: false,
     audio: heavyAtk, //TODO: sound effect
   },
@@ -248,8 +248,8 @@ export const cardMap: ICardMap = {
       }
     },
     type: CardType.Skill,
-    effect: CardEffectType.SingleTarget,
-    description: `Play the top card of your draw pile and Exhaust it.`,
+    effect: CardEffectType.Self,
+    description: `Play the top card of\nyour draw pile and\nExhaust it.`,
     targetSpecificEnemy: false,
     audio: heavyAtk, //TODO: sound effect
   },
@@ -264,8 +264,8 @@ export const cardMap: ICardMap = {
       return 14 + 2 * battle.player.extradamage; //it's 2x extra here because extradamage itself is added elsewhere
     },
     type: CardType.Attack,
-    effect: CardEffectType.SingleTarget,
-    description: `Deal {} damage. Strength affects Heavy Blade 3 times.`,
+    effect: CardEffectType.SpecificEnemy,
+    description: `Deal {} damage.\nStrength affects this\n card 3 times.`,
     descriptionVariables: ["damage"],
     targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
@@ -275,15 +275,24 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.common,
     manaCost: 1,
     image: getImage({ sheetNumber: 4, position: [4, 8] }),
-    damage: 5,
+    block: 5,
     special: () => {
       let battle = new Battle();
-      battle.player.addBlock(5);
+      if (!battle.selectedMonster)
+        throw new Error("Iron Wave needs a selected monster!");
+
+      battle.selectedMonster.takeDamage(
+        battle.calculateDamage({
+          damage: 5,
+          extradamage: battle.player.extradamage,
+          statuses: battle.selectedMonster.get.statuses,
+        })
+      );
     },
     type: CardType.Attack,
-    effect: CardEffectType.SingleTarget,
-    description: `Gain 5 Block. Deal {} damage.`,
-    descriptionVariables: ["damage"],
+    effect: CardEffectType.SpecificEnemy,
+    description: `Gain {} Block.\nDeal 5 damage.`,
+    descriptionVariables: ["block"],
     targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
   },
@@ -299,11 +308,11 @@ export const cardMap: ICardMap = {
         battle.player.get.deck.filter((card) =>
           card.get.name.toLowerCase().includes("strike")
         ).length *
-          2
+        2
       );
     },
     type: CardType.Attack,
-    effect: CardEffectType.SingleTarget,
+    effect: CardEffectType.SpecificEnemy,
     description: `Deal {} damage.\n Deals an additional\n2 damage for ALL of your\ncards containing\n"Strike".`,
     descriptionVariables: ["damage"],
     targetSpecificEnemy: true,
@@ -320,8 +329,8 @@ export const cardMap: ICardMap = {
       battle.draw(1);
     },
     type: CardType.Attack,
-    effect: CardEffectType.SingleTarget,
-    description: `Deal {} damage. Draw 1 card(s).`,
+    effect: CardEffectType.SpecificEnemy,
+    description: `Deal {} damage.\nDraw 1 card.`,
     descriptionVariables: ["damage"],
     targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect
@@ -331,43 +340,27 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.common,
     manaCost: 1,
     image: getImage({ sheetNumber: 2, position: [3, 2] }),
-    damage: 0,
+    block: 8,
     special: () => {
       let battle = new Battle();
-      battle.player.addBlock(8);
       battle.draw(1);
     },
     type: CardType.Skill,
-    effect: CardEffectType.SingleTarget,
-    description: `Gain 8 Block. Draw 1 card.`,
+    effect: CardEffectType.Self,
+    description: `Gain 8 Block.\nDraw 1 card.`,
     targetSpecificEnemy: false,
     audio: heavyAtk, //TODO: sound effect
   },
-  // TODO: Fix bug: finishing off the encounter with this card doesn't pop the card reward screen
   swordBoomerang: {
     name: "Sword Boomerang",
     rarity: CardRarity.common,
     manaCost: 1,
     image: getImage({ sheetNumber: 5, position: [3, 0] }),
-    damage: 0,
-    special: () => {
-      let battle = new Battle();
-      range(0, 3).forEach(() => {
-        let randomMonster = battle.monsters?.[random(0, battle.monsters.length - 1)];
-        if (randomMonster) {
-          randomMonster.takeDamage(
-            battle.calculateDamage({
-              damage: 3,
-              extradamage: battle.player.extradamage,
-              statuses: randomMonster.get.statuses,
-            })
-          );
-        }
-      });
-    },
+    damageInstances: 3,
+    damage: 3,
     type: CardType.Attack,
-    effect: CardEffectType.SingleTarget,
-    description: `Deal 3 damage to a random enemy 3 times.`,
+    effect: CardEffectType.Random,
+    description: `Deal 3 damage to a\nrandom enemy 3 times.`,
     targetSpecificEnemy: false,
     audio: heavyAtk, //TODO: sound effect
   },
@@ -384,8 +377,8 @@ export const cardMap: ICardMap = {
       );
     },
     type: CardType.Attack,
-    effect: CardEffectType.MultiTarget,
-    description: `Deal {} damage and apply 1 Vulnerable to ALL enemies.`,
+    effect: CardEffectType.AllEnemies,
+    description: `Deal {} damage and\napply 1 Vulnerable to\nALL enemies.`,
     descriptionVariables: ["damage"],
     targetSpecificEnemy: true,
     audio: heavyAtk, //TODO: sound effect

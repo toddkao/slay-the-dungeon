@@ -121,7 +121,7 @@ const CardSpriteContainer = styled.div`
   zoom: 0.58;
 `;
 
-const CardWrapper = styled(PullRelease)<{
+const CardWrapper = styled(PullRelease) <{
   selected: boolean;
 }>`
   display: flex;

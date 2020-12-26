@@ -2,10 +2,9 @@ import { computed } from "mobx";
 import { IStatus } from "../Common/StatusBar";
 import { Howl } from "howler";
 import { Battle, IBattleState } from "../Battle/Battle";
-import { uniqueId } from "lodash";
 
 export class Card {
-  constructor(private card: ICard) {}
+  constructor(private card: ICard) { }
 
   @computed
   public get get() {
@@ -44,6 +43,14 @@ export class Card {
         : this.card.damage) ?? 0
     );
   };
+
+  public evaluateBlock = () => {
+    return (
+      (typeof this.card.block === "function"
+        ? this.card.block()
+        : this.card.block) ?? 0
+    );
+  };
 }
 
 export enum CardType {
@@ -52,9 +59,10 @@ export enum CardType {
 }
 
 export enum CardEffectType {
-  SingleTarget,
-  MultiTarget,
-  AddBlock,
+  SpecificEnemy,
+  AllEnemies,
+  Self,
+  Random
 }
 
 export interface ICard {
@@ -64,9 +72,10 @@ export interface ICard {
   type: CardType;
   effect: CardEffectType;
   damage?: number | (() => number);
+  damageInstances? : number;
+  block?: number | (() => number);
   prerequisite?: (battleState: IBattleState) => boolean;
   status?: IStatus;
-  block?: number;
   special?: Function;
   rarity: CardRarity;
   targetSpecificEnemy: boolean;

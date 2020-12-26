@@ -32,7 +32,7 @@ export class Battle {
       exhaustPile: [],
       endTurnActions: [],
     })
-  ) {}
+  ) { }
 
   @computed
   get wonBattle() {
@@ -120,6 +120,9 @@ export class Battle {
   @computed
   get discardPile() {
     return this.battleState.discardPile;
+  }
+  set discardPile(cards: Card[]) {
+    this.battleState.discardPile = cards;
   }
 
   @computed
@@ -236,15 +239,18 @@ export class Battle {
   public resolveTargetedCard = action((cards: Card[]) => {
     cards.forEach((card) => {
       switch (card.get.effect) {
-        case CardEffectType.SingleTarget:
+        case CardEffectType.SpecificEnemy:
           if (card.get.damage)
             //TODO: add a new card type for cards that has no damage
             this.resolveSingleTargetDamage({
               card: card,
               selectedMonster: this.selectedMonster,
             });
+          if (card.get.block) {
+            this.player.addBlock(card.evaluateBlock());
+          }
           break;
-        case CardEffectType.MultiTarget:
+        case CardEffectType.AllEnemies:
           this.monsters?.forEach((monster) => {
             if (card.get.damage) {
               this.resolveSingleTargetDamage({
@@ -254,16 +260,25 @@ export class Battle {
             }
           });
           break;
-        case CardEffectType.AddBlock:
+        case CardEffectType.Self:
           if (card.get.block && card.get.targetSelf) {
-            this.player.addBlock(card.get.block + this.player.extrablock);
+            this.player.addBlock(card.evaluateBlock());
           }
+          break;
+        case CardEffectType.Random:
+          range(0, card.get.damageInstances).forEach(() => {
+            let randomMonster = this.monsters?.[random(0, this.monsters.length - 1)];
+            this.resolveSingleTargetDamage({
+              card: card,
+              selectedMonster: randomMonster,
+            });
+          });
           break;
         default:
           break;
       }
       if (card.get.special) {
-        card.get.special(this.battleState);
+        card.get.special();
       }
     });
   });
