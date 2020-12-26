@@ -25,8 +25,8 @@ import { IReward, RewardTypes } from "./RewardDefinition";
 import takeAll from "../../../Images/UI/reward/takeAll.png";
 import { Player } from "../../Entities/Player/Player";
 import proceedButton from "../../../Images/UI/reward/proceedButton.png";
-import { Card, CardRarity, ICard } from "../../Cards/Card";
-import { weightedSample } from "../../Common/utility";
+import { Card, ICard } from "../../Cards/Card";
+
 import { Chance } from "chance";
 
 export const RenderRewardsModal = observer(

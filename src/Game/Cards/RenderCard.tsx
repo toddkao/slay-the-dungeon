@@ -60,6 +60,8 @@ export const RenderCard = observer(
     const { src, position, width, height } = cardState.get.image;
     const [x, y] = position;
 
+    console.log(props, bind)
+
     return (
       <CardWrapper
         key={cardState.get.id}
