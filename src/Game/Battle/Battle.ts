@@ -185,18 +185,15 @@ export class Battle {
 
     let shuffleIndex = 0;
     range(0, count).forEach((index) => {
-      console.log(this.drawPile);
-      if (this.drawPile.length === 0) {
-        console.log('shuffle discard pile')
+      if (this.battleState.drawPile.length === 0) {
         this.reshuffleDiscardPile();
         shuffleIndex = index;
       }
 
-      if (this.drawPile[index - shuffleIndex]) {
-        cards.push(this.drawPile[index - shuffleIndex]);
-        this.drawCards([this.drawPile[index - shuffleIndex]]);
-      }
+      cards.push(this.drawPile[index - shuffleIndex]);
     });
+
+    this.drawCards(cards);
     return cards;
   });
 
