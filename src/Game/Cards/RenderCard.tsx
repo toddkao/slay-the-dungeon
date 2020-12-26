@@ -26,6 +26,7 @@ export const RenderCard = observer(
   }) => {
     const battleState = new Battle();
     const cardRef = useRef(null);
+    cardState.ref = cardRef;
     const parseCardText = () => {
       const player = new Player();
       let text = cardState.get.description;
@@ -50,30 +51,7 @@ export const RenderCard = observer(
         key={cardState.get.id}
         onClick={onClick}
         onMouseEnter={cardState.select}
-        onMouseUp={() => {
-          // @ts-ignore
-          const cardBoundingRect = cardRef?.current?.getBoundingClientRect();
-          const { top, right, bottom, left } = cardBoundingRect;
-          console.log(top, right, bottom, left);
-
-          if (window.innerHeight / top > 1.7 && cardState.get.targetSelf) {
-            console.log("play untargetted card");
-            battleState.playSelectedCard();
-          } else {
-            const collisions = battleState.monstersWithBoundingRef?.find(
-              (monster) =>
-                isCollidingWithEachOther(cardBoundingRect, monster.boundingRect)
-            );
-            if (collisions) {
-              battleState.selectMonster(collisions.id);
-              battleState.playSelectedCard();
-            }
-            console.log(collisions);
-            console.log(battleState.monstersWithBoundingRef);
-            // TODO check if card is hovering over an enemy, and
-            // if card is meant to target enemies, cast the card
-          }
-        }}
+        onMouseUp={cardState.onReleaseDrag}
         selected={cardState.get.id === battleState.selectedCardId}
       >
         <Image src={cardImage} />
