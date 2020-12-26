@@ -26,6 +26,7 @@ export const RenderCard = observer(
   }) => {
     const battleState = new Battle();
     const cardRef = useRef(null);
+
     cardState.ref = cardRef;
     const parseCardText = () => {
       const player = new Player();
@@ -50,7 +51,8 @@ export const RenderCard = observer(
         ref={cardRef}
         key={cardState.get.id}
         onClick={onClick}
-        onDrag={cardState.select}
+        // TODO Fix this logic so it occurs when starting to drag
+        onMouseEnter={cardState.select}
         onMouseUp={cardState.onReleaseDrag}
         selected={cardState.get.id === battleState.selectedCardId}
       >

@@ -69,6 +69,7 @@ export class Card {
     const cardBoundingRect = this.ref?.current?.getBoundingClientRect();
     const { top } = cardBoundingRect;
 
+    console.log(this.get.targetAllEnemies, this.get.targetSelf);
     if (
       window.innerHeight / top > 1.7 &&
       (this.get.targetAllEnemies || this.get.targetSelf)
