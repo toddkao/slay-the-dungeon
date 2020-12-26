@@ -6,13 +6,15 @@ import { uniqueId } from "lodash";
 import { isCollidingWithEachOther } from "../Common/utility";
 
 export class Card {
-  constructor(private card: ICard) { }
+  constructor(private card: ICard) {}
 
   @computed
   public get get() {
     return {
       ...this.card,
-      targetSelf: !this.card.targetSpecificEnemy,
+      targetSpecificEnemy: this.card.effect === CardEffectType.SpecificEnemy,
+      targetSelf: this.card.effect === CardEffectType.Self,
+      targetAllEnemies: this.card.effect === CardEffectType.AllEnemies,
     };
   }
 
@@ -61,25 +63,27 @@ export class Card {
         : this.card.block) ?? 0
     );
   };
-    
+
   public onReleaseDrag = () => {
     const battleState = new Battle();
     const cardBoundingRect = this.ref?.current?.getBoundingClientRect();
     const { top } = cardBoundingRect;
 
-    if (window.innerHeight / top > 1.7 && this.get.targetSelf) {
+    if (
+      window.innerHeight / top > 1.7 &&
+      (this.get.targetAllEnemies || this.get.targetSelf)
+    ) {
       battleState.playSelectedCard();
     } else {
-      const collisions = battleState.monstersWithBoundingRef?.find(
-        (monster) =>
-          isCollidingWithEachOther(cardBoundingRect, monster.boundingRect)
+      const collisions = battleState.monstersWithBoundingRef?.find((monster) =>
+        isCollidingWithEachOther(cardBoundingRect, monster.boundingRect)
       );
       if (collisions) {
         battleState.selectMonster(collisions.id);
         battleState.playSelectedCard();
       }
     }
-  }
+  };
 }
 
 export enum CardType {
@@ -91,7 +95,7 @@ export enum CardEffectType {
   SpecificEnemy,
   AllEnemies,
   Self,
-  Random
+  Random,
 }
 
 export interface ICard {
@@ -101,7 +105,7 @@ export interface ICard {
   type: CardType;
   effect: CardEffectType;
   damage?: number | (() => number);
-  damageInstances? : number;
+  damageInstances?: number;
   block?: number | (() => number);
   prerequisite?: (battleState: IBattleState) => boolean;
   status?: IStatus;

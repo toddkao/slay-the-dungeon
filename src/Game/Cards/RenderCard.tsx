@@ -50,7 +50,7 @@ export const RenderCard = observer(
         ref={cardRef}
         key={cardState.get.id}
         onClick={onClick}
-        onMouseEnter={cardState.select}
+        onDrag={cardState.select}
         onMouseUp={cardState.onReleaseDrag}
         selected={cardState.get.id === battleState.selectedCardId}
       >
