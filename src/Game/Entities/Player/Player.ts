@@ -34,10 +34,16 @@ export class Player extends Entity {
     // times(6, () => stats.deck.push(cardMap.cleave(uniqueId())));
     // times(6, () => stats.deck.push(cardMap.clothesline(uniqueId())));
     // times(6, () => stats.deck.push(cardMap.flex(uniqueId())));
-    range(0, 5).forEach(() => this.addCardToDeck(cardMap.defend(uniqueId())));
-    range(0, 5).forEach(() => this.addCardToDeck(cardMap.strike(uniqueId())));
-    // times(1, () => this.addCardToDeck(cardMap.strike(uniqueId())));
-    // this.addStatus(StatusType.strength, 2);
+    //range(0, 6).forEach(() => stats.deck.push(cardMap.clash(uniqueId())));
+    //range(0, 6).forEach(() => stats.deck.push(cardMap.havoc(uniqueId())));
+    //range(0, 6).forEach(() => stats.deck.push(cardMap.heavyBlade(uniqueId())));
+    //range(0, 6).forEach(() => stats.deck.push(cardMap.ironWave(uniqueId())));
+    //range(0, 6).forEach(() => stats.deck.push(cardMap.perfectedStrike(uniqueId())));
+    //range(0, 6).forEach(() => stats.deck.push(cardMap.pommelStrike(uniqueId())));
+    //range(0, 6).forEach(() => stats.deck.push(cardMap.shrugItOff(uniqueId())));
+    //range(0, 6).forEach(() => stats.deck.push(cardMap.swordBoomerang(uniqueId())));
+    range(0, 6).forEach(() => stats.deck.push(cardMap.thunderclap(uniqueId())));
+    this.addStatus(StatusType.strength, 1);
     // this.addStatus(StatusType.dexterity);
   }
 

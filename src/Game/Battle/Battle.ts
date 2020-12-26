@@ -259,7 +259,7 @@ export class Battle {
     });
   });
 
-  private calculateDamage = action(
+  public calculateDamage = action(
     ({
       damage,
       extradamage = 0,
@@ -295,7 +295,7 @@ export class Battle {
     if (card.get.damage && selectedMonster) {
       selectedMonster.takeDamage(
         this.calculateDamage({
-          damage: card.evaluateDamage(this.player),
+          damage: card.evaluateDamage(),
           extradamage: this.player.extradamage,
           statuses: selectedMonster.get.statuses,
         })

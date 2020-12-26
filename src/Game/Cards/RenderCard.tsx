@@ -38,11 +38,25 @@ export const RenderCard = observer(
       return text;
     };
 
-    const [props, set] = useSpring(() => ({
-      x: 0,
-      y: 0,
-      scale: 1,
-    }));
+  const parseCardText = () => {
+    const player = new Player();
+    let text = cardState.get.description;
+    cardState.get.descriptionVariables?.forEach((variable) => {
+      const variableValue = (cardState as any)?.get?.[variable];
+      text = text.replace(
+        "{}", //TODO: don't show updated number when evaluating
+        (typeof variableValue === "function" ? variableValue() : variableValue) +
+        (player as any)?.[`extra${variable}`]
+      );
+    });
+    return text;
+  };
+
+  const [props, set] = useSpring(() => ({
+    x: 0,
+    y: 0,
+    scale: 1,
+  }));
 
     // @ts-ignore
     const bind = useDrag(({ down, movement: [x, y] }) => {
