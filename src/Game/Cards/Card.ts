@@ -64,7 +64,7 @@ export interface ICard {
   status?: IStatus;
   block?: number;
   special?: Function;
-
+  rarity: CardRarity.common,
   targetEnemy: boolean;
 
   description: string;
@@ -77,4 +77,10 @@ export interface ICard {
     height: number;
   };
   audio?: string;
+}
+
+export enum CardRarity {
+  common,
+  uncommon,
+  rare,
 }

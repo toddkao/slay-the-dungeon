@@ -3,11 +3,11 @@ import styled, { css } from "styled-components";
 import { Column, Row } from "../../Layout";
 import { Modal } from "../Common/Modal";
 import Xarrow from "react-xarrows";
-import cancelButton from "../../Images/cancel-button.png";
 import { mapNodeType, mapNodeTypeToImage, Map } from "./Map";
 import { observer } from "mobx-react";
 import { useHistory } from "react-router-dom";
 import { Battle } from "../Battle/Battle";
+import { ReturnButton } from "../../Clickables";
 
 export const RenderMap = observer(
   ({
@@ -30,10 +30,10 @@ export const RenderMap = observer(
       scrollToBottom();
     });
 
-    const map = new Map();
+    const mapState = new Map();
 
-    const { matrix, paths } = map.currentFloor;
-    const { selectNode, selectableNodeIds, traversedNodeIds } = map;
+    const { matrix, paths } = mapState.currentFloor;
+    const { selectNode, selectableNodeIds, traversedNodeIds } = mapState;
 
     return (
       <Modal>
@@ -60,6 +60,7 @@ export const RenderMap = observer(
                         if (battleState.wonBattle && selectableNodeIds.includes(node.id)) {
                           history.push(`/battle/${node.id}`);
                           selectNode(node);
+                          mapState.setShowingMap(false);
                         }
                       }}
                       style={{
@@ -78,7 +79,7 @@ export const RenderMap = observer(
                         start={path.start}
                         end={path.end}
                         path="straight"
-                        headSize={0}
+                        headSize={3}
                         dashness={true}
                         lineColor="black"
                       />
@@ -93,22 +94,6 @@ export const RenderMap = observer(
     );
   }
 );
-
-const ReturnButton = styled.div`
-  font-size: 30px;
-  background: url(${cancelButton});
-  text-shadow: -1px -1px 0 #000, 0 -1px 0 #000, 1px -1px 0 #000, 1px 0 0 #000,
-    1px 1px 0 #000, 0 1px 0 #000, -1px 1px 0 #000, -1px 0 0 #000;
-  color: white;
-  width: 270px;
-  height: 135px;
-  position: absolute;
-  bottom: 200px;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
 
 const Wrapper = styled.div`
   background-color: beige;

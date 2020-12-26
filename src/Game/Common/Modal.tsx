@@ -1,6 +1,7 @@
 import { observer } from "mobx-react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
+import React from 'react';
 
 const Wrapper = styled.div`
   position: absolute;

@@ -32,7 +32,7 @@ export class Battle {
       exhaustPile: [],
       endTurnActions: [],
     })
-  ) { }
+  ) {}
 
   @computed
   get wonBattle() {
@@ -120,10 +120,22 @@ export class Battle {
   }
 
   public log = () => {
-    console.log("draw", this.battleState.drawPile.map(card => card.get.id));
-    console.log("hand", this.battleState.currentHand.map(card => card.get.id));
-    console.log("discard", this.battleState.discardPile.map(card => card.get.id));
-    console.log("exhaust", this.battleState.exhaustPile.map(card => card.get.id));
+    console.log(
+      "draw",
+      this.battleState.drawPile.map((card) => card.get.id)
+    );
+    console.log(
+      "hand",
+      this.battleState.currentHand.map((card) => card.get.id)
+    );
+    console.log(
+      "discard",
+      this.battleState.discardPile.map((card) => card.get.id)
+    );
+    console.log(
+      "exhaust",
+      this.battleState.exhaustPile.map((card) => card.get.id)
+    );
   };
 
   private getCardFromId = (cardId: string) => {
@@ -131,14 +143,20 @@ export class Battle {
   };
 
   private drawCards = action((cards: Card[]) => {
-    console.log(cards, this.battleState.drawPile);
-    console.log(cards.map(card => card.get.id), this.battleState.drawPile.map(card => card.get.id));
-    if (!cards.every(card => this.battleState.drawPile.map(drawCard => drawCard.get.id).includes(card.get.id))) {
+    if (
+      !cards.every((card) =>
+        this.battleState.drawPile
+          .map((drawCard) => drawCard.get.id)
+          .includes(card.get.id)
+      )
+    ) {
       throw new Error("Trying to draw cards that don't exist in draw pile");
     } else {
       cards.forEach((card) => {
         this.battleState.currentHand = [...this.battleState.currentHand, card];
-        this.battleState.drawPile = this.battleState.drawPile.filter(drawCard => drawCard.get.id !== card.get.id);
+        this.battleState.drawPile = this.battleState.drawPile.filter(
+          (drawCard) => drawCard.get.id !== card.get.id
+        );
       });
     }
   });
@@ -167,15 +185,18 @@ export class Battle {
 
     let shuffleIndex = 0;
     range(0, count).forEach((index) => {
-      if (this.battleState.drawPile.length === 0) {
+      console.log(this.drawPile);
+      if (this.drawPile.length === 0) {
+        console.log('shuffle discard pile')
         this.reshuffleDiscardPile();
         shuffleIndex = index;
       }
 
-      cards.push(this.drawPile[index - shuffleIndex]);
+      if (this.drawPile[index - shuffleIndex]) {
+        cards.push(this.drawPile[index - shuffleIndex]);
+        this.drawCards([this.drawPile[index - shuffleIndex]]);
+      }
     });
-
-    this.drawCards(cards);
     return cards;
   });
 
@@ -189,19 +210,26 @@ export class Battle {
   };
 
   public exhaustCards(cards: Card[]) {
-    cards.forEach(card => {
-      this.battleState.drawPile = this.battleState.drawPile.filter(drawCard => drawCard.get.id !== card.get.id);
-      this.battleState.currentHand = this.battleState.currentHand.filter(handCard => handCard.get.id !== card.get.id);
-      this.battleState.discardPile = this.battleState.discardPile.filter(exhaustCard => exhaustCard.get.id !== card.get.id);
+    cards.forEach((card) => {
+      this.battleState.drawPile = this.battleState.drawPile.filter(
+        (drawCard) => drawCard.get.id !== card.get.id
+      );
+      this.battleState.currentHand = this.battleState.currentHand.filter(
+        (handCard) => handCard.get.id !== card.get.id
+      );
+      this.battleState.discardPile = this.battleState.discardPile.filter(
+        (exhaustCard) => exhaustCard.get.id !== card.get.id
+      );
       this.battleState.exhaustPile = [...this.battleState.exhaustPile, card];
     });
   }
 
   public resolveTargetedCard = action((cards: Card[]) => {
-    cards.forEach(card => {
+    cards.forEach((card) => {
       switch (card.get.effect) {
         case CardEffectType.SingleTarget:
-          if (card.get.damage) //TODO: add a new card type for cards that has no damage
+          if (card.get.damage)
+            //TODO: add a new card type for cards that has no damage
             this.resolveSingleTargetDamage({
               card: card,
               selectedMonster: this.selectedMonster,
@@ -210,7 +238,10 @@ export class Battle {
         case CardEffectType.MultiTarget:
           this.monsters.forEach((monster) => {
             if (card.get.damage) {
-              this.resolveSingleTargetDamage({ card: card, selectedMonster: monster });
+              this.resolveSingleTargetDamage({
+                card: card,
+                selectedMonster: monster,
+              });
             }
           });
           break;
@@ -226,7 +257,6 @@ export class Battle {
         card.get.special(this.battleState);
       }
     });
-
   });
 
   private calculateDamage = action(

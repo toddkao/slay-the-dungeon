@@ -2,10 +2,12 @@ import styled, { css } from "styled-components";
 import { Typography } from "../../Typography";
 import redEnergy from "../../Images/redenergy.png";
 
-export const ManaCost = styled(Typography)<{ notEnoughMana: boolean }>`
+export const ManaCost = styled(Typography).attrs({
+  fontSize: 24, 
+  outline: true,
+})<{ notEnoughMana: boolean }>`
   background: url(${redEnergy});
   background-size: cover;
-  font-size: 24px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,6 +25,4 @@ export const ManaCost = styled(Typography)<{ notEnoughMana: boolean }>`
       : css`
           color: white;
         `};
-  text-shadow: -1px -1px 0 #000, 0 -1px 0 #000, 1px -1px 0 #000, 1px 0 0 #000,
-    1px 1px 0 #000, 0 1px 0 #000, -1px 1px 0 #000, -1px 0 0 #000;
 `;

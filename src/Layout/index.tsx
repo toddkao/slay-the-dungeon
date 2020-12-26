@@ -27,3 +27,13 @@ export const Spacer = styled.div<{ size: number }>`
       margin: ${size}px;
     `};
 `;
+
+export const RelativeWrapper = styled.div<ILayoutProps>`
+  position: relative;
+`;
+
+export const horizontalCenterAbsolute = css`
+  transform: translateX(-50%);
+  left: 50%;
+  position: absolute;
+`;
