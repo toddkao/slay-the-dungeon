@@ -72,8 +72,8 @@ export const RenderBattle = observer(() => {
         amount={battleState.drawPile.length}
       />
       <Graveyard
-        onClick={() => setCardsToShow(battleState.graveyard)}
-        amount={battleState.graveyard.length}
+        onClick={() => setCardsToShow(battleState.discardPile)}
+        amount={battleState.discardPile.length}
       />
 
       <OpenMap onClick={() => setShowMap(true)} />

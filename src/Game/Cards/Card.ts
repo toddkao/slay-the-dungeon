@@ -37,8 +37,8 @@ export class Card {
     }
   };
 
-  public evaluateDamage = (arg0: any) => {
-    return ((typeof this.card.damage === 'function' ? this.card.damage(arg0) : this.card.damage) ?? 0);
+  public evaluateDamage = () => {
+    return ((typeof this.card.damage === 'function' ? this.card.damage() : this.card.damage) ?? 0);
   };
 }
 
@@ -59,7 +59,7 @@ export interface ICard {
   manaCost: number;
   type: CardType;
   effect: CardEffectType;
-  damage?: number | ((argument: any) => number);
+  damage?: number | (() => number);
   prerequisite?: (battleState: IBattleState) => boolean;
   status?: IStatus;
   block?: number;

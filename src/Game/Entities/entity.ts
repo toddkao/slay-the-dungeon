@@ -121,7 +121,7 @@ export class Entity {
     if (this.entity.block === undefined) {
       return;
     }
-    this.entity.block += amount;
+    this.entity.block += amount + (this.statuses.find(status => status.type === StatusType.dexterity)?.amount ?? 0);
   });
 
   public clearBlock = action(() => {
