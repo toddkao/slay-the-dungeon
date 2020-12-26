@@ -3,7 +3,7 @@ import cards2 from "../../Images/cards2.png";
 import cards3 from "../../Images/cards3.png";
 import cards4 from "../../Images/cards4.png";
 import cards5 from "../../Images/cards5.png";
-import { Card, CardEffectType, CardRarity, CardType } from "./Card";
+import { Card, CardEffectType, CardRarity, CardType, ICard } from "./Card";
 import { StatusType } from "../Common/StatusBar";
 // @ts-ignore
 import fastAtk from "../../Audio/fastAtk.ogg";
@@ -12,10 +12,10 @@ import heavyAtk from "../../Audio/heavyAtk.ogg";
 // @ts-ignore
 import addBlock from "../../Audio/addBlock.ogg";
 import { Battle, IBattleState } from "../Battle/Battle";
-import { random, range, uniqueId } from "lodash";
-
+import { groupBy, random, range, uniqueId } from "lodash";
+import Chance from "chance";
 interface ISpriteToCardSize {
-  [index: string]: { CARD_WIDTH: number, CARD_HEIGHT: number }
+  [index: string]: { CARD_WIDTH: number; CARD_HEIGHT: number };
 }
 
 export const spriteToCardSize: ISpriteToCardSize = {
@@ -41,7 +41,13 @@ export const spriteToCardSize: ISpriteToCardSize = {
   },
 };
 
-const getImage = ({ sheetNumber, position }: { sheetNumber: number, position: [number, number] }) => {
+const getImage = ({
+  sheetNumber,
+  position,
+}: {
+  sheetNumber: number;
+  position: [number, number];
+}) => {
   let src = "cards" + sheetNumber;
   let path;
   switch (sheetNumber) {
@@ -64,14 +70,47 @@ const getImage = ({ sheetNumber, position }: { sheetNumber: number, position: [n
       throw new Error(`Expecting sheet number of 1-5, got ${sheetNumber}`);
   }
 
-  return { src: path, position, width: spriteToCardSize[src].CARD_WIDTH, height: spriteToCardSize[src].CARD_HEIGHT };
+  return {
+    src: path,
+    position,
+    width: spriteToCardSize[src].CARD_WIDTH,
+    height: spriteToCardSize[src].CARD_HEIGHT,
+  };
 };
+interface ICardMap {
+  [index: string]: ICard;
+}
 
-const Bash = (id: string) =>
-  new Card({
-    id,
+export const cardMap: ICardMap = {
+  strike: {
+    name: "Strike",
+    rarity: CardRarity.starter,
+    manaCost: 1,
+    damage: 999,
+    image: getImage({ sheetNumber: 5, position: [4, 2] }),
+    type: CardType.Attack,
+    effect: CardEffectType.SingleTarget,
+    description: `Deal {} damage.`,
+    descriptionVariables: ["damage"],
+    targetEnemy: true,
+    audio: fastAtk,
+  },
+  defend: {
+    name: "Defend",
+    rarity: CardRarity.starter,
+    manaCost: 1,
+    block: 5,
+    image: getImage({ sheetNumber: 1, position: [6, 4] }),
+    type: CardType.Skill,
+    effect: CardEffectType.AddBlock,
+    description: "Gain {} Block.",
+    descriptionVariables: ["block"],
+    targetEnemy: false,
+    audio: addBlock,
+  },
+  bash: {
     name: "Bash",
-    rarity: CardRarity.common,
+    rarity: CardRarity.starter,
     manaCost: 2,
     damage: 8,
     status: {
@@ -86,43 +125,8 @@ const Bash = (id: string) =>
     descriptionVariables: ["damage"],
     targetEnemy: true,
     audio: heavyAtk,
-  });
-
-const Defend = (id: string) =>
-  new Card({
-    id,
-    name: "Defend",
-    rarity: CardRarity.common,
-    manaCost: 1,
-    block: 5,
-    image: getImage({ sheetNumber: 1, position: [6, 4] }),
-    type: CardType.Skill,
-    effect: CardEffectType.AddBlock,
-    description: "Gain {} Block.",
-    descriptionVariables: ["block"],
-    targetEnemy: false,
-    audio: addBlock,
-  });
-
-const Strike = (id: string) =>
-  new Card({
-    id,
-    name: "Strike",
-    rarity: CardRarity.common,
-    manaCost: 1,
-    damage: 6,
-    image: getImage({ sheetNumber: 5, position: [4, 2] }),
-    type: CardType.Attack,
-    effect: CardEffectType.SingleTarget,
-    description: `Deal {} damage.`,
-    descriptionVariables: ["damage"],
-    targetEnemy: true,
-    audio: fastAtk,
-  });
-
-const Anger = (id: string) =>
-  new Card({
-    id,
+  },
+  anger: {
     name: "Anger",
     rarity: CardRarity.common,
     manaCost: 0,
@@ -134,7 +138,10 @@ const Anger = (id: string) =>
       }
 
       //TODO: need to update when implementing card upgrading
-      battleState.discardPile = [...battleState.discardPile, cardMap.anger((uniqueId()))];
+      battleState.discardPile = [
+        ...battleState.discardPile,
+        new Card(cardMap.anger),
+      ];
     },
     type: CardType.Attack,
     effect: CardEffectType.SingleTarget,
@@ -142,13 +149,9 @@ const Anger = (id: string) =>
     descriptionVariables: ["damage"],
     targetEnemy: true,
     audio: heavyAtk, //TODO: sound effect
-  });
-
-//TODO Armament requires UPGRADE functionality
-
-const BodySlam = (id: string) =>
-  new Card({
-    id,
+  },
+  //TODO Armament requires UPGRADE functionality
+  bodySlam: {
     name: "Body Slam",
     rarity: CardRarity.common,
     manaCost: 1,
@@ -162,18 +165,17 @@ const BodySlam = (id: string) =>
     description: `Deal damage equal to your current block`,
     descriptionVariables: [],
     targetEnemy: true,
-    audio: heavyAtk,//TODO: sound effect
-  });
-
-const Clash = (id: string) =>
-  new Card({
-    id,
+    audio: heavyAtk, //TODO: sound effect
+  },
+  clash: {
     name: "Clash",
     rarity: CardRarity.common,
     manaCost: 0,
     damage: 14,
     prerequisite: (battleState: IBattleState) => {
-      return battleState.currentHand.every(card => card.get.type === CardType.Attack);
+      return battleState.currentHand.every(
+        (card) => card.get.type === CardType.Attack
+      );
     },
     image: getImage({ sheetNumber: 3, position: [4, 1] }),
     type: CardType.Attack,
@@ -181,12 +183,9 @@ const Clash = (id: string) =>
     description: `Can only be played if every card in your hand is an Attack.\nDeal {} damage.`,
     descriptionVariables: ["damage"],
     targetEnemy: true,
-    audio: heavyAtk,//TODO: sound effect
-  });
-
-const Cleave = (id: string) =>
-  new Card({
-    id,
+    audio: heavyAtk, //TODO: sound effect
+  },
+  cleave: {
     name: "Cleave",
     rarity: CardRarity.common,
     manaCost: 1,
@@ -197,12 +196,9 @@ const Cleave = (id: string) =>
     description: `Deal 8 damage to ALL enemies.`,
     descriptionVariables: ["damage"],
     targetEnemy: true,
-    audio: heavyAtk,//TODO: sound effect
-  });
-
-const Clothesline = (id: string) =>
-  new Card({
-    id,
+    audio: heavyAtk, //TODO: sound effect
+  },
+  clothesline: {
     name: "Clothesline",
     rarity: CardRarity.common,
     manaCost: 2,
@@ -218,12 +214,9 @@ const Clothesline = (id: string) =>
     description: `Deal {} damage. Apply 2 Weak.`, //TODO: add weak to descriptionvariable
     descriptionVariables: ["damage"],
     targetEnemy: true,
-    audio: heavyAtk,//TODO: sound effect
-  });
-
-const Flex = (id: string) =>
-  new Card({
-    id,
+    audio: heavyAtk, //TODO: sound effect
+  },
+  flex: {
     name: "Flex",
     rarity: CardRarity.common,
     manaCost: 0,
@@ -233,18 +226,15 @@ const Flex = (id: string) =>
       battle.player.addStatus(StatusType.strength, 2);
       battle.endTurnActions.push(() => {
         new Battle().player.removeStatus(StatusType.strength, 2);
-      })
+      });
     },
     type: CardType.Skill,
     effect: CardEffectType.SingleTarget,
     description: `Gain 2 Strength. At the end of your turn, lose 2 Strength.`,
     targetEnemy: false,
-    audio: heavyAtk,//TODO: sound effect
-  });
-
-const Havoc = (id: string) =>
-  new Card({
-    id,
+    audio: heavyAtk, //TODO: sound effect
+  },
+  havoc: {
     name: "Havoc",
     rarity: CardRarity.common,
     manaCost: 1,
@@ -261,33 +251,28 @@ const Havoc = (id: string) =>
     effect: CardEffectType.SingleTarget,
     description: `Play the top card of your draw pile and Exhaust it.`,
     targetEnemy: false,
-    audio: heavyAtk,//TODO: sound effect
-  });
-
-//TODO: Headbutt needs card selection
-
-const HeavyBlade = (id: string) =>
-  new Card({
-    id,
+    audio: heavyAtk, //TODO: sound effect
+  },
+  //TODO: Headbutt needs card selection
+  heavyBlade: {
     name: "Heavy Blade",
+    rarity: CardRarity.common,
     manaCost: 2,
     image: getImage({ sheetNumber: 4, position: [3, 5] }),
     damage: () => {
       let battle = new Battle();
-      return 14 + (2 * battle.player.extradamage); //it's 2x extra here because extradamage itself is added elsewhere
+      return 14 + 2 * battle.player.extradamage; //it's 2x extra here because extradamage itself is added elsewhere
     },
     type: CardType.Attack,
     effect: CardEffectType.SingleTarget,
     description: `Deal {} damage. Strength affects Heavy Blade 3 times.`,
     descriptionVariables: ["damage"],
     targetEnemy: true,
-    audio: heavyAtk,//TODO: sound effect
-  });
-
-const IronWave = (id: string) =>
-  new Card({
-    id,
+    audio: heavyAtk, //TODO: sound effect
+  },
+  ironWave: {
     name: "Iron Wave",
+    rarity: CardRarity.common,
     manaCost: 1,
     image: getImage({ sheetNumber: 4, position: [4, 8] }),
     damage: 5,
@@ -300,31 +285,33 @@ const IronWave = (id: string) =>
     description: `Gain 5 Block. Deal {} damage.`,
     descriptionVariables: ["damage"],
     targetEnemy: true,
-    audio: heavyAtk,//TODO: sound effect
-  });
-
-const PerfectedStrike = (id: string) =>
-  new Card({
-    id,
+    audio: heavyAtk, //TODO: sound effect
+  },
+  perfectedStrike: {
     name: "Perfected Strike",
+    rarity: CardRarity.common,
     manaCost: 1,
     image: getImage({ sheetNumber: 5, position: [2, 3] }),
     damage: () => {
       let battle = new Battle();
-      return 6 + (battle.player.get.deck.filter(card => card.get.name.toLowerCase().includes("strike")).length * 2);
+      return (
+        6 +
+        battle.player.get.deck.filter((card) =>
+          card.get.name.toLowerCase().includes("strike")
+        ).length *
+          2
+      );
     },
     type: CardType.Attack,
     effect: CardEffectType.SingleTarget,
-    description: `Deal {} damage. Deals an additional 2 damage for ALL of your cards containing "Strike".`,
+    description: `Deal {} damage.\n Deals an additional\n2 damage for ALL of your\ncards containing\n"Strike".`,
     descriptionVariables: ["damage"],
     targetEnemy: true,
-    audio: heavyAtk,//TODO: sound effect
-  });
-
-const PommelStrike = (id: string) =>
-  new Card({
-    id,
+    audio: heavyAtk, //TODO: sound effect
+  },
+  pommelStrike: {
     name: "Pommel Strike",
+    rarity: CardRarity.common,
     manaCost: 1,
     image: getImage({ sheetNumber: 5, position: [0, 0] }),
     damage: 9,
@@ -337,14 +324,11 @@ const PommelStrike = (id: string) =>
     description: `Deal {} damage. Draw 1 card(s).`,
     descriptionVariables: ["damage"],
     targetEnemy: true,
-    audio: heavyAtk,//TODO: sound effect
-  });
-
-
-const ShrugItOff = (id: string) =>
-  new Card({
-    id,
+    audio: heavyAtk, //TODO: sound effect
+  },
+  shrugItOff: {
     name: "Shrug It Off",
+    rarity: CardRarity.common,
     manaCost: 1,
     image: getImage({ sheetNumber: 2, position: [3, 2] }),
     damage: 0,
@@ -357,69 +341,69 @@ const ShrugItOff = (id: string) =>
     effect: CardEffectType.SingleTarget,
     description: `Gain 8 Block. Draw 1 card.`,
     targetEnemy: false,
-    audio: heavyAtk,//TODO: sound effect
-  });
-
-const SwordBoomerang = (id: string) =>
-  new Card({
-    id,
+    audio: heavyAtk, //TODO: sound effect
+  },
+  swordBoomerang: {
     name: "Sword Boomerang",
+    rarity: CardRarity.common,
     manaCost: 1,
     image: getImage({ sheetNumber: 5, position: [3, 0] }),
     damage: 0,
     special: () => {
       let battle = new Battle();
       range(0, 3).forEach(() => {
-        let randomMonster = battle.monsters[random(0, battle.monsters.length - 1)];
-        randomMonster.takeDamage(battle.calculateDamage({
-          damage: 3,
-          extradamage: battle.player.extradamage,
-          statuses: randomMonster.get.statuses,
-        }));
+        let randomMonster =
+          battle.monsters[random(0, battle.monsters.length - 1)];
+        randomMonster.takeDamage(
+          battle.calculateDamage({
+            damage: 3,
+            extradamage: battle.player.extradamage,
+            statuses: randomMonster.get.statuses,
+          })
+        );
       });
     },
     type: CardType.Attack,
     effect: CardEffectType.SingleTarget,
     description: `Deal 3 damage to a random enemy 3 times.`,
     targetEnemy: true,
-    audio: heavyAtk,//TODO: sound effect
-  });
-
-const Thunderclap = (id: string) =>
-  new Card({
-    id,
+    audio: heavyAtk, //TODO: sound effect
+  },
+  thunderclap: {
     name: "Thunderclap",
+    rarity: CardRarity.common,
     manaCost: 1,
     image: getImage({ sheetNumber: 5, position: [4, 1] }),
     damage: 4,
     special: () => {
       let battle = new Battle();
-      battle.monsters.forEach(monster => monster.addStatus(StatusType.vulnerable));
+      battle.monsters.forEach((monster) =>
+        monster.addStatus(StatusType.vulnerable)
+      );
     },
     type: CardType.Attack,
     effect: CardEffectType.MultiTarget,
     description: `Deal {} damage and apply 1 Vulnerable to ALL enemies.`,
     descriptionVariables: ["damage"],
     targetEnemy: true,
-    audio: heavyAtk,//TODO: sound effect
-  });
-
-export const cardMap = {
-  strike: Strike,
-  defend: Defend,
-  bash: Bash,
-  anger: Anger,
-  bodySlam: BodySlam,
-  clash: Clash,
-  cleave: Cleave,
-  clothesline: Clothesline,
-  flex: Flex,
-  havoc: Havoc,
-  heavyBlade: HeavyBlade,
-  ironWave: IronWave,
-  perfectedStrike: PerfectedStrike,
-  pommelStrike: PommelStrike,
-  shrugItOff: ShrugItOff,
-  swordBoomerang: SwordBoomerang,
-  thunderclap: Thunderclap,
+    audio: heavyAtk, //TODO: sound effect
+  },
 };
+
+export const nonBasicCardList = Object.values(cardMap).filter(card => card.rarity !== CardRarity.starter);
+
+export const cardsByRarity = groupBy(nonBasicCardList, (card) => card.rarity);
+interface IChanceByRarity {
+  [index: string]: number;
+}
+
+// 60% common, 37% uncommon 3% rare
+const chanceByRarity: IChanceByRarity = {
+  [CardRarity.common]: 60,
+  [CardRarity.uncommon]: 37,
+  [CardRarity.rare]: 3,
+};
+
+export const rarityChance = Object.keys(cardsByRarity).map(
+  (rarity) => chanceByRarity[rarity]
+);

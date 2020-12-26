@@ -70,7 +70,7 @@ export class Map {
         left:
           rowIndex === 0 && colIndex === 0
             ? 500
-            : (Math.floor(Math.random() * 40) + 150) * (colIndex + 1),
+            : (Math.floor(Math.random() * 40) + 200) * (colIndex + 1),
         top:
           rowIndex === 0 && colIndex === 0
             ? 50
@@ -78,9 +78,9 @@ export class Map {
       }));
     });
 
-    this.map.floors[1].matrix.forEach((row, rowIndex) => {
+    this.currentFloor.matrix.forEach((row, rowIndex) => {
       const currentRow = clone(row);
-      const nextRow = clone(this.map.floors[1].matrix[rowIndex + 1]);
+      const nextRow = clone(this.currentFloor.matrix[rowIndex + 1]);
       if (nextRow) {
         nextRow.forEach((node, index) => {
           if (currentRow[index]) {
@@ -92,6 +92,38 @@ export class Map {
             this.map.floors[1].paths.push({
               start: node.id,
               end: currentRow[currentRow.length - 1].id,
+            });
+          }
+          const randomNumber = random(0, 100);
+          const leftNode = clone(row)[index - 1];
+          const rightNode = clone(row)[index + 1];
+          if (randomNumber < 10 && leftNode) {
+            // connect to left node
+            this.map.floors[1].paths.push({
+              start: node.id,
+              end: leftNode.id,
+            });
+          } else if (randomNumber < 20 && rightNode) {
+            // connect to right node
+            this.map.floors[1].paths.push({
+              start: node.id,
+              end: rightNode.id,
+            });
+          }
+        });
+      }
+    });
+
+    this.map.floors[1].matrix.forEach((row, rowIndex) => {
+      const nextRow = clone(this.map.floors[1].matrix[rowIndex + 1]);
+      if (nextRow) {
+        row.forEach((node) => {
+          if (
+            !this.map.floors[1].paths.map((path) => path.end).includes(node.id)
+          ) {
+            this.map.floors[1].paths.push({
+              start: nextRow[nextRow.length - 1].id,
+              end: node.id,
             });
           }
         });
@@ -148,8 +180,8 @@ export class Map {
   });
 
   generateNodeType = (rowIndex: number) => {
-    return rowIndex === 8 ? mapNodeType.rest : mapNodeType.monster;
-  }
+    return rowIndex === 1 ? mapNodeType.rest : mapNodeType.monster;
+  };
 
   generateEncounter = (rowIndex: number) => {
     const randomFirstThreeEncounterIndex = random(

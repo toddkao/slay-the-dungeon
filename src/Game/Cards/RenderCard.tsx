@@ -12,7 +12,7 @@ import { Player } from "../Entities/Player/Player";
 
 // @ts-ignore
 import { Sprite } from "react-spritesheet";
-import { horizontalCenterAbsolute } from "../../Layout";
+import { horizontalCenterAbsolute, Row } from "../../Layout";
 
 export const RenderCard = observer(
   ({
@@ -25,38 +25,27 @@ export const RenderCard = observer(
     showIfCastable?: boolean;
   }) => {
     const battleState = new Battle();
+
     const parseCardText = () => {
       const player = new Player();
       let text = cardState.get.description;
       cardState.get.descriptionVariables?.forEach((variable) => {
+        const variableValue = (cardState as any)?.get?.[variable];
         text = text.replace(
-          "{}",
-          (cardState as any)?.get?.[variable] +
-            (player as any)?.[`extra${variable}`]
+          "{}", //TODO: don't show updated number when evaluating
+          (typeof variableValue === "function"
+            ? variableValue()
+            : variableValue) + (player as any)?.[`extra${variable}`]
         );
       });
       return text;
     };
 
-  const parseCardText = () => {
-    const player = new Player();
-    let text = cardState.get.description;
-    cardState.get.descriptionVariables?.forEach((variable) => {
-      const variableValue = (cardState as any)?.get?.[variable];
-      text = text.replace(
-        "{}", //TODO: don't show updated number when evaluating
-        (typeof variableValue === "function" ? variableValue() : variableValue) +
-        (player as any)?.[`extra${variable}`]
-      );
-    });
-    return text;
-  };
-
-  const [props, set] = useSpring(() => ({
-    x: 0,
-    y: 0,
-    scale: 1,
-  }));
+    const [props, set] = useSpring(() => ({
+      x: 0,
+      y: 0,
+      scale: 1,
+    }));
 
     // @ts-ignore
     const bind = useDrag(({ down, movement: [x, y] }) => {
@@ -91,7 +80,9 @@ export const RenderCard = observer(
         </ManaCost>
         <RenderCardName outline>{cardState.get.name}</RenderCardName>
         <RenderCardType>{cardState.get.type}</RenderCardType>
-        <RenderCardText>{parseCardText()}</RenderCardText>
+        <CardTextContainer>
+          <RenderCardText>{parseCardText()}</RenderCardText>
+        </CardTextContainer>
         <CardSpriteContainer>
           <Sprite
             filename={src}
@@ -142,10 +133,12 @@ const CardWrapper = styled(animated.div)<{ selected: boolean }>`
 `;
 
 const RenderCardName = styled(Typography)`
+  ${horizontalCenterAbsolute};
   color: white;
   font-size: 16px;
   top: 17px;
-  ${horizontalCenterAbsolute};
+  width: 100%;
+  text-align: center;
 `;
 
 const RenderCardType = styled(Typography)`
@@ -154,11 +147,21 @@ const RenderCardType = styled(Typography)`
   ${horizontalCenterAbsolute};
 `;
 
-const RenderCardText = styled(Typography)`
+const RenderCardText = styled(Typography).attrs({
+  as: 'pre'
+})`
+  font-size: 14px;
+  color: white;
+  font-weight: 100;
+  line-height: 1.2;
+`;
+
+const CardTextContainer = styled(Row)`
   ${horizontalCenterAbsolute};
   text-align: center;
-  font-size: 16px;
-  color: white;
-  top: 65%;
-  width: 65%;
+  align-items: center;
+  justify-content: center;
+  top: 58%;
+  height: 90px;
+  width: 115px;
 `;

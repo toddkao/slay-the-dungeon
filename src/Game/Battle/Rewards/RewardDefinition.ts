@@ -3,7 +3,7 @@ import { Card } from "../../Cards/Card";
 export interface IReward {
   id: string;
   type: RewardTypes;
-  cards: ((id: string) => Card)[];
+  cards: () => Card[];
   // TODO add more reward types
 }
 

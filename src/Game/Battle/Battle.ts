@@ -9,7 +9,7 @@ import { Map } from "../Map/Map";
 export interface IBattleState {
   selectedCardId: string | undefined;
   selectedMonsterId: string | undefined;
-  monsters: Monster[];
+  monsters: Monster[] | undefined;
   currentHand: Card[];
   currentMana: number;
   drawPile: Card[];
@@ -25,7 +25,7 @@ export class Battle {
       selectedCardId: undefined,
       selectedMonsterId: undefined,
       currentMana: new Player().maxMana,
-      monsters: [],
+      monsters: undefined,
       currentHand: [],
       drawPile: [],
       discardPile: [],
@@ -178,6 +178,7 @@ export class Battle {
     this.battleState.drawPile = this.player.get.deck;
     this.battleState.drawPile = shuffle(this.battleState.drawPile);
     this.draw(5);
+    console.log(this.player.get.deck);
   });
 
   public draw = action((count: number = 1) => {
@@ -345,6 +346,7 @@ export class Battle {
   private resolveGameActions = action(() => {
     this.battleState.currentMana = this.player.maxMana;
     this.removeCardsFromHand(this.currentHand);
+    this.selectCard(undefined);
     this.draw(5);
   });
 

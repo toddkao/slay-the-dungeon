@@ -2,9 +2,10 @@ import { computed } from "mobx";
 import { IStatus } from "../Common/StatusBar";
 import { Howl } from "howler";
 import { Battle, IBattleState } from "../Battle/Battle";
+import { uniqueId } from "lodash";
 
 export class Card {
-  constructor(private card: ICard) { };
+  constructor(private card: ICard) {}
 
   @computed
   public get get() {
@@ -12,12 +13,11 @@ export class Card {
       ...this.card,
       targetSelf: !this.card.targetEnemy,
     };
-  };
-
+  }
 
   public selectable = () => {
     return this.card.prerequisite ? this.card.prerequisite(new Battle()) : true;
-  }
+  };
 
   public select = () => {
     const battle = new Battle();
@@ -25,7 +25,7 @@ export class Card {
     if (this.selectable()) {
       battle.selectCard(this.get.id);
     }
-  }
+  };
 
   public playAudioClip = () => {
     if (this.get.audio) {
@@ -38,7 +38,11 @@ export class Card {
   };
 
   public evaluateDamage = () => {
-    return ((typeof this.card.damage === 'function' ? this.card.damage() : this.card.damage) ?? 0);
+    return (
+      (typeof this.card.damage === "function"
+        ? this.card.damage()
+        : this.card.damage) ?? 0
+    );
   };
 }
 
@@ -54,7 +58,7 @@ export enum CardEffectType {
 }
 
 export interface ICard {
-  id: any;
+  id?: string;
   name: string;
   manaCost: number;
   type: CardType;
@@ -64,7 +68,7 @@ export interface ICard {
   status?: IStatus;
   block?: number;
   special?: Function;
-  rarity: CardRarity.common,
+  rarity: CardRarity;
   targetEnemy: boolean;
 
   description: string;
@@ -80,6 +84,7 @@ export interface ICard {
 }
 
 export enum CardRarity {
+  starter,
   common,
   uncommon,
   rare,

@@ -72,10 +72,10 @@ export const RenderMap = observer(
                       nodeType={node.type}
                     />
                   ))}
-                  {paths.map((path) => {
+                  {paths.map((path, index) => {
                     return (
                       <Xarrow
-                        key={`${path.start}-${path.end}`}
+                        key={`${path.start}-${path.end}-${index}`}
                         start={path.start}
                         end={path.end}
                         path="straight"
