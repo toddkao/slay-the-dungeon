@@ -9,11 +9,9 @@ import background from "../../Images/background.jpg";
 import { ShowCardsModal } from "../Common/ShowCardsModal";
 import { useState } from "react";
 import {
-  DeckWithNumber,
   DiscardPileWithNumber,
   DrawPileWithNumber,
   MapButton,
-  MapIcon,
 } from "../Common/icons";
 import { Card } from "../Cards/Card";
 import { RenderCard } from "../Cards/RenderCard";
@@ -23,7 +21,6 @@ import { RenderMap } from "../Map/RenderMap";
 import { Map } from "../Map/Map";
 import { useHistory } from "react-router-dom";
 import { RenderRewardsModal } from "./Rewards/RenderRewardsModal";
-import { map } from "lodash";
 
 export const RenderBattle = observer(() => {
   const battleState = new Battle();

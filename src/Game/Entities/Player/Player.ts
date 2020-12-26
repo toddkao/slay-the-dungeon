@@ -1,6 +1,6 @@
 import { action, computed, observable } from "mobx";
 import { Card } from "../../Cards/Card";
-import { range, times, uniqueId } from "lodash";
+import { range, uniqueId } from "lodash";
 import { Singleton } from "@taipescripeto/singleton";
 import { Entity, IEntity } from "../entity";
 import { StatusType } from "../../Common/StatusBar";
@@ -27,6 +27,7 @@ export class Player extends Entity {
     })
   ) {
     super(stats);
+
     // times(6, () => stats.deck.push(cardMap.bash(uniqueId())));
     // times(6, () => stats.deck.push(cardMap.defend(uniqueId())));
     // times(6, () => stats.deck.push(cardMap.anger(uniqueId())));
@@ -37,12 +38,15 @@ export class Player extends Entity {
     //range(0, 6).forEach(() => stats.deck.push(cardMap.clash(uniqueId())));
     //range(0, 6).forEach(() => stats.deck.push(cardMap.havoc(uniqueId())));
     //range(0, 6).forEach(() => stats.deck.push(cardMap.heavyBlade(uniqueId())));
-    //range(0, 6).forEach(() => stats.deck.push(cardMap.ironWave(uniqueId())));
+    // range(0, 4).forEach(() =>
+    //   stats.deck.push(new Card({ ...cardMap.ironWave, id: uniqueId() }))
+    // );
     //range(0, 6).forEach(() => stats.deck.push(cardMap.perfectedStrike(uniqueId())));
     //range(0, 6).forEach(() => stats.deck.push(cardMap.pommelStrike(uniqueId())));
     //range(0, 6).forEach(() => stats.deck.push(cardMap.shrugItOff(uniqueId())));
     //range(0, 6).forEach(() => stats.deck.push(cardMap.swordBoomerang(uniqueId())));
     //range(0, 6).forEach(() => stats.deck.push(cardMap.thunderclap(uniqueId())));
+    
     range(0, 5).forEach(() =>
       stats.deck.push(new Card({ ...cardMap.strike, id: uniqueId() }))
     );

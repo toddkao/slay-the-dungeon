@@ -1,8 +1,7 @@
-import { range, sample, sampleSize, uniqueId } from "lodash";
+import { range, sample, uniqueId } from "lodash";
 import { observer } from "mobx-react";
 import React, { useState } from "react";
 import {
-  cardMap,
   cardsByRarity,
   rarityChance,
 } from "../../Cards/CardDefinitions";
@@ -59,7 +58,7 @@ export const RenderRewardsModal = observer(
         <RewardItem onClick={() => setSelectedReward(reward)}>
           <RewardListItemPanel src={rewardListItemPanel} />
           <RewardItemDetails>
-            <img src={normalCardReward} />
+            <img src={normalCardReward} alt="Normal Card Reward" />
             <Spacer size={10} />
             <Typography color="white" fontSize={20} outline>
               Add a card to your deck

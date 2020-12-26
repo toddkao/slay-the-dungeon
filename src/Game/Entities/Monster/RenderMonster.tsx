@@ -13,7 +13,7 @@ export const RenderMonster = observer(
     const battleState = new Battle();
 
     const {
-      get: { id, currentIntent, damage, image },
+      get: { id, currentIntent, image },
       statuses,
       health,
       maxHealth,
