@@ -18,6 +18,15 @@ export class Monster extends Entity {
   }
 
   @computed
+  get dead() {
+    return this.monster.dead;
+  }
+  set dead(isDead: boolean | undefined) {
+    this.monster.dead = isDead;
+  }
+
+
+  @computed
   public get get() {
     return this.monster;
   }
@@ -68,4 +77,5 @@ interface IMonster extends IEntity {
   currentIntent?: IIntent;
   effect?: any;
   ref?: React.MutableRefObject<any>;
+  dead?: boolean;
 }

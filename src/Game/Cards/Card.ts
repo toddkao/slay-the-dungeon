@@ -78,7 +78,7 @@ export class Card {
       const collisions = battleState.monstersWithBoundingRef?.find((monster) =>
         isCollidingWithEachOther(cardBoundingRect, monster.boundingRect)
       );
-      if (collisions) {
+      if (collisions && !battleState.getMonsterById(collisions.id)?.dead) {
         battleState.selectMonster(collisions.id);
         battleState.playSelectedCard();
       }

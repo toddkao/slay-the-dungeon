@@ -32,11 +32,14 @@ export class Battle {
       exhaustPile: [],
       endTurnActions: [],
     })
-  ) { }
+  ) {}
 
   @computed
   get wonBattle() {
-    return this.monsters !== undefined && this.monsters.length === 0;
+    return (
+      this.monsters !== undefined &&
+      this.monsters.every((monster) => monster.dead)
+    );
   }
 
   @computed
@@ -129,6 +132,10 @@ export class Battle {
   get exhaustPile() {
     return this.battleState.exhaustPile;
   }
+
+  public getMonsterById = (monsterId: string) => {
+    return this.monsters?.find((monster) => monster.get.id === monsterId);
+  };
 
   public log = () => {
     console.log(
@@ -266,7 +273,9 @@ export class Battle {
           break;
         case CardEffectType.Random:
           range(0, card.get.damageInstances).forEach(() => {
-            let randomMonster = this.monsters?.[random(0, this.monsters.length - 1)];
+            let randomMonster = this.monsters?.[
+              random(0, this.monsters.length - 1)
+            ];
             this.resolveSingleTargetDamage({
               card: card,
               selectedMonster: randomMonster,
@@ -327,11 +336,7 @@ export class Battle {
         selectedMonster.addStatus(card.get.status.type, card.get.status.amount);
       }
       if (selectedMonster.get.health === 0) {
-        this.setMonsters(
-          this.monsters?.filter(
-            (monster) => monster.get.id !== selectedMonster?.id
-          )
-        );
+        selectedMonster.dead = true;
       }
     }
   }

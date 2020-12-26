@@ -18,21 +18,16 @@ export const RenderMonster = observer(
       health,
       maxHealth,
       extradamage,
+      dead,
     } = monsterState;
     const monsterRef = useRef(null);
     monsterState.ref = monsterRef;
-    // TODO actually I think we should render a dead 
-    // monster here, and avoid removing monsters from battleState
-    // when they die
-    if (health === 0) {
-      return null;
-    }
 
     const renderIntentNumber = () => {
       switch (currentIntent?.type) {
         case IntentType.Attack:
           return (
-             // TODO: update this to multiply (damage + extra damage) by modifier (eg. weak) 
+            // TODO: update this to multiply (damage + extra damage) by modifier (eg. weak)
             <IntentNumber> {monsterState.damage + extradamage} </IntentNumber>
           );
         default:
@@ -51,6 +46,7 @@ export const RenderMonster = observer(
             battleState.playSelectedCard();
           }
         }}
+        dead={dead}
         disabled={battleState.targetSelf}
         selected={id === battleState.selectedMonsterId}
       >
@@ -79,14 +75,26 @@ export const RenderMonster = observer(
   }
 );
 
-const MonsterWrapper = styled(Column)<{ selected: boolean; disabled: boolean }>`
+const MonsterWrapper = styled(Column)<{
+  selected: boolean;
+  disabled: boolean;
+  dead?: boolean;
+}>`
   position: relative;
+
   z-index: 0;
   height: 100%;
   width: 100%;
-  ${({ selected }) => (selected ? "outline: 2px solid green;" : "")}
-  ${({ disabled }) =>
-    disabled
+  ${({ selected }) => (selected ? "outline: 2px solid green;" : "")};
+  ${({ dead }) =>
+    dead
+      ? css`
+          transition: opacity 0.5s ease-in-out;
+          opacity: 0;
+        `
+      : ""};
+  ${({ disabled, dead }) =>
+    disabled || dead
       ? "pointer-events: none"
       : css`
           &:hover {
