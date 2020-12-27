@@ -102,7 +102,7 @@ export const RenderBattle = observer(() => {
               }
               onFinishSelectingCards={(cards: Card[]) => {
                 battleState.selectedCard?.get.cardSelection?.selectCards(cards);
-                battleState.setCardsToShow(undefined);
+                battleState.setCardsToShow();
               }}
             />
           ) : null}

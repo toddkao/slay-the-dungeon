@@ -5,7 +5,7 @@ import { IStatus, StatusType } from "../Common/StatusBar";
 import { IntentType, Monster } from "../Entities/Monster/Monster";
 import { Player } from "../Entities/Player/Player";
 import { Map } from "../Map/Map";
-import { AppHistory } from '../../Router';
+import { AppHistory } from "../../Router";
 
 enum DeckPosition {
   top,
@@ -65,9 +65,7 @@ export class Battle {
 
   @computed
   get wonBattle() {
-    return (
-      this.monsters !== undefined && this.monstersAlive?.length === 0
-    );
+    return this.monsters !== undefined && this.monstersAlive?.length === 0;
   }
 
   @computed
@@ -140,7 +138,7 @@ export class Battle {
 
   @computed
   get monstersAlive() {
-    return this.monsters?.filter(monster => !monster.dead)
+    return this.monsters?.filter((monster) => !monster.dead);
   }
 
   @computed
@@ -182,7 +180,7 @@ export class Battle {
     return this.battleState.cardsToShow;
   }
 
-  public setCardsToShow(cards: Card[] | undefined) {
+  public setCardsToShow(cards?: Card[]) {
     this.battleState.cardsToShow = cards;
   }
 
@@ -322,8 +320,8 @@ export class Battle {
             setTimeout(() => {
               this.resolveSingleTargetDamage({
                 card: card,
-                selectedMonster: this.monsters?.[
-                  random(0, this.monsters.length - 1)
+                selectedMonster: this.monstersAlive?.[
+                  random(0, this.monstersAlive.length - 1)
                 ],
               });
               resolve(true);
@@ -378,7 +376,9 @@ export class Battle {
     selectedMonster?: Monster;
   }) {
     if (!selectedMonster && this.monstersAlive) {
-      selectedMonster = this.monstersAlive[random(0, this.monstersAlive.length - 1)];
+      selectedMonster = this.monstersAlive[
+        random(0, this.monstersAlive.length - 1)
+      ];
     }
 
     if (card.get.damage && selectedMonster) {
@@ -413,7 +413,7 @@ export class Battle {
           break;
       }
       if (Player.get().health <= 0) {
-        AppHistory.push('/defeat');
+        AppHistory.push("/defeat");
       }
       monster.updateStatuses();
       monster.cleanupStatuses();
@@ -488,10 +488,17 @@ export class Battle {
   };
 
   public playSelectedCard = action(() => {
+    console.log(this.cardResolveQueue);
     if (
+      // Ensure a card is selected
       !this.selectedCardId ||
+      !this.selectedCard ||
+      // Ensure you have enough mana to cast the card
       this.selectedCardManaCost > this.currentMana ||
-      !this.selectedCard
+      // Make sure previous card isn't in the process of resolving
+      // TODO maybe instead just push the new card onto the queue?
+      // need to check in game and think about the best way to handle it
+      this.cardResolveQueue.length !== 0
     ) {
       return;
     }
@@ -509,6 +516,7 @@ export class Battle {
   public initialize = action(() => {
     this.initializeMonsters();
     this.initializeHand();
+    Player.get().clearBlock();
     this.battleState.cardsToShow = undefined;
     this.battleState.currentMana = Player.get().maxMana;
   });
@@ -528,7 +536,7 @@ export class Battle {
     );
   });
 
-  setMonsters = action((monsters: Monster[] | undefined) => {
+  setMonsters = action((monsters?: Monster[]) => {
     this.battleState.monsters = monsters;
   });
 

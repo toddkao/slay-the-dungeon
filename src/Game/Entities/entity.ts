@@ -128,6 +128,11 @@ export class Entity {
     this.entity.block = 0;
   });
 
+  public reset = action(() => {
+    this.entity.health = this.maxHealth;
+    this.entity.block = 0;
+  });
+
   constructor(
     private entity: IEntity = observable({
       health: 0,
