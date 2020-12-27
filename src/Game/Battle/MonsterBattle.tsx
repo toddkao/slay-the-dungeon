@@ -26,7 +26,6 @@ export const RenderBattle = observer(() => {
   const battleState = new Battle();
   const useMountEffect = (fun: () => any) => useEffect(fun, []);
   const history = useHistory();
-  const [cardToShow, setCardsToShow] = useState<Card[]>();
   const mapState = new Map();
 
   useMountEffect(() => {
@@ -67,26 +66,26 @@ export const RenderBattle = observer(() => {
       </ManaAmount>
 
       <DrawPile
-        onClick={() => setCardsToShow(battleState.drawPile)}
+        onClick={() => battleState.setCardsToShow(battleState.drawPile)}
         amount={battleState.drawPile.length}
       />
 
       <ExhaustPile
-        onClick={() => setCardsToShow(battleState.exhaustPile)}
+        onClick={() => battleState.setCardsToShow(battleState.exhaustPile)}
         amount={battleState.exhaustPile.length}
       />
 
       <DiscardPile
-        onClick={() => setCardsToShow(battleState.discardPile)}
+        onClick={() => battleState.setCardsToShow(battleState.discardPile)}
         amount={battleState.discardPile.length}
       />
 
       <OpenMap onClick={() => mapState.setShowingMap(true)} />
 
-      {cardToShow ? (
+      {battleState.cardsToShow ? (
         <ShowCardsModal
-          cards={cardToShow}
-          onClose={() => setCardsToShow(undefined)}
+          cards={battleState.cardsToShow}
+          onClose={() => battleState.setCardsToShow(undefined)}
         />
       ) : null}
 

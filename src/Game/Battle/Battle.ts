@@ -1,5 +1,5 @@
 import { Singleton } from "@taipescripeto/singleton";
-import { groupBy, keyBy, random, range, sampleSize, shuffle } from "lodash";
+import { random, range, sampleSize, shuffle } from "lodash";
 import { action, computed, observable } from "mobx";
 import { Card, CardEffectType } from "../Cards/Card";
 import { IStatus, StatusType } from "../Common/StatusBar";
@@ -16,6 +16,8 @@ export interface IBattleState {
   discardPile: Card[];
   exhaustPile: Card[];
   endTurnActions: Function[];
+  cardsToShow?: Card[];
+  turnIndex?: number;
 }
 @Singleton()
 export class Battle {
@@ -31,8 +33,10 @@ export class Battle {
       discardPile: [],
       exhaustPile: [],
       endTurnActions: [],
+      cardsToShow: undefined,
+      turnIndex: undefined
     })
-  ) {}
+  ) { }
 
   @computed
   get wonBattle() {
@@ -119,6 +123,9 @@ export class Battle {
   get drawPile() {
     return this.battleState.drawPile;
   }
+  set drawPile(cards: Card[]) {
+    this.battleState.drawPile = cards;
+  }
 
   @computed
   get discardPile() {
@@ -131,6 +138,15 @@ export class Battle {
   @computed
   get exhaustPile() {
     return this.battleState.exhaustPile;
+  }
+
+  @computed
+  get cardsToShow() {
+    return this.battleState.cardsToShow;
+  }
+
+  public setCardsToShow(cards: Card[] | undefined) {
+    this.battleState.cardsToShow = cards;
   }
 
   public getMonsterById = (monsterId: string) => {
@@ -247,7 +263,6 @@ export class Battle {
       switch (card.get.effect) {
         case CardEffectType.SpecificEnemy:
           if (card.get.damage)
-            //TODO: add a new card type for cards that has no damage
             this.resolveSingleTargetDamage({
               card: card,
               selectedMonster: this.selectedMonster,
@@ -285,10 +300,16 @@ export class Battle {
         default:
           break;
       }
-      if (card.get.special) {
-        card.get.special();
+      if (card.get.cardSelection) {
+        this.battleState.cardsToShow = card.get.cardSelection.from();
+        return;
+      }
+      if (card.get.specialEffect) {
+        card.get.specialEffect();
       }
     });
+    console.log("resolve targeted card");
+    this.callNextAction();
   });
 
   public calculateDamage = action(
@@ -386,6 +407,34 @@ export class Battle {
     if (amount <= this.currentMana) {
       this.battleState.currentMana -= amount;
     }
+    console.log("use mana");
+    this.callNextAction();
+  });
+
+  @computed
+  get cardResolveQueue() {
+    return [
+      () => this.useMana(this.selectedCardManaCost),
+      ...(this.selectedCard
+        ? [() => this.selectedCard?.playAudioClip,
+        () => this.resolveTargetedCard([this.selectedCard as any]),
+        () => this.removeCardsFromHand([this.selectedCard as any])]
+        : []),
+      () => this.selectCard(undefined),
+      () => { this.battleState.turnIndex = undefined; },
+    ];
+  }
+
+  public callNextAction = action(() => {
+    if (this.battleState.turnIndex === undefined) {
+      this.battleState.turnIndex = 0;
+    }
+    else{
+      this.battleState.turnIndex++;
+    }
+    const nextAction = this.cardResolveQueue[this.battleState.turnIndex];
+    console.log(nextAction);
+    nextAction?.();
   });
 
   public playSelectedCard = action(() => {
@@ -393,14 +442,12 @@ export class Battle {
       !this.selectedCardId ||
       this.selectedCardManaCost > this.currentMana ||
       !this.selectedCard
-    ) {
+    )
       return;
-    }
-    this.useMana(this.selectedCardManaCost);
-    this.selectedCard.playAudioClip();
-    this.resolveTargetedCard([this.selectedCard]);
-    this.removeCardsFromHand([this.selectedCard]);
-    this.selectCard(undefined);
+
+    console.log(this.cardResolveQueue);
+    console.log("play selected card");
+    this.callNextAction();
   });
 
   public endTurn = action(() => {
