@@ -146,7 +146,7 @@ const UnitContainer = styled(Row).attrs({
   align: "flex-end",
 })`
   top: 80vh;
-  gap: 30px;
+  gap: 70px;
 `;
 
 const CurrentHandContainer = styled(Row).attrs({

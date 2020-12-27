@@ -7,6 +7,8 @@ import { Battle } from "../../Battle/Battle";
 import { HealthBar } from "../../Common/HealthBar";
 import { StatusBar } from "../../Common/StatusBar";
 import { IntentType, Monster } from "./Monster";
+import reticleCorner from "../../../Images/combat/reticleCorner.png";
+import { ReticleWrapper } from "../../Common/ReticleWrapper";
 
 export const RenderMonster = observer(
   ({ monsterState }: { monsterState: Monster }) => {
@@ -35,6 +37,8 @@ export const RenderMonster = observer(
       }
     };
 
+    const selected = battleState.selectedMonsterIds?.includes(id) ?? false;
+
     return (
       <MonsterWrapper
         ref={monsterRef}
@@ -42,35 +46,35 @@ export const RenderMonster = observer(
         key={`monster-${id}`}
         dead={dead}
         disabled={battleState.targetSelf}
-        selected={battleState.selectedMonsterIds?.includes(id) ?? false}
       >
-        <MonsterIntentWrapper>
+        <ReticleWrapper selected={selected}>
+          <MonsterIntentWrapper>
+            <img
+              src={currentIntent?.intentImage}
+              width={45}
+              height={45}
+              draggable={false}
+              alt="intent"
+            />
+            {renderIntentNumber()}
+          </MonsterIntentWrapper>
           <img
-            src={currentIntent?.intentImage}
-            width={45}
-            height={45}
+            src={image}
+            width={150}
+            height={150}
             draggable={false}
-            alt="intent"
+            alt="monster"
           />
-          {renderIntentNumber()}
-        </MonsterIntentWrapper>
-        <img
-          src={image}
-          width={150}
-          height={150}
-          draggable={false}
-          alt="monster"
-        />
-        <HealthBar health={health} maxHealth={maxHealth} />
-        <Spacer size={10} />
-        <StatusBar statuses={statuses as any} />
+          <HealthBar health={health} maxHealth={maxHealth} />
+          <Spacer size={10} />
+          <StatusBar statuses={statuses as any} />
+        </ReticleWrapper>
       </MonsterWrapper>
     );
   }
 );
 
 const MonsterWrapper = styled(Column)<{
-  selected: boolean;
   disabled: boolean;
   dead?: boolean;
 }>`
@@ -79,7 +83,6 @@ const MonsterWrapper = styled(Column)<{
   z-index: 0;
   height: 100%;
   width: 100%;
-  ${({ selected }) => (selected ? "outline: 2px solid green;" : "")};
   ${({ dead }) =>
     dead
       ? css`
@@ -90,11 +93,7 @@ const MonsterWrapper = styled(Column)<{
   ${({ disabled, dead }) =>
     disabled || dead
       ? "pointer-events: none"
-      : css`
-          &:hover {
-            outline: 2px solid green;
-          }
-        `}
+      : ''}
 `;
 
 const MonsterIntentWrapper = styled.div`

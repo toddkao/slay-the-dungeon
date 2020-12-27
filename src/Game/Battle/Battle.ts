@@ -66,8 +66,7 @@ export class Battle {
   @computed
   get wonBattle() {
     return (
-      this.monsters !== undefined &&
-      this.monsters.every((monster) => monster.dead)
+      this.monsters !== undefined && this.monstersAlive?.length === 0
     );
   }
 
@@ -137,6 +136,11 @@ export class Battle {
   @computed
   get monsters() {
     return this.battleState.monsters;
+  }
+
+  @computed
+  get monstersAlive() {
+    return this.monsters?.filter(monster => !monster.dead)
   }
 
   @computed
@@ -373,8 +377,8 @@ export class Battle {
     card: Card;
     selectedMonster?: Monster;
   }) {
-    if (!selectedMonster && this.monsters) {
-      selectedMonster = this.monsters[random(0, this.monsters.length - 1)];
+    if (!selectedMonster && this.monstersAlive) {
+      selectedMonster = this.monstersAlive[random(0, this.monstersAlive.length - 1)];
     }
 
     if (card.get.damage && selectedMonster) {
