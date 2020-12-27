@@ -11,7 +11,7 @@ import fastAtk from "../../Audio/fastAtk.ogg";
 import heavyAtk from "../../Audio/heavyAtk.ogg";
 // @ts-ignore
 import addBlock from "../../Audio/addBlock.ogg";
-import { Battle, IBattleState } from "../Battle/Battle";
+import { Battle, IBattleState, PileOfCards } from "../Battle/Battle";
 import { groupBy } from "lodash";
 import { Player } from "../Entities/Player/Player";
 interface ISpriteToCardSize {
@@ -136,10 +136,7 @@ export const cardMap: ICardMap = {
       }
 
       //TODO: need to update when implementing card upgrading
-      battle.discardPile = [
-        ...battle.discardPile,
-        new Card(cardMap.anger),
-      ];
+      battle.discardPile = [...battle.discardPile, new Card(cardMap.anger)];
     },
     type: CardType.Attack,
     effect: CardEffectType.SpecificEnemy,
@@ -272,13 +269,16 @@ export const cardMap: ICardMap = {
       from: () => {
         return Battle.get().discardPile;
       },
-      selectCards: (card: Card[]) => {
-        if (card.length > 1) {
+      selectCards: (cards: Card[]) => {
+        if (cards.length > 1) {
           throw new Error("Headbutt can only select 1 card!");
         }
-        let battle = Battle.get();
-        battle.drawPile = [...battle.drawPile, card[0]];
-      }
+        Battle.get().moveCards({
+          cards,
+          from: PileOfCards.discard,
+          to: PileOfCards.draw,
+        });
+      },
     },
     image: getImage({ sheetNumber: 1, position: [0, 9] }),
     type: CardType.Attack,
@@ -337,7 +337,7 @@ export const cardMap: ICardMap = {
         Player.get().get.deck.filter((card) =>
           card.get.name.toLowerCase().includes("strike")
         ).length *
-        2
+          2
       );
     },
     type: CardType.Attack,
@@ -409,7 +409,9 @@ export const cardMap: ICardMap = {
   },
 };
 
-export const nonBasicCardList = Object.values(cardMap).filter(card => card.rarity !== CardRarity.starter);
+export const nonBasicCardList = Object.values(cardMap).filter(
+  (card) => card.rarity !== CardRarity.starter
+);
 
 export const cardsByRarity = groupBy(nonBasicCardList, (card) => card.rarity);
 interface IChanceByRarity {

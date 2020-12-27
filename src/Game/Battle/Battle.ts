@@ -511,7 +511,7 @@ export class Battle {
               break;
           }
         } else {
-          throw new Error("FUCK YOU DOING??");
+          throw new Error("Tried to draw non-existant card");
         }
       });
     }
@@ -522,7 +522,7 @@ interface IPileOfCards {
   [index: string]: Card[];
 }
 
-enum PileOfCards {
+export enum PileOfCards {
   deck,
   draw,
   discard,

@@ -40,12 +40,6 @@ export const RenderMonster = observer(
         ref={monsterRef}
         id={`monster-${id}`}
         key={`monster-${id}`}
-        onClick={() => {
-          if (battleState.targetEnemy) {
-            battleState.selectMonster(id);
-            battleState.playSelectedCard();
-          }
-        }}
         dead={dead}
         disabled={battleState.targetSelf}
         selected={id === battleState.selectedMonsterId}
