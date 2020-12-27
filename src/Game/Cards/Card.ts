@@ -6,7 +6,7 @@ import { uniqueId } from "lodash";
 import { isCollidingWithEachOther } from "../Common/utility";
 
 export class Card {
-  constructor(private card: ICard) {}
+  constructor(private card: ICard) { }
 
   @computed
   public get get() {
@@ -27,11 +27,11 @@ export class Card {
   }
 
   public selectable = () => {
-    return this.card.prerequisite ? this.card.prerequisite(new Battle()) : true;
+    return this.card.prerequisite ? this.card.prerequisite(Battle.get()) : true;
   };
 
   public select = () => {
-    const battle = new Battle();
+    const battle = Battle.get();
     battle.selectCard(undefined);
     if (this.selectable()) {
       battle.selectCard(this.get.id);
@@ -46,6 +46,8 @@ export class Card {
       });
       sound.play();
     }
+    console.log("play audio clip");
+    Battle.get().callNextAction();
   };
 
   public evaluateDamage = () => {
@@ -65,7 +67,7 @@ export class Card {
   };
 
   public onReleaseDrag = () => {
-    const battleState = new Battle();
+    const battleState = Battle.get();
     const cardBoundingRect = this.ref?.current?.getBoundingClientRect();
     const { top } = cardBoundingRect;
 
@@ -107,11 +109,11 @@ export interface ICard {
   damage?: number | (() => number);
   damageInstances?: number;
   block?: number | (() => number);
+  cardSelection?: { amount: number, from: (() => Card[]), selectCards: ((cards: Card[]) => void) }
   prerequisite?: (battleState: IBattleState) => boolean;
   status?: IStatus;
-  special?: Function;
+  specialEffect?: Function;
   rarity: CardRarity;
-  targetSpecificEnemy: boolean;
 
   description: string;
   descriptionVariables?: string[];

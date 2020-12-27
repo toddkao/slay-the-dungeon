@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { Column, Row } from '../Layout';
 import { Typography } from '../Typography';
 import { Link } from 'react-router-dom';
-import { Player } from './Entities/Player/Player';
 import { RenderPlayer } from './Entities/Player/RenderPlayer';
 import background from "../Images/background.jpg";
 import { RenderMap } from './Map/RenderMap';
@@ -18,7 +17,6 @@ const Wrapper = styled(Row)`
 `;
 
 export function StartMenu() {
-  const player = new Player();
   return (
     <Wrapper align="center" justify="center">
       <Column align="center" justify="center">
@@ -26,7 +24,7 @@ export function StartMenu() {
           Select your character
         </Typography>
         <Link to="/battle" >
-          <RenderPlayer playerState={player} />
+          <RenderPlayer />
         </Link>
       </Column>
       <RenderMap onClose={() => undefined} hideReturn />

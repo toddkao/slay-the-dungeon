@@ -10,7 +10,7 @@ import { IntentType, Monster } from "./Monster";
 
 export const RenderMonster = observer(
   ({ monsterState }: { monsterState: Monster }) => {
-    const battleState = new Battle();
+    const battleState = Battle.get();
 
     const {
       get: { id, currentIntent, image },
@@ -40,12 +40,6 @@ export const RenderMonster = observer(
         ref={monsterRef}
         id={`monster-${id}`}
         key={`monster-${id}`}
-        onClick={() => {
-          if (battleState.targetEnemy) {
-            battleState.selectMonster(id);
-            battleState.playSelectedCard();
-          }
-        }}
         dead={dead}
         disabled={battleState.targetSelf}
         selected={id === battleState.selectedMonsterId}

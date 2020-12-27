@@ -1,7 +1,6 @@
 import { action, computed, observable } from "mobx";
 import { Card } from "../../Cards/Card";
 import { range, uniqueId } from "lodash";
-import { Singleton } from "@taipescripeto/singleton";
 import { Entity, IEntity } from "../entity";
 import { StatusType } from "../../Common/StatusBar";
 import { cardMap } from "../../Cards/CardDefinitions";
@@ -11,14 +10,18 @@ export enum PlayerClass {
   Silent,
 }
 
-@Singleton()
 export class Player extends Entity {
-  constructor(
+  private static instance: Player;
+  public static get(): Player {
+    if (!Player.instance) Player.instance = new Player();
+    return Player.instance;
+  }
+  private constructor(
     private stats: IPlayer = observable({
       health: 80,
       maxHealth: 80,
       statuses: [],
-      maxMana: 3,
+      maxMana: 9,
       class: PlayerClass.Ironclad,
       deck: [],
       block: 0,
@@ -27,7 +30,6 @@ export class Player extends Entity {
     })
   ) {
     super(stats);
-
     // times(6, () => stats.deck.push(cardMap.bash(uniqueId())));
     // times(6, () => stats.deck.push(cardMap.defend(uniqueId())));
     // times(6, () => stats.deck.push(cardMap.anger(uniqueId())));
@@ -46,15 +48,21 @@ export class Player extends Entity {
     //range(0, 6).forEach(() => stats.deck.push(cardMap.shrugItOff(uniqueId())));
     //range(0, 6).forEach(() => stats.deck.push(cardMap.swordBoomerang(uniqueId())));
     //range(0, 6).forEach(() => stats.deck.push(cardMap.thunderclap(uniqueId())));
-    
+
+    // range(0, 5).forEach(() =>
+    //   stats.deck.push(new Card({ ...cardMap.strike, id: uniqueId() }))
+    // );
+    // range(0, 4).forEach(() =>
+    //   stats.deck.push(new Card({ ...cardMap.defend, id: uniqueId() }))
+    // );
+    // range(0, 1).forEach(() =>
+    //   stats.deck.push(new Card({ ...cardMap.bash, id: uniqueId() }))
+    // );
     range(0, 5).forEach(() =>
-      stats.deck.push(new Card({ ...cardMap.strike, id: uniqueId() }))
-    );
-    range(0, 4).forEach(() =>
-      stats.deck.push(new Card({ ...cardMap.defend, id: uniqueId() }))
-    );
-    range(0, 1).forEach(() =>
-      stats.deck.push(new Card({ ...cardMap.bash, id: uniqueId() }))
+    stats.deck.push(new Card({ ...cardMap.bash, id: uniqueId() }))
+  );
+    range(0, 5).forEach(() =>
+      stats.deck.push(new Card({ ...cardMap.headbutt, id: uniqueId() }))
     );
     this.addStatus(StatusType.strength, 1);
     // this.addStatus(StatusType.dexterity);
