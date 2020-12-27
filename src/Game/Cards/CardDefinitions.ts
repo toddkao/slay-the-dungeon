@@ -278,6 +278,7 @@ export const cardMap: ICardMap = {
           from: PileOfCards.discard,
           to: PileOfCards.draw,
         });
+        Battle.get().callNextAction();
       },
     },
     image: getImage({ sheetNumber: 1, position: [0, 9] }),

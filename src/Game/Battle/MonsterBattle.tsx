@@ -89,7 +89,10 @@ export const RenderBattle = observer(() => {
           cards={battleState.cardsToShow}
           onClose={() => battleState.setCardsToShow(undefined)}
           cardsToSelect={battleState.selectedCard?.get.cardSelection?.amount}
-          onFinishSelectingCards={battleState.selectedCard?.get.cardSelection?.selectCards}
+          onFinishSelectingCards={(cards: Card[]) => {
+            battleState.selectedCard?.get.cardSelection?.selectCards(cards);
+            battleState.setCardsToShow(undefined);
+          }}
         />
       ) : null}
 
