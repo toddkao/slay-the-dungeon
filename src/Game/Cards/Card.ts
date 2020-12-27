@@ -47,7 +47,6 @@ export class Card {
   public playAudioClips = async () => {
     // TODO stop currently playing audio clips when beginning 
     // to play a new set of audio clips
-    Battle.get().callNextAction();
     if (this.get.audio !== undefined) {
       for (const audioClip of this.get.audio) {
         await Card.playAudioClip(audioClip);

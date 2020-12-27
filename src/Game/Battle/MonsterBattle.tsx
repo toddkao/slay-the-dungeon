@@ -24,11 +24,11 @@ import { RenderRewardsModal } from "./Rewards/RenderRewardsModal";
 import { Player } from "../Entities/Player/Player";
 
 export const RenderBattle = observer(() => {
+  const history = useHistory();
   const battleState = Battle.get();
   const playerState = Player.get();
-  const useMountEffect = (fun: () => any) => useEffect(fun, []);
-  const history = useHistory();
   const mapState = Map.get();
+  const useMountEffect = (fun: () => any) => useEffect(fun, []);
 
   useMountEffect(() => {
     const mapState = Map.get();
@@ -40,7 +40,7 @@ export const RenderBattle = observer(() => {
 
   const onRightClick = (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    battleState.selectCard(undefined);
+    battleState.selectCard();
   };
 
   return (

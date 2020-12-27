@@ -60,6 +60,54 @@ export class Map {
       showingMap: false,
     })
   ) {
+    this.generateRandomFloors();
+  }
+
+  @computed
+  get showingMap() {
+    return this.map.showingMap;
+  }
+
+  @computed
+  get floors() {
+    return this.map.floors;
+  }
+
+  @computed
+  get currentFloor() {
+    return this.map.floors[this.map.currentFloorNumber];
+  }
+
+  @computed
+  get currentEncounter() {
+    return this.map.currentEncounter;
+  }
+
+  @computed
+  get selectableNodeIds() {
+    if (this.map.currentNode === undefined) {
+      return this.currentFloor.matrix[this.currentFloor.matrix.length - 1].map(
+        (node) => node.id
+      );
+    }
+    return this.currentFloor.paths
+      .filter((path) => {
+        return path.start === this.map.currentNode?.id;
+      })
+      .map((node) => node.end);
+  }
+
+  @computed
+  get currentNode() {
+    return this.map.currentNode;
+  }
+
+  @computed
+  get traversedNodeIds() {
+    return this.map.traversedNodeIds;
+  }
+
+  generateRandomFloors = action(() => {
     this.map.floors[1].matrix = range(0, 16).map((layer, rowIndex) => {
       const randomNumberOfNodes =
         rowIndex === 0
@@ -133,51 +181,7 @@ export class Map {
         });
       }
     });
-  }
-
-  @computed
-  get showingMap() {
-    return this.map.showingMap;
-  }
-
-  @computed
-  get floors() {
-    return this.map.floors;
-  }
-
-  @computed
-  get currentFloor() {
-    return this.map.floors[this.map.currentFloorNumber];
-  }
-
-  @computed
-  get currentEncounter() {
-    return this.map.currentEncounter;
-  }
-
-  @computed
-  get selectableNodeIds() {
-    if (this.map.currentNode === undefined) {
-      return this.currentFloor.matrix[this.currentFloor.matrix.length - 1].map(
-        (node) => node.id
-      );
-    }
-    return this.currentFloor.paths
-      .filter((path) => {
-        return path.start === this.map.currentNode?.id;
-      })
-      .map((node) => node.end);
-  }
-
-  @computed
-  get currentNode() {
-    return this.map.currentNode;
-  }
-
-  @computed
-  get traversedNodeIds() {
-    return this.map.traversedNodeIds;
-  }
+  });
 
   setShowingMap = action((showingMap: boolean) => {
     this.map.showingMap = showingMap;
@@ -218,6 +222,7 @@ export class Map {
   reset = action(() => {
     this.map.currentNode = undefined;
     this.map.currentEncounter = undefined;
+    this.generateRandomFloors();
     this.map.traversedNodeIds = [];
   });
 
@@ -232,10 +237,11 @@ export class Map {
         this.map.traversedNodeIds.push(this.currentNode?.id);
       }
       this.map.currentEncounter = this.currentNode?.encounter;
-      AppHistory.push(`/battle/${node.id}`);
-      const battleState = Battle.get();
       battleState.initialize();
-      this.setShowingMap(false);
+      setTimeout(() => {
+        AppHistory.push(`/battle/${node.id}`);
+        this.setShowingMap(false);
+      }, 0);
     }
   });
 }

@@ -19,12 +19,8 @@ export class Monster extends Entity {
 
   @computed
   get dead() {
-    return this.monster.dead;
+    return this.monster.health <= 0;
   }
-  set dead(isDead: boolean | undefined) {
-    this.monster.dead = isDead;
-  }
-
 
   @computed
   public get get() {

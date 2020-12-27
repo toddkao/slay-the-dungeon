@@ -250,7 +250,7 @@ export const cardMap: ICardMap = {
       let battle = Battle.get();
       if (battle.drawPile.length + battle.discardPile.length >= 1) {
         let nextCard = battle.draw(1);
-        battle.resolveTargetedCard(nextCard[0]);
+        battle.resolveCardEffect(nextCard[0]);
         battle.exhaustCards(nextCard);
       }
     },
@@ -388,7 +388,7 @@ export const cardMap: ICardMap = {
     type: CardType.Attack,
     effect: CardEffectType.Random,
     description: `Deal 3 damage to a\nrandom enemy 3 times.`,
-    audio: [fastAtk, fastAtk, fastAtk], //TODO: sound effect
+    audio: [fastAtk], //TODO: sound effect
   },
   thunderclap: {
     name: "Thunderclap",

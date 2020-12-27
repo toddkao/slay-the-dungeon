@@ -287,7 +287,7 @@ export class Battle {
     });
   }
 
-  public resolveTargetedCard = action(async (card: Card) => {
+  public resolveCardEffect = action(async (card: Card) => {
     switch (card.get.effect) {
       case CardEffectType.SpecificEnemy:
         if (card.get.damage)
@@ -316,19 +316,23 @@ export class Battle {
         break;
       case CardEffectType.Random:
         for (const _instance of range(0, card.get.damageInstances)) {
-          await new Promise((resolve) =>
-            setTimeout(() => {
-              this.resolveSingleTargetDamage({
-                card: card,
-                selectedMonster: this.monstersAlive?.[
-                  random(0, this.monstersAlive.length - 1)
-                ],
-              });
-              resolve(true);
-            }, 300)
-          );
+          if ((this.monstersAlive?.length ?? 0) > 0) {
+            await new Promise((resolve) =>
+              setTimeout(() => {
+                this.resolveSingleTargetDamage({
+                  card: card,
+                  selectedMonster: this.monstersAlive?.[
+                    random(0, this.monstersAlive.length - 1)
+                  ],
+                });
+                this.selectedCard?.playAudioClips();
+                resolve(true);
+              }, 175)
+            );
+          }
         }
-        break;
+        this.callNextAction();
+        return;
       default:
         break;
     }
@@ -343,6 +347,7 @@ export class Battle {
     if (card.get.specialEffect) {
       card.get.specialEffect();
     }
+    this.selectedCard?.playAudioClips();
     this.callNextAction();
   });
 
@@ -457,7 +462,6 @@ export class Battle {
     this.cardResolveQueue = [];
     this.cardResolveQueue.push(
       () => this.useMana(this.selectedCardManaCost),
-      () => this.selectedCard?.playAudioClips(),
       () => {
         this.moveCards({
           cards: [this.selectedCard as Card],
@@ -466,16 +470,7 @@ export class Battle {
         });
         this.callNextAction();
       },
-      () => this.resolveTargetedCard(this.selectedCard as Card),
-      () => {
-        this.battleState.monsters = this.monsters?.map((monster) => {
-          if (monster.get.health === 0) {
-            monster.dead = true;
-          }
-          return monster;
-        });
-        this.callNextAction();
-      },
+      () => this.resolveCardEffect(this.selectedCard as Card),
       () => {
         this.selectCard();
         this.callNextAction();
@@ -496,8 +491,11 @@ export class Battle {
       // Ensure you have enough mana to cast the card
       this.selectedCardManaCost > this.currentMana ||
       // Make sure previous card isn't in the process of resolving
+
       // TODO maybe instead just push the new card onto the queue?
       // need to check in game and think about the best way to handle it
+      // currentlySelectedCard / currentlySelectedMonster would have to be 
+      // re-designed to be attached to card themselves instead of battleState
       this.cardResolveQueue.length !== 0
     ) {
       return;
