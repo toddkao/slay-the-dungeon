@@ -1,5 +1,4 @@
-import { Singleton } from "@taipescripeto/singleton";
-import { random, range, sampleSize, shuffle } from "lodash";
+import { clone, random, range, sampleSize, shuffle } from "lodash";
 import { action, computed, observable } from "mobx";
 import { Card, CardEffectType } from "../Cards/Card";
 import { IStatus, StatusType } from "../Common/StatusBar";
@@ -17,16 +16,19 @@ export interface IBattleState {
   exhaustPile: Card[];
   endTurnActions: Function[];
   cardsToShow?: Card[];
-  turnIndex?: number;
 }
-@Singleton()
 export class Battle {
-  player = new Player();
-  constructor(
+  private static instance: Battle;
+  public static get(): Battle {
+    if (!Battle.instance) Battle.instance = new Battle();
+    return Battle.instance;
+  }
+
+  private constructor(
     private battleState: IBattleState = observable({
       selectedCardId: undefined,
       selectedMonsterId: undefined,
-      currentMana: new Player().maxMana,
+      currentMana: Player.get().maxMana,
       monsters: undefined,
       currentHand: [],
       drawPile: [],
@@ -34,9 +36,8 @@ export class Battle {
       exhaustPile: [],
       endTurnActions: [],
       cardsToShow: undefined,
-      turnIndex: undefined
     })
-  ) { }
+  ) {}
 
   @computed
   get wonBattle() {
@@ -173,7 +174,7 @@ export class Battle {
   };
 
   private getCardFromId = (cardId: string) => {
-    return this.player.get.deck.find((card) => card.get.id === cardId);
+    return Player.get().get.deck.find((card) => card.get.id === cardId);
   };
 
   private drawCards = action((cards: Card[]) => {
@@ -186,12 +187,7 @@ export class Battle {
     ) {
       throw new Error("Trying to draw cards that don't exist in draw pile");
     } else {
-      cards.forEach((card) => {
-        this.battleState.currentHand = [...this.battleState.currentHand, card];
-        this.battleState.drawPile = this.battleState.drawPile.filter(
-          (drawCard) => drawCard.get.id !== card.get.id
-        );
-      });
+      this.moveCards({ cards, from: PileOfCards.draw, to: PileOfCards.hand });
     }
   });
 
@@ -209,7 +205,7 @@ export class Battle {
     this.battleState.currentHand = [];
     this.battleState.exhaustPile = [];
     this.battleState.discardPile = [];
-    this.battleState.drawPile = this.player.get.deck;
+    this.battleState.drawPile = Player.get().get.deck;
     this.battleState.drawPile = shuffle(this.battleState.drawPile);
     this.draw(5);
   });
@@ -234,12 +230,11 @@ export class Battle {
     return cards;
   });
 
-  private removeCardsFromHand = (cards: Card[]) => {
-    cards.forEach((cardToRemove) => {
-      this.battleState.currentHand = this.battleState.currentHand.filter(
-        (card) => card.get.id !== cardToRemove.get.id
-      );
-      this.battleState.discardPile.push(cardToRemove);
+  private removeCardsFromHand = () => {
+    this.moveCards({
+      cards: this.currentHand,
+      from: PileOfCards.hand,
+      to: PileOfCards.discard,
     });
   };
 
@@ -258,56 +253,58 @@ export class Battle {
     });
   }
 
-  public resolveTargetedCard = action((cards: Card[]) => {
-    cards.forEach((card) => {
-      switch (card.get.effect) {
-        case CardEffectType.SpecificEnemy:
-          if (card.get.damage)
+  public resolveTargetedCard = action((card: Card) => {
+    switch (card.get.effect) {
+      case CardEffectType.SpecificEnemy:
+        if (card.get.damage)
+          this.resolveSingleTargetDamage({
+            card: card,
+            selectedMonster: this.selectedMonster,
+          });
+        if (card.get.block) {
+          Player.get().addBlock(card.evaluateBlock());
+        }
+        break;
+      case CardEffectType.AllEnemies:
+        this.monsters?.forEach((monster) => {
+          if (card.get.damage) {
             this.resolveSingleTargetDamage({
               card: card,
-              selectedMonster: this.selectedMonster,
+              selectedMonster: monster,
             });
-          if (card.get.block) {
-            this.player.addBlock(card.evaluateBlock());
           }
-          break;
-        case CardEffectType.AllEnemies:
-          this.monsters?.forEach((monster) => {
-            if (card.get.damage) {
-              this.resolveSingleTargetDamage({
-                card: card,
-                selectedMonster: monster,
-              });
-            }
+        });
+        break;
+      case CardEffectType.Self:
+        if (card.get.block && card.get.targetSelf) {
+          Player.get().addBlock(card.evaluateBlock());
+        }
+        break;
+      case CardEffectType.Random:
+        range(0, card.get.damageInstances).forEach(() => {
+          let randomMonster = this.monsters?.[
+            random(0, this.monsters.length - 1)
+          ];
+          this.resolveSingleTargetDamage({
+            card: card,
+            selectedMonster: randomMonster,
           });
-          break;
-        case CardEffectType.Self:
-          if (card.get.block && card.get.targetSelf) {
-            this.player.addBlock(card.evaluateBlock());
-          }
-          break;
-        case CardEffectType.Random:
-          range(0, card.get.damageInstances).forEach(() => {
-            let randomMonster = this.monsters?.[
-              random(0, this.monsters.length - 1)
-            ];
-            this.resolveSingleTargetDamage({
-              card: card,
-              selectedMonster: randomMonster,
-            });
-          });
-          break;
-        default:
-          break;
-      }
-      if (card.get.cardSelection) {
+        });
+        break;
+      default:
+        break;
+    }
+    if (card.get.cardSelection) {
+      if (card.get.cardSelection.from().length <= 1) {
+        card.get.cardSelection.selectCards(card.get.cardSelection.from());
+      } else {
         this.battleState.cardsToShow = card.get.cardSelection.from();
         return;
       }
-      if (card.get.specialEffect) {
-        card.get.specialEffect();
-      }
-    });
+    }
+    if (card.get.specialEffect) {
+      card.get.specialEffect();
+    }
     console.log("resolve targeted card");
     this.callNextAction();
   });
@@ -349,7 +346,7 @@ export class Battle {
       selectedMonster.takeDamage(
         this.calculateDamage({
           damage: card.evaluateDamage(),
-          extradamage: this.player.extradamage,
+          extradamage: Player.get().extradamage,
           statuses: selectedMonster.get.statuses,
         })
       );
@@ -366,7 +363,7 @@ export class Battle {
     this.monsters?.forEach((monster) => {
       switch (monster.get.currentIntent?.type) {
         case IntentType.Attack:
-          this.player.takeDamage(this.calculateDamage(monster.get));
+          Player.get().takeDamage(this.calculateDamage(monster.get));
           break;
         case IntentType.GainStrength:
           if (monster.get.currentIntent.amount) {
@@ -386,15 +383,17 @@ export class Battle {
   });
 
   private resolvePlayerActions = action(() => {
-    this.player.cleanupStatuses();
-    this.player.updateStatuses();
-    this.player.clearBlock();
+    const player = Player.get();
+
+    player.cleanupStatuses();
+    player.updateStatuses();
+    player.clearBlock();
   });
 
   private resolveGameActions = action(() => {
-    this.battleState.currentMana = this.player.maxMana;
-    this.removeCardsFromHand(this.currentHand);
-    this.selectCard(undefined);
+    this.battleState.currentMana = Player.get().maxMana;
+    this.removeCardsFromHand();
+    this.selectCard();
     this.draw(5);
   });
 
@@ -407,46 +406,42 @@ export class Battle {
     if (amount <= this.currentMana) {
       this.battleState.currentMana -= amount;
     }
-    console.log("use mana");
     this.callNextAction();
   });
 
-  @computed
-  get cardResolveQueue() {
-    return [
-      () => this.useMana(this.selectedCardManaCost),
-      ...(this.selectedCard
-        ? [() => this.selectedCard?.playAudioClip,
-        () => this.resolveTargetedCard([this.selectedCard as any]),
-        () => this.removeCardsFromHand([this.selectedCard as any])]
-        : []),
-      () => this.selectCard(undefined),
-      () => { this.battleState.turnIndex = undefined; },
-    ];
-  }
+  @observable
+  cardResolveQueue: (() => void)[] = [];
 
   public callNextAction = action(() => {
-    if (this.battleState.turnIndex === undefined) {
-      this.battleState.turnIndex = 0;
-    }
-    else{
-      this.battleState.turnIndex++;
-    }
-    const nextAction = this.cardResolveQueue[this.battleState.turnIndex];
-    console.log(nextAction);
+    const nextAction = this.cardResolveQueue.shift();
     nextAction?.();
   });
+
+  public initializeCardResolveQueue = () => {
+    this.cardResolveQueue = [];
+    this.cardResolveQueue.push(
+      () => this.useMana(this.selectedCardManaCost),
+      () => this.selectedCard?.playAudioClip(),
+      () => this.resolveTargetedCard(this.selectedCard as Card),
+      () =>
+        this.moveCards({
+          cards: [this.selectedCard as Card],
+          from: PileOfCards.hand,
+          to: PileOfCards.discard,
+        }),
+      () => this.selectCard()
+    );
+  };
 
   public playSelectedCard = action(() => {
     if (
       !this.selectedCardId ||
       this.selectedCardManaCost > this.currentMana ||
       !this.selectedCard
-    )
+    ) {
       return;
-
-    console.log(this.cardResolveQueue);
-    console.log("play selected card");
+    }
+    this.initializeCardResolveQueue();
     this.callNextAction();
   });
 
@@ -460,10 +455,10 @@ export class Battle {
   public initialize = action(() => {
     this.initializeMonsters();
     this.initializeHand();
-    this.battleState.currentMana = this.player.maxMana;
+    this.battleState.currentMana = Player.get().maxMana;
   });
 
-  selectCard = action((id: string | undefined) => {
+  selectCard = action((id?: string) => {
     this.battleState.selectedCardId = id;
     this.selectMonster(undefined);
   });
@@ -475,4 +470,75 @@ export class Battle {
   setMonsters = action((monsters: Monster[] | undefined) => {
     this.battleState.monsters = monsters;
   });
+
+  moveCards = action(
+    ({
+      cards,
+      to,
+      from,
+      position = DeckPosition.top,
+    }: {
+      cards: Card[];
+      to: PileOfCards;
+      from: PileOfCards;
+      position?: DeckPosition;
+    }) => {
+      cards.forEach((cardToMove) => {
+        const toPile = getPileOfCards[to]();
+        const fromPile = getPileOfCards[from]();
+
+        const fromPileCopy = clone(fromPile);
+        const toPileCopy = clone(toPile);
+
+        if (
+          fromPileCopy.map((card) => card.get.id).includes(cardToMove.get.id)
+        ) {
+          const newFromPile = fromPileCopy.filter(
+            (card) => card.get.id !== cardToMove.get.id
+          );
+          fromPile.length = 0;
+          fromPile.push(...newFromPile);
+          switch (position) {
+            case DeckPosition.bottom:
+              toPile.length = 0;
+              toPile.push(...[...toPileCopy, cardToMove]);
+              break;
+            case DeckPosition.top:
+            default:
+              toPile.length = 0;
+              console.log(toPileCopy, cardToMove)
+              toPile.push(...[cardToMove, ...toPileCopy]);
+              break;
+          }
+        } else {
+          throw new Error("FUCK YOU DOING??");
+        }
+      });
+    }
+  );
 }
+
+interface IPileOfCards {
+  [index: string]: Card[];
+}
+
+enum PileOfCards {
+  deck,
+  draw,
+  discard,
+  exhaust,
+  hand,
+}
+
+enum DeckPosition {
+  top,
+  bottom,
+}
+
+const getPileOfCards = {
+  [PileOfCards.deck]: () => Player.get().get.deck,
+  [PileOfCards.draw]: () => Battle.get().drawPile,
+  [PileOfCards.discard]: () => Battle.get().discardPile,
+  [PileOfCards.exhaust]: () => Battle.get().exhaustPile,
+  [PileOfCards.hand]: () => Battle.get().currentHand,
+};

@@ -27,11 +27,11 @@ export class Card {
   }
 
   public selectable = () => {
-    return this.card.prerequisite ? this.card.prerequisite(new Battle()) : true;
+    return this.card.prerequisite ? this.card.prerequisite(Battle.get()) : true;
   };
 
   public select = () => {
-    const battle = new Battle();
+    const battle = Battle.get();
     battle.selectCard(undefined);
     if (this.selectable()) {
       battle.selectCard(this.get.id);
@@ -47,7 +47,7 @@ export class Card {
       sound.play();
     }
     console.log("play audio clip");
-    new Battle().callNextAction();
+    Battle.get().callNextAction();
   };
 
   public evaluateDamage = () => {
@@ -67,7 +67,7 @@ export class Card {
   };
 
   public onReleaseDrag = () => {
-    const battleState = new Battle();
+    const battleState = Battle.get();
     const cardBoundingRect = this.ref?.current?.getBoundingClientRect();
     const { top } = cardBoundingRect;
 

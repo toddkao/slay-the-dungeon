@@ -10,7 +10,7 @@ import { IntentType, Monster } from "./Monster";
 
 export const RenderMonster = observer(
   ({ monsterState }: { monsterState: Monster }) => {
-    const battleState = new Battle();
+    const battleState = Battle.get();
 
     const {
       get: { id, currentIntent, image },

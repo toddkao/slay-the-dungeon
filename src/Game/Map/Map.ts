@@ -217,7 +217,7 @@ export class Map {
       this.map.traversedNodeIds.push(this.currentNode?.id);
     }
     this.map.currentEncounter = this.currentNode?.encounter;
-    const battleState = new Battle();
+    const battleState = Battle.get();
     battleState.initialize();
   });
 }

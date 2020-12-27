@@ -21,9 +21,11 @@ import { RenderMap } from "../Map/RenderMap";
 import { Map } from "../Map/Map";
 import { useHistory } from "react-router-dom";
 import { RenderRewardsModal } from "./Rewards/RenderRewardsModal";
+import { Player } from "../Entities/Player/Player";
 
 export const RenderBattle = observer(() => {
-  const battleState = new Battle();
+  const battleState = Battle.get();
+  const playerState = Player.get();
   const useMountEffect = (fun: () => any) => useEffect(fun, []);
   const history = useHistory();
   const mapState = new Map();
@@ -45,10 +47,10 @@ export const RenderBattle = observer(() => {
     <Wrapper align="center" justify="center" onContextMenu={onRightClick}>
       <UnitWrappers align="flex-end" justify="space-between">
         <UnitContainer>
-          <RenderPlayer playerState={battleState.player} />
+          <RenderPlayer />
         </UnitContainer>
         <UnitContainer>
-          {new Battle().monsters?.map((monster) => (
+          {Battle.get().monsters?.map((monster) => (
             <RenderMonster monsterState={monster} />
           ))}
         </UnitContainer>
@@ -62,7 +64,7 @@ export const RenderBattle = observer(() => {
         <Typography fontSize={25}>End Turn</Typography>
       </EndTurnButton>
       <ManaAmount notEnoughMana={battleState.currentMana === 0}>
-        {battleState.currentMana}/{battleState.player.maxMana}
+        {battleState.currentMana}/{playerState.maxMana}
       </ManaAmount>
 
       <DrawPile
@@ -86,6 +88,8 @@ export const RenderBattle = observer(() => {
         <ShowCardsModal
           cards={battleState.cardsToShow}
           onClose={() => battleState.setCardsToShow(undefined)}
+          cardsToSelect={battleState.selectedCard?.get.cardSelection?.amount}
+          onFinishSelectingCards={battleState.selectedCard?.get.cardSelection?.selectCards}
         />
       ) : null}
 

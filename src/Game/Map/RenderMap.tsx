@@ -17,7 +17,7 @@ export const RenderMap = observer(
     onClose?: () => void;
     hideReturn?: boolean;
   }) => {
-    const battleState = new Battle();
+    const battleState = Battle.get();
     const mapState = new Map();
     const history = useHistory();
     const useMountEffect = (fun: () => any) => useEffect(fun, []);

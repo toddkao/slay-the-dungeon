@@ -25,12 +25,12 @@ export const RenderCard = observer(
     showIfCastable?: boolean;
     draggable?: boolean;
   }) => {
-    const battleState = new Battle();
+    const battleState = Battle.get();
     const cardRef = useRef(null);
 
     cardState.ref = cardRef;
     const parseCardText = () => {
-      const player = new Player();
+      const player = Player.get();
       let text = cardState.get.description;
       cardState.get.descriptionVariables?.forEach((variable) => {
         const variableValue = (cardState as any)?.get?.[variable];

@@ -30,7 +30,7 @@ import { Chance } from "chance";
 
 export const RenderRewardsModal = observer(
   ({ onClickProceed }: { onClickProceed: () => void }) => {
-    const player = new Player();
+    const player = Player.get();
     const [selectedReward, setSelectedReward] = useState<IReward | undefined>();
     const [rewards, setRewards] = useState<IReward[]>([
       {

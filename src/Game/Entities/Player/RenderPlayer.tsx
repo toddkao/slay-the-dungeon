@@ -9,8 +9,9 @@ import { Battle } from "../../Battle/Battle";
 import { HealthBar } from "../../Common/HealthBar";
 
 export const RenderPlayer = observer(
-  ({ playerState }: { playerState: Player }) => {
-    const battleState = new Battle();
+  () => {
+    const playerState = Player.get();
+    const battleState = Battle.get();
     const { health, block, maxHealth, statuses } = playerState;
     if (health === 0) {
       return null;

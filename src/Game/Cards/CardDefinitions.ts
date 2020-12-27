@@ -13,6 +13,7 @@ import heavyAtk from "../../Audio/heavyAtk.ogg";
 import addBlock from "../../Audio/addBlock.ogg";
 import { Battle, IBattleState } from "../Battle/Battle";
 import { groupBy } from "lodash";
+import { Player } from "../Entities/Player/Player";
 interface ISpriteToCardSize {
   [index: string]: { CARD_WIDTH: number; CARD_HEIGHT: number };
 }
@@ -129,7 +130,7 @@ export const cardMap: ICardMap = {
     damage: 6,
     image: getImage({ sheetNumber: 3, position: [4, 3] }),
     specialEffect: () => {
-      let battle = new Battle();
+      let battle = Battle.get();
       if (!battle.discardPile) {
         return;
       }
@@ -152,7 +153,7 @@ export const cardMap: ICardMap = {
   //   manaCost: 1,
   //   block: 5,
   //   cardSelection: () => {
-  //     let battle = new Battle();
+  //     let battle = Battle.get();
   //     return battle.currentHand.filter(card => card.get.id !== battle.selectedCardId;)
   //   },
   //   cardSelectionEffect:() => {
@@ -171,8 +172,7 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.common,
     manaCost: 1,
     damage: () => {
-      let battle = new Battle();
-      return battle.player.block;
+      return Player.get().block;
     },
     image: getImage({ sheetNumber: 3, position: [5, 2] }),
     type: CardType.Attack,
@@ -233,10 +233,10 @@ export const cardMap: ICardMap = {
     manaCost: 0,
     image: getImage({ sheetNumber: 1, position: [0, 0] }),
     specialEffect: () => {
-      let battle = new Battle();
-      battle.player.addStatus(StatusType.strength, 2);
+      let battle = Battle.get();
+      Player.get().addStatus(StatusType.strength, 2);
       battle.endTurnActions.push(() => {
-        new Battle().player.removeStatus(StatusType.strength, 2);
+        Player.get().removeStatus(StatusType.strength, 2);
       });
     },
     type: CardType.Skill,
@@ -250,10 +250,10 @@ export const cardMap: ICardMap = {
     manaCost: 1,
     image: getImage({ sheetNumber: 2, position: [2, 10] }),
     specialEffect: () => {
-      let battle = new Battle();
+      let battle = Battle.get();
       if (battle.drawPile.length + battle.discardPile.length >= 1) {
         let nextCard = battle.draw(1);
-        battle.resolveTargetedCard(nextCard);
+        battle.resolveTargetedCard(nextCard[0]);
         battle.exhaustCards(nextCard);
       }
     },
@@ -270,13 +270,13 @@ export const cardMap: ICardMap = {
     cardSelection: {
       amount: 1,
       from: () => {
-        return new Battle().discardPile;
+        return Battle.get().discardPile;
       },
       selectCards: (card: Card[]) => {
         if (card.length > 1) {
           throw new Error("Headbutt can only select 1 card!");
         }
-        let battle = new Battle();
+        let battle = Battle.get();
         battle.drawPile = [...battle.drawPile, card[0]];
       }
     },
@@ -293,8 +293,7 @@ export const cardMap: ICardMap = {
     manaCost: 2,
     image: getImage({ sheetNumber: 4, position: [3, 5] }),
     damage: () => {
-      let battle = new Battle();
-      return 14 + 2 * battle.player.extradamage; //it's 2x extra here because extradamage itself is added elsewhere
+      return 14 + 2 * Player.get().extradamage; //it's 2x extra here because extradamage itself is added elsewhere
     },
     type: CardType.Attack,
     effect: CardEffectType.SpecificEnemy,
@@ -309,14 +308,14 @@ export const cardMap: ICardMap = {
     image: getImage({ sheetNumber: 4, position: [4, 8] }),
     block: 5,
     specialEffect: () => {
-      let battle = new Battle();
+      let battle = Battle.get();
       if (!battle.selectedMonster)
         throw new Error("Iron Wave needs a selected monster!");
 
       battle.selectedMonster.takeDamage(
         battle.calculateDamage({
           damage: 5,
-          extradamage: battle.player.extradamage,
+          extradamage: Player.get().extradamage,
           statuses: battle.selectedMonster.get.statuses,
         })
       );
@@ -333,10 +332,9 @@ export const cardMap: ICardMap = {
     manaCost: 1,
     image: getImage({ sheetNumber: 5, position: [2, 3] }),
     damage: () => {
-      let battle = new Battle();
       return (
         6 +
-        battle.player.get.deck.filter((card) =>
+        Player.get().get.deck.filter((card) =>
           card.get.name.toLowerCase().includes("strike")
         ).length *
         2
@@ -355,7 +353,7 @@ export const cardMap: ICardMap = {
     image: getImage({ sheetNumber: 5, position: [0, 0] }),
     damage: 9,
     specialEffect: () => {
-      let battle = new Battle();
+      let battle = Battle.get();
       battle.draw(1);
     },
     type: CardType.Attack,
@@ -371,7 +369,7 @@ export const cardMap: ICardMap = {
     image: getImage({ sheetNumber: 2, position: [3, 2] }),
     block: 8,
     specialEffect: () => {
-      let battle = new Battle();
+      let battle = Battle.get();
       battle.draw(1);
     },
     type: CardType.Skill,
@@ -398,7 +396,7 @@ export const cardMap: ICardMap = {
     image: getImage({ sheetNumber: 5, position: [4, 1] }),
     damage: 4,
     specialEffect: () => {
-      let battle = new Battle();
+      let battle = Battle.get();
       battle.monsters?.forEach((monster) =>
         monster.addStatus(StatusType.vulnerable)
       );
