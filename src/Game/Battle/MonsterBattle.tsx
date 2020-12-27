@@ -28,10 +28,10 @@ export const RenderBattle = observer(() => {
   const playerState = Player.get();
   const useMountEffect = (fun: () => any) => useEffect(fun, []);
   const history = useHistory();
-  const mapState = new Map();
+  const mapState = Map.get();
 
   useMountEffect(() => {
-    const mapState = new Map();
+    const mapState = Map.get();
     // redirects you to base path if currentNode is undefined (if you refresh the page)
     if (mapState.currentNode === undefined) {
       history.push("/");
@@ -55,55 +55,59 @@ export const RenderBattle = observer(() => {
           ))}
         </UnitContainer>
       </UnitWrappers>
-      <CurrentHandContainer>
-        {battleState.currentHand.map((card) => (
-          <RenderCard cardState={card} />
-        ))}
-      </CurrentHandContainer>
-      <EndTurnButton onClick={() => battleState.endTurn()}>
-        <Typography fontSize={25}>End Turn</Typography>
-      </EndTurnButton>
-      <ManaAmount notEnoughMana={battleState.currentMana === 0}>
-        {battleState.currentMana}/{playerState.maxMana}
-      </ManaAmount>
-
-      <DrawPile
-        onClick={() => battleState.setCardsToShow(battleState.drawPile)}
-        amount={battleState.drawPile.length}
-      />
-
-      <ExhaustPile
-        onClick={() => battleState.setCardsToShow(battleState.exhaustPile)}
-        amount={battleState.exhaustPile.length}
-      />
-
-      <DiscardPile
-        onClick={() => battleState.setCardsToShow(battleState.discardPile)}
-        amount={battleState.discardPile.length}
-      />
-
-      <OpenMap onClick={() => mapState.setShowingMap(true)} />
-
-      {battleState.cardsToShow ? (
-        <ShowCardsModal
-          cards={battleState.cardsToShow}
-          onClose={() => battleState.setCardsToShow(undefined)}
-          cardsToSelect={battleState.selectedCard?.get.cardSelection?.amount}
-          onFinishSelectingCards={(cards: Card[]) => {
-            battleState.selectedCard?.get.cardSelection?.selectCards(cards);
-            battleState.setCardsToShow(undefined);
-          }}
-        />
-      ) : null}
-
       {mapState.showingMap ? (
-        <RenderMap
-          onClose={() => mapState.setShowingMap(false)}
-        />
+        <RenderMap onClose={() => mapState.setShowingMap(false)} />
       ) : null}
       {battleState.wonBattle ? (
-        <RenderRewardsModal onClickProceed={() => mapState.setShowingMap(true)} />
-      ) : null}
+        <RenderRewardsModal
+          onClickProceed={() => mapState.setShowingMap(true)}
+        />
+      ) : (
+        <>
+          <CurrentHandContainer>
+            {battleState.currentHand.map((card) => (
+              <RenderCard cardState={card} />
+            ))}
+          </CurrentHandContainer>
+          <EndTurnButton onClick={() => battleState.endTurn()}>
+            <Typography fontSize={25}>End Turn</Typography>
+          </EndTurnButton>
+          <ManaAmount notEnoughMana={battleState.currentMana === 0}>
+            {battleState.currentMana}/{playerState.maxMana}
+          </ManaAmount>
+
+          <DrawPile
+            onClick={() => battleState.setCardsToShow(battleState.drawPile)}
+            amount={battleState.drawPile.length}
+          />
+
+          <ExhaustPile
+            onClick={() => battleState.setCardsToShow(battleState.exhaustPile)}
+            amount={battleState.exhaustPile.length}
+          />
+
+          <DiscardPile
+            onClick={() => battleState.setCardsToShow(battleState.discardPile)}
+            amount={battleState.discardPile.length}
+          />
+
+          <OpenMap onClick={() => mapState.setShowingMap(true)} />
+
+          {battleState.cardsToShow ? (
+            <ShowCardsModal
+              cards={battleState.cardsToShow}
+              onClose={() => battleState.setCardsToShow(undefined)}
+              cardsToSelect={
+                battleState.selectedCard?.get.cardSelection?.amount
+              }
+              onFinishSelectingCards={(cards: Card[]) => {
+                battleState.selectedCard?.get.cardSelection?.selectCards(cards);
+                battleState.setCardsToShow(undefined);
+              }}
+            />
+          ) : null}
+        </>
+      )}
     </Wrapper>
   );
 });

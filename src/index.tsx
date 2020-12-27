@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Router } from "./Router";
-import { BrowserRouter } from "react-router-dom";
+import { MyRouter } from "./Router";
 import { createGlobalStyle } from "styled-components";
 import cursor from "./Images/cursor.png";
 
@@ -41,9 +40,7 @@ const GlobalStyle = createGlobalStyle`
 ReactDOM.render(
   <>
     <GlobalStyle />
-    <BrowserRouter>
-      <Router />
-    </BrowserRouter>
+    <MyRouter />
   </>,
   document.getElementById("root")
 );

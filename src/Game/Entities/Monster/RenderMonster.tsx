@@ -42,7 +42,7 @@ export const RenderMonster = observer(
         key={`monster-${id}`}
         dead={dead}
         disabled={battleState.targetSelf}
-        selected={id === battleState.selectedMonsterId}
+        selected={battleState.selectedMonsterIds?.includes(id) ?? false}
       >
         <MonsterIntentWrapper>
           <img

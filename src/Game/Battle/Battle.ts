@@ -5,9 +5,29 @@ import { IStatus, StatusType } from "../Common/StatusBar";
 import { IntentType, Monster } from "../Entities/Monster/Monster";
 import { Player } from "../Entities/Player/Player";
 import { Map } from "../Map/Map";
+import { AppHistory } from '../../Router';
+
+enum DeckPosition {
+  top,
+  bottom,
+}
+
+interface IPileOfCards {
+  [index: string]: Card[];
+}
+
+export enum PileOfCards {
+  deck,
+  draw,
+  discard,
+  exhaust,
+  hand,
+}
+
 export interface IBattleState {
   selectedCardId: string | undefined;
-  selectedMonsterId: string | undefined;
+  selectedMonsterIds?: string[];
+  selectedSelf?: boolean;
   monsters: Monster[] | undefined;
   currentHand: Card[];
   currentMana: number;
@@ -27,7 +47,8 @@ export class Battle {
   private constructor(
     private battleState: IBattleState = observable({
       selectedCardId: undefined,
-      selectedMonsterId: undefined,
+      selectedMonsterIds: undefined,
+      selectedSelf: undefined,
       currentMana: Player.get().maxMana,
       monsters: undefined,
       currentHand: [],
@@ -38,6 +59,9 @@ export class Battle {
       cardsToShow: undefined,
     })
   ) {}
+
+  @observable
+  cardResolveQueue: (() => void)[] = [];
 
   @computed
   get wonBattle() {
@@ -91,14 +115,22 @@ export class Battle {
   }
 
   @computed
-  get selectedMonsterId() {
-    return this.battleState.selectedMonsterId;
+  get selectedMonsterIds() {
+    return this.battleState.selectedMonsterIds;
   }
 
   @computed
-  get selectedMonster() {
-    return this.monsters?.find(
-      (monster) => monster.get.id === this.battleState.selectedMonsterId
+  get selectedSelf() {
+    return this.battleState.selectedSelf;
+  }
+  set selectedSelf(selected: boolean | undefined) {
+    this.battleState.selectedSelf = selected;
+  }
+
+  @computed
+  get selectedMonsters() {
+    return this.monsters?.filter((monster) =>
+      this.battleState.selectedMonsterIds?.includes(monster.get.id)
     );
   }
 
@@ -192,7 +224,7 @@ export class Battle {
   });
 
   private initializeMonsters = action(() => {
-    const mapState = new Map();
+    const mapState = Map.get();
     this.setMonsters(mapState.currentEncounter);
   });
 
@@ -253,13 +285,13 @@ export class Battle {
     });
   }
 
-  public resolveTargetedCard = action((card: Card) => {
+  public resolveTargetedCard = action(async (card: Card) => {
     switch (card.get.effect) {
       case CardEffectType.SpecificEnemy:
         if (card.get.damage)
           this.resolveSingleTargetDamage({
             card: card,
-            selectedMonster: this.selectedMonster,
+            selectedMonster: this.selectedMonsters?.[0],
           });
         if (card.get.block) {
           Player.get().addBlock(card.evaluateBlock());
@@ -281,15 +313,19 @@ export class Battle {
         }
         break;
       case CardEffectType.Random:
-        range(0, card.get.damageInstances).forEach(() => {
-          let randomMonster = this.monsters?.[
-            random(0, this.monsters.length - 1)
-          ];
-          this.resolveSingleTargetDamage({
-            card: card,
-            selectedMonster: randomMonster,
-          });
-        });
+        for (const _instance of range(0, card.get.damageInstances)) {
+          await new Promise((resolve) =>
+            setTimeout(() => {
+              this.resolveSingleTargetDamage({
+                card: card,
+                selectedMonster: this.monsters?.[
+                  random(0, this.monsters.length - 1)
+                ],
+              });
+              resolve(true);
+            }, 300)
+          );
+        }
         break;
       default:
         break;
@@ -305,7 +341,6 @@ export class Battle {
     if (card.get.specialEffect) {
       card.get.specialEffect();
     }
-    console.log("resolve targeted card");
     this.callNextAction();
   });
 
@@ -353,9 +388,6 @@ export class Battle {
       if (card.get.status && selectedMonster) {
         selectedMonster.addStatus(card.get.status.type, card.get.status.amount);
       }
-      if (selectedMonster.get.health === 0) {
-        selectedMonster.dead = true;
-      }
     }
   }
 
@@ -375,6 +407,9 @@ export class Battle {
           break;
         default:
           break;
+      }
+      if (Player.get().health <= 0) {
+        AppHistory.push('/defeat');
       }
       monster.updateStatuses();
       monster.cleanupStatuses();
@@ -409,9 +444,6 @@ export class Battle {
     this.callNextAction();
   });
 
-  @observable
-  cardResolveQueue: (() => void)[] = [];
-
   public callNextAction = action(() => {
     const nextAction = this.cardResolveQueue.shift();
     nextAction?.();
@@ -421,15 +453,33 @@ export class Battle {
     this.cardResolveQueue = [];
     this.cardResolveQueue.push(
       () => this.useMana(this.selectedCardManaCost),
-      () => this.selectedCard?.playAudioClip(),
-      () => this.resolveTargetedCard(this.selectedCard as Card),
-      () =>
+      () => this.selectedCard?.playAudioClips(),
+      () => {
         this.moveCards({
           cards: [this.selectedCard as Card],
           from: PileOfCards.hand,
           to: PileOfCards.discard,
-        }),
-      () => this.selectCard()
+        });
+        this.callNextAction();
+      },
+      () => this.resolveTargetedCard(this.selectedCard as Card),
+      () => {
+        this.battleState.monsters = this.monsters?.map((monster) => {
+          if (monster.get.health === 0) {
+            monster.dead = true;
+          }
+          return monster;
+        });
+        this.callNextAction();
+      },
+      () => {
+        this.selectCard();
+        this.callNextAction();
+      },
+      () => {
+        this.selectMonster();
+        this.callNextAction();
+      }
     );
   };
 
@@ -455,16 +505,23 @@ export class Battle {
   public initialize = action(() => {
     this.initializeMonsters();
     this.initializeHand();
+    this.battleState.cardsToShow = undefined;
     this.battleState.currentMana = Player.get().maxMana;
   });
 
   selectCard = action((id?: string) => {
     this.battleState.selectedCardId = id;
-    this.selectMonster(undefined);
+    this.selectMonster();
   });
 
-  selectMonster = action((id: string | undefined) => {
-    this.battleState.selectedMonsterId = id;
+  selectMonster = action((ids?: string[]) => {
+    this.battleState.selectedMonsterIds = ids;
+  });
+
+  selectAllMonsters = action(() => {
+    this.battleState.selectedMonsterIds = this.monsters?.map(
+      (monster) => monster.get.id
+    );
   });
 
   setMonsters = action((monsters: Monster[] | undefined) => {
@@ -483,13 +540,13 @@ export class Battle {
       from: PileOfCards;
       position?: DeckPosition;
     }) => {
-      cards.forEach((cardToMove) => {
+      const cardsCopy = clone(cards);
+      cardsCopy.forEach((cardToMove) => {
         const toPile = getPileOfCards[to]();
         const fromPile = getPileOfCards[from]();
 
         const fromPileCopy = clone(fromPile);
         const toPileCopy = clone(toPile);
-
         if (
           fromPileCopy.map((card) => card.get.id).includes(cardToMove.get.id)
         ) {
@@ -506,7 +563,6 @@ export class Battle {
             case DeckPosition.top:
             default:
               toPile.length = 0;
-              console.log(toPileCopy, cardToMove)
               toPile.push(...[cardToMove, ...toPileCopy]);
               break;
           }
@@ -516,23 +572,6 @@ export class Battle {
       });
     }
   );
-}
-
-interface IPileOfCards {
-  [index: string]: Card[];
-}
-
-export enum PileOfCards {
-  deck,
-  draw,
-  discard,
-  exhaust,
-  hand,
-}
-
-enum DeckPosition {
-  top,
-  bottom,
 }
 
 const getPileOfCards = {

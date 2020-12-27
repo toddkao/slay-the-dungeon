@@ -12,7 +12,7 @@ import heavyAtk from "../../Audio/heavyAtk.ogg";
 // @ts-ignore
 import addBlock from "../../Audio/addBlock.ogg";
 import { Battle, IBattleState, PileOfCards } from "../Battle/Battle";
-import { groupBy } from "lodash";
+import { groupBy, range } from "lodash";
 import { Player } from "../Entities/Player/Player";
 interface ISpriteToCardSize {
   [index: string]: { CARD_WIDTH: number; CARD_HEIGHT: number };
@@ -97,7 +97,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SpecificEnemy,
     description: `Deal {} damage.\nApply 2 vulnerable.`,
     descriptionVariables: ["damage"],
-    audio: heavyAtk,
+    audio: [heavyAtk],
   },
   defend: {
     name: "Defend",
@@ -109,7 +109,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.Self,
     description: "Gain {} Block.",
     descriptionVariables: ["block"],
-    audio: addBlock,
+    audio: [addBlock],
   },
   strike: {
     name: "Strike",
@@ -121,7 +121,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SpecificEnemy,
     description: `Deal {} damage.`,
     descriptionVariables: ["damage"],
-    audio: fastAtk,
+    audio: [fastAtk],
   },
   anger: {
     name: "Anger",
@@ -142,7 +142,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SpecificEnemy,
     description: `Deal {} damage.\nAdd a copy of this card\ninto your discard pile.`,
     descriptionVariables: ["damage"],
-    audio: heavyAtk, //TODO: sound effect
+    audio: [heavyAtk], //TODO: sound effect
   },
   // armament: {
   //   name: "Armament",
@@ -162,7 +162,7 @@ export const cardMap: ICardMap = {
   //   description: `Gain {} Block.\nUpgrade a card in your\nhand for the rest of the combat.`,
   //   descriptionVariables: ["block"],
   //   targetSpecificEnemy: true,
-  //   audio: heavyAtk, //TODO: sound effect
+  //   audio: [heavyAtk], //TODO: sound effect
   // },
   bodySlam: {
     name: "Body Slam",
@@ -176,7 +176,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SpecificEnemy,
     description: `Deal damage equal to\nyour block`,
     descriptionVariables: [],
-    audio: heavyAtk, //TODO: sound effect
+    audio: [heavyAtk], //TODO: sound effect
   },
   clash: {
     name: "Clash",
@@ -193,7 +193,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SpecificEnemy,
     description: `Can only be played if\nevery card in your\nhand is an Attack.\nDeal {} damage.`,
     descriptionVariables: ["damage"],
-    audio: heavyAtk, //TODO: sound effect
+    audio: [heavyAtk], //TODO: sound effect
   },
   cleave: {
     name: "Cleave",
@@ -205,7 +205,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.AllEnemies,
     description: `Deal 8 damage to ALL\n enemies.`,
     descriptionVariables: ["damage"],
-    audio: heavyAtk, //TODO: sound effect
+    audio: [heavyAtk], //TODO: sound effect
   },
   clothesline: {
     name: "Clothesline",
@@ -222,7 +222,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SpecificEnemy,
     description: `Deal {} damage.\nApply 2 Weak.`, //TODO: add weak to descriptionvariable
     descriptionVariables: ["damage"],
-    audio: heavyAtk, //TODO: sound effect
+    audio: [heavyAtk], //TODO: sound effect
   },
   flex: {
     name: "Flex",
@@ -239,7 +239,7 @@ export const cardMap: ICardMap = {
     type: CardType.Skill,
     effect: CardEffectType.Self,
     description: `Gain 2 Strength.\nAt the end of this turn,\nlose 2 Strength.`,
-    audio: heavyAtk, //TODO: sound effect
+    audio: [heavyAtk], //TODO: sound effect
   },
   havoc: {
     name: "Havoc",
@@ -257,7 +257,7 @@ export const cardMap: ICardMap = {
     type: CardType.Skill,
     effect: CardEffectType.Self,
     description: `Play the top card of\nyour draw pile and\nExhaust it.`,
-    audio: heavyAtk, //TODO: sound effect
+    audio: [heavyAtk], //TODO: sound effect
   },
   headbutt: {
     name: "Headbutt",
@@ -286,7 +286,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SpecificEnemy,
     description: `Deal {} damage.\nPut a card from your\ndiscard pile on top of\nyour draw pile.`,
     descriptionVariables: ["damage"],
-    audio: heavyAtk, //TODO: sound effect
+    audio: [heavyAtk], //TODO: sound effect
   },
   heavyBlade: {
     name: "Heavy Blade",
@@ -300,7 +300,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SpecificEnemy,
     description: `Deal {} damage.\nStrength affects this\n card 3 times.`,
     descriptionVariables: ["damage"],
-    audio: heavyAtk, //TODO: sound effect
+    audio: [heavyAtk], //TODO: sound effect
   },
   ironWave: {
     name: "Iron Wave",
@@ -310,14 +310,14 @@ export const cardMap: ICardMap = {
     block: 5,
     specialEffect: () => {
       let battle = Battle.get();
-      if (!battle.selectedMonster)
+      if (!battle.selectedMonsters)
         throw new Error("Iron Wave needs a selected monster!");
 
-      battle.selectedMonster.takeDamage(
+      battle.selectedMonsters[0].takeDamage(
         battle.calculateDamage({
           damage: 5,
           extradamage: Player.get().extradamage,
-          statuses: battle.selectedMonster.get.statuses,
+          statuses: battle.selectedMonsters[0].get.statuses,
         })
       );
     },
@@ -325,7 +325,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SpecificEnemy,
     description: `Gain {} Block.\nDeal 5 damage.`,
     descriptionVariables: ["block"],
-    audio: heavyAtk, //TODO: sound effect
+    audio: [addBlock, fastAtk],
   },
   perfectedStrike: {
     name: "Perfected Strike",
@@ -345,7 +345,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SpecificEnemy,
     description: `Deal {} damage.\n Deals an additional\n2 damage for ALL of your\ncards containing\n"Strike".`,
     descriptionVariables: ["damage"],
-    audio: heavyAtk, //TODO: sound effect
+    audio: [heavyAtk], //TODO: sound effect
   },
   pommelStrike: {
     name: "Pommel Strike",
@@ -361,7 +361,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SpecificEnemy,
     description: `Deal {} damage.\nDraw 1 card.`,
     descriptionVariables: ["damage"],
-    audio: heavyAtk, //TODO: sound effect
+    audio: [heavyAtk], //TODO: sound effect
   },
   shrugItOff: {
     name: "Shrug It Off",
@@ -376,7 +376,7 @@ export const cardMap: ICardMap = {
     type: CardType.Skill,
     effect: CardEffectType.Self,
     description: `Gain 8 Block.\nDraw 1 card.`,
-    audio: heavyAtk, //TODO: sound effect
+    audio: addBlock,
   },
   swordBoomerang: {
     name: "Sword Boomerang",
@@ -388,7 +388,7 @@ export const cardMap: ICardMap = {
     type: CardType.Attack,
     effect: CardEffectType.Random,
     description: `Deal 3 damage to a\nrandom enemy 3 times.`,
-    audio: heavyAtk, //TODO: sound effect
+    audio: [fastAtk, fastAtk, fastAtk], //TODO: sound effect
   },
   thunderclap: {
     name: "Thunderclap",
@@ -406,7 +406,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.AllEnemies,
     description: `Deal {} damage and\napply 1 Vulnerable to\nALL enemies.`,
     descriptionVariables: ["damage"],
-    audio: heavyAtk, //TODO: sound effect
+    audio: [heavyAtk], //TODO: sound effect
   },
 };
 

@@ -27,6 +27,7 @@ interface IProps {
   onClose: () => void;
   onFinishSelectingCards?: (cards: Card[]) => void;
   cardsToSelect?: number;
+  showReturnButton?: boolean;
 }
 
 class State {
@@ -35,7 +36,13 @@ class State {
 }
 
 export const ShowCardsModal = observer(
-  ({ cards, onClose, onFinishSelectingCards, cardsToSelect }: IProps) => {
+  ({
+    cards,
+    onClose,
+    onFinishSelectingCards,
+    cardsToSelect,
+    showReturnButton = true,
+  }: IProps) => {
     const state = new State();
 
     const onSelectCard = (card: Card) => {
@@ -52,16 +59,20 @@ export const ShowCardsModal = observer(
     };
     return (
       <Modal>
-        <ReturnButton onClick={onClose}>Return</ReturnButton>
-        <CardRow>
-          {cards.map((card) => (
-            <RenderCard
-              cardState={card}
-              onClick={() => onSelectCard(card)}
-              draggable={false}
-            />
-          ))}
-        </CardRow>
+        <>
+          {showReturnButton ? (
+            <ReturnButton onClick={onClose}>Return</ReturnButton>
+          ) : null}
+          <CardRow>
+            {cards.map((card) => (
+              <RenderCard
+                cardState={card}
+                onClick={() => onSelectCard(card)}
+                draggable={false}
+              />
+            ))}
+          </CardRow>
+        </>
       </Modal>
     );
   }

@@ -1,4 +1,3 @@
-import { Singleton } from "@taipescripeto/singleton";
 import monster from "../../Images/monster.png";
 import chest from "../../Images/chest.png";
 import rest from "../../Images/rest.png";
@@ -11,6 +10,7 @@ import { clone } from "lodash";
 import { Battle } from "../Battle/Battle";
 import { Monster } from "../Entities/Monster/Monster";
 import { mapEncounterType } from "./MapEncounterDefinition";
+import { AppHistory } from "../../Router";
 
 interface IMapNode {
   id: string;
@@ -38,9 +38,13 @@ interface IMap {
   currentEncounter: Monster[] | undefined;
   showingMap: boolean;
 }
-
-@Singleton()
 export class Map {
+  private static instance: Map;
+  public static get(): Map {
+    if (!Map.instance) Map.instance = new Map();
+    return Map.instance;
+  }
+
   constructor(
     private map: IMap = observable({
       currentFloorNumber: 1,
@@ -182,7 +186,7 @@ export class Map {
 
       if (currentNode) {
         currentNode.scrollIntoView({
-          block: 'center'
+          block: "center",
         });
       }
     }, 0);
@@ -211,14 +215,28 @@ export class Map {
         ].map((createMob) => createMob(uniqueId()));
   };
 
+  reset = action(() => {
+    this.map.currentNode = undefined;
+    this.map.currentEncounter = undefined;
+    this.map.traversedNodeIds = [];
+  });
+
   selectNode = action((node: IMapNode) => {
-    this.map.currentNode = node;
-    if (this.currentNode !== undefined) {
-      this.map.traversedNodeIds.push(this.currentNode?.id);
-    }
-    this.map.currentEncounter = this.currentNode?.encounter;
     const battleState = Battle.get();
-    battleState.initialize();
+    if (
+      (battleState.wonBattle || battleState.monsters === undefined) &&
+      this.selectableNodeIds.includes(node.id)
+    ) {
+      this.map.currentNode = node;
+      if (this.currentNode !== undefined) {
+        this.map.traversedNodeIds.push(this.currentNode?.id);
+      }
+      this.map.currentEncounter = this.currentNode?.encounter;
+      AppHistory.push(`/battle/${node.id}`);
+      const battleState = Battle.get();
+      battleState.initialize();
+      this.setShowingMap(false);
+    }
   });
 }
 

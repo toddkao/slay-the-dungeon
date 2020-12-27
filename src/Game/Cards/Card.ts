@@ -1,12 +1,18 @@
 import { computed } from "mobx";
 import { IStatus } from "../Common/StatusBar";
-import { Howl } from "howler";
+import { Howl, HowlOptions } from "howler";
 import { Battle, IBattleState } from "../Battle/Battle";
-import { uniqueId } from "lodash";
 import { isCollidingWithEachOther } from "../Common/utility";
 
+export enum CardEffectType {
+  SpecificEnemy,
+  AllEnemies,
+  Self,
+  Random,
+}
+
 export class Card {
-  constructor(private card: ICard) { }
+  constructor(private card: ICard) {}
 
   @computed
   public get get() {
@@ -38,16 +44,29 @@ export class Card {
     }
   };
 
-  public playAudioClip = () => {
-    if (this.get.audio) {
-      const sound = new Howl({
-        src: this.get.audio,
-        volume: 0.5,
+  public playAudioClips = async () => {
+    // TODO stop currently playing audio clips when beginning 
+    // to play a new set of audio clips
+    Battle.get().callNextAction();
+    if (this.get.audio !== undefined) {
+      for (const audioClip of this.get.audio) {
+        await Card.playAudioClip(audioClip);
+      }
+    }
+  };
+
+  public static playAudioClip = (src: string, options?: HowlOptions) => {
+    const sound = new Howl({
+      src: [src],
+      ...options,
+    });
+
+    return new Promise((resolve) => {
+      sound.on("end", () => {
+        resolve(sound);
       });
       sound.play();
-    }
-    console.log("play audio clip");
-    Battle.get().callNextAction();
+    });
   };
 
   public evaluateDamage = () => {
@@ -66,23 +85,59 @@ export class Card {
     );
   };
 
+  public onDrag = () => {
+    const battleState = Battle.get();
+    const cardBoundingRect = this.ref?.current?.getBoundingClientRect();
+    const { top } = cardBoundingRect;
+    const collisions = battleState.monstersWithBoundingRef
+      ?.filter((monster) => !battleState.getMonsterById(monster.id)?.dead)
+      .find((monster) =>
+        isCollidingWithEachOther(cardBoundingRect, monster.boundingRect)
+      );
+    if (window.innerHeight / top > 1.7) {
+      switch (this.card.effect) {
+        case CardEffectType.SpecificEnemy:
+          if (collisions && !battleState.getMonsterById(collisions.id)?.dead) {
+            battleState.selectMonster([collisions.id]);
+          } else {
+            battleState.selectMonster();
+          }
+          return;
+        case CardEffectType.AllEnemies:
+        case CardEffectType.Random:
+          battleState.selectAllMonsters();
+          return;
+        case CardEffectType.Self:
+          battleState.selectedSelf = true;
+          break;
+        default:
+          break;
+      }
+    }
+    battleState.selectMonster();
+  };
+
   public onReleaseDrag = () => {
     const battleState = Battle.get();
     const cardBoundingRect = this.ref?.current?.getBoundingClientRect();
     const { top } = cardBoundingRect;
 
-    if (
-      window.innerHeight / top > 1.7 &&
-      (this.get.targetAllEnemies || this.get.targetSelf)
-    ) {
-      battleState.playSelectedCard();
-    } else {
-      const collisions = battleState.monstersWithBoundingRef?.find((monster) =>
-        isCollidingWithEachOther(cardBoundingRect, monster.boundingRect)
-      );
-      if (collisions && !battleState.getMonsterById(collisions.id)?.dead) {
-        battleState.selectMonster(collisions.id);
-        battleState.playSelectedCard();
+    if (window.innerHeight / top > 1.7) {
+      switch (this.card.effect) {
+        case CardEffectType.Self:
+          battleState.playSelectedCard();
+          break;
+        case CardEffectType.SpecificEnemy:
+        case CardEffectType.AllEnemies:
+        case CardEffectType.Random:
+        default:
+          if (
+            (battleState.selectedMonsterIds?.length || 0) > 0 &&
+            !battleState.wonBattle
+          ) {
+            battleState.playSelectedCard();
+          }
+          break;
       }
     }
   };
@@ -91,13 +146,6 @@ export class Card {
 export enum CardType {
   Attack = "Attack",
   Skill = "Skill",
-}
-
-export enum CardEffectType {
-  SpecificEnemy,
-  AllEnemies,
-  Self,
-  Random,
 }
 
 export interface ICard {
@@ -109,7 +157,11 @@ export interface ICard {
   damage?: number | (() => number);
   damageInstances?: number;
   block?: number | (() => number);
-  cardSelection?: { amount: number, from: (() => Card[]), selectCards: ((cards: Card[]) => void) }
+  cardSelection?: {
+    amount: number;
+    from: () => Card[];
+    selectCards: (cards: Card[]) => void;
+  };
   prerequisite?: (battleState: IBattleState) => boolean;
   status?: IStatus;
   specialEffect?: Function;
@@ -124,7 +176,7 @@ export interface ICard {
     width: number;
     height: number;
   };
-  audio?: string;
+  audio?: string[];
   ref?: React.MutableRefObject<any>;
 }
 

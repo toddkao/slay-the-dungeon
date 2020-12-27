@@ -5,7 +5,6 @@ import { Modal } from "../Common/Modal";
 import Xarrow from "react-xarrows";
 import { mapNodeType, mapNodeTypeToImage, Map } from "./Map";
 import { observer } from "mobx-react";
-import { useHistory } from "react-router-dom";
 import { Battle } from "../Battle/Battle";
 import { ReturnButton } from "../../Clickables";
 
@@ -18,8 +17,7 @@ export const RenderMap = observer(
     hideReturn?: boolean;
   }) => {
     const battleState = Battle.get();
-    const mapState = new Map();
-    const history = useHistory();
+    const mapState = Map.get();
     const useMountEffect = (fun: () => any) => useEffect(fun, []);
     const mapRef = useRef(null);
 
@@ -55,17 +53,7 @@ export const RenderMap = observer(
                     <MapNode
                       id={node.id}
                       key={node.id}
-                      onClick={() => {
-                        if (
-                          (battleState.wonBattle ||
-                            battleState.monsters === undefined) &&
-                          selectableNodeIds.includes(node.id)
-                        ) {
-                          history.push(`/battle/${node.id}`);
-                          selectNode(node);
-                          mapState.setShowingMap(false);
-                        }
-                      }}
+                      onClick={() => selectNode(node)}
                       style={{
                         left: node.left,
                         top: node.top,

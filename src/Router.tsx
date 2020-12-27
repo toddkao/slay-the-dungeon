@@ -1,12 +1,20 @@
-import { Route, Switch } from 'react-router-dom';
-import { StartMenu } from './Game/StartMenu';
-import { RenderBattle } from './Game/Battle/MonsterBattle';
+import { Route, Switch } from "react-router-dom";
+import { StartMenu } from "./Game/StartMenu";
+import { RenderBattle } from "./Game/Battle/MonsterBattle";
+import { RenderDefeatScreen } from "./Game/Battle/RenderDefeatScreen";
+import { Router } from "react-router";
+import { createBrowserHistory } from "history";
 
-export function Router() {
+export const AppHistory = createBrowserHistory();
+
+export function MyRouter() {
   return (
-    <Switch>
-      <Route exact path="/" component={StartMenu} />
-      <Route exact path="/battle/:nodeID" component={RenderBattle} />
-    </Switch>
+    <Router history={AppHistory}>
+      <Switch>
+        <Route exact path="/defeat" component={RenderDefeatScreen} />
+        <Route exact path="/battle/:nodeID" component={RenderBattle} />
+        <Route path="/" component={StartMenu} />
+      </Switch>
+    </Router>
   );
 }

@@ -1,10 +1,7 @@
 import { range, sample, uniqueId } from "lodash";
 import { observer } from "mobx-react";
 import React, { useState } from "react";
-import {
-  cardsByRarity,
-  rarityChance,
-} from "../../Cards/CardDefinitions";
+import { cardsByRarity, rarityChance } from "../../Cards/CardDefinitions";
 import { RenderCard } from "../../Cards/RenderCard";
 import { Modal } from "../../Common/Modal";
 import rewardScreenSheet from "../../../Images/UI/reward/rewardScreenSheet.png";
@@ -94,7 +91,7 @@ export const RenderRewardsModal = observer(
               </RelativeWrapper>
               <ProceedButtonWrapper onClick={onClickProceed}>
                 <img src={proceedButton} alt="proceed" />
-                <RewardBannerText fontSize={40} outline style={{ top: 230 }}>
+                <RewardBannerText fontSize={40} outline style={{ top: 36 }}>
                   Proceed
                 </RewardBannerText>
               </ProceedButtonWrapper>
@@ -125,17 +122,13 @@ export const RenderRewardsModal = observer(
                   />
                 ))}
               </Row>
-              <RelativeWrapper style={{ zIndex: 1 }}>
-                <SkipButton
-                  src={takeAll}
-                  alt="skip"
-                  style={{ zIndex: 1 }}
-                  onClick={() => setSelectedReward(undefined)}
-                />
-                <RewardBannerText fontSize={40} outline style={{ top: 100 }}>
+              <Spacer size={70} />
+              <SkipButtonWrapper onClick={() => setSelectedReward(undefined)}>
+                <SkipButton src={takeAll} alt="skip" style={{ zIndex: 1 }} />
+                <RewardBannerText fontSize={40} outline style={{ top: 5 }}>
                   Skip
                 </RewardBannerText>
-              </RelativeWrapper>
+              </SkipButtonWrapper>
             </Column>
           ) : null}
         </>
@@ -150,6 +143,7 @@ const RewardBanner = styled.img`
 `;
 
 const RewardBannerText = styled(Typography)`
+  position: relative;
   ${horizontalCenterAbsolute};
   text-align: center;
   color: white;
@@ -185,12 +179,20 @@ const RewardItemDetails = styled(Row).attrs({
 const RewardListItemPanel = styled.img``;
 
 const ProceedButtonWrapper = styled(RelativeWrapper)`
+  filter: brightness(80%);
   &:hover {
-    transform: scale(1.2);
+    filter: brightness(100%);
   }
-  right: 0;
-  bottom: 0;
+  right: 100px;
+  bottom: 150px;
   position: absolute;
+`;
+
+const SkipButtonWrapper = styled(RelativeWrapper)`
+  filter: brightness(80%);
+  &:hover {
+    filter: brightness(100%);
+  }
 `;
 
 const SkipButton = styled.img``;
