@@ -488,6 +488,7 @@ export class Battle {
       },
       () => {
         this.selectMonster();
+        this.selectedSelf = false;
         this.callNextAction();
       }
     );

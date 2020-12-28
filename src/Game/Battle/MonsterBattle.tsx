@@ -38,8 +38,10 @@ export const RenderBattle = observer(() => {
   });
 
   const onRightClick = (e: { preventDefault: () => void }) => {
+    // TODO Move logic onto onReleaseDrag on card
     e.preventDefault();
     battleState.selectCard();
+    battleState.selectedSelf = false;
   };
 
   return (

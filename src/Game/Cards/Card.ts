@@ -131,11 +131,12 @@ export class Card {
           return;
         case CardEffectType.SELF:
           battleState.selectedSelf = true;
-          break;
+          return;
         default:
           break;
       }
     }
+    battleState.selectedSelf = false;
     battleState.selectMonster();
   };
 

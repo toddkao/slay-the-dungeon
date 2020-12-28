@@ -61,16 +61,21 @@ export class Player extends Entity {
     //   range(0, 5).forEach(() =>
     //   stats.deck.push(new Card({ ...cardMap.swordBoomerang, id: uniqueId() }))
     // );
-
-    range(0, 5).forEach(() =>
-      stats.deck.push(new Card({ ...cardMap.bash, id: uniqueId() }))
+    range(0, 4).forEach(() =>
+      stats.deck.push(new Card({ ...cardMap.strike, id: uniqueId() }))
     );
 
+    range(0, 4).forEach(() =>
+      stats.deck.push(new Card({ ...cardMap.defend, id: uniqueId() }))
+    );
+
+    stats.deck.push(new Card({ ...cardMap.strike, id: uniqueId(), upgraded: true }))
+    stats.deck.push(new Card({ ...cardMap.defend, id: uniqueId(), upgraded: true }))
+    stats.deck.push(new Card({ ...cardMap.bash, id: uniqueId(), upgraded: true  }))
     // range(0, 5).forEach(() =>
     //   stats.deck.push(new Card({ ...cardMap.clothesline, id: uniqueId() }))
     // );
 
-    // stats.deck.push(new Card({ ...cardMap.flex, id: uniqueId(), upgraded: true }))
   }
 
   @computed
