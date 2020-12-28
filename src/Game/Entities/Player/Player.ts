@@ -2,7 +2,6 @@ import { action, computed, observable } from "mobx";
 import { Card } from "../../Cards/Card";
 import { range, uniqueId } from "lodash";
 import { Entity, IEntity } from "../entity";
-import { StatusType } from "../../Common/StatusBar";
 import { cardMap } from "../../Cards/CardDefinitions";
 
 export enum PlayerClass {
@@ -64,16 +63,14 @@ export class Player extends Entity {
     // );
 
     range(0, 5).forEach(() =>
-      stats.deck.push(new Card({ ...cardMap.swordBoomerang, id: uniqueId() }))
+      stats.deck.push(new Card({ ...cardMap.bash, id: uniqueId() }))
     );
 
-    stats.deck.push(new Card({ ...cardMap.swordBoomerang, id: uniqueId(), upgraded: true }))
-    
-    range(0, 5).forEach(() =>
-      stats.deck.push(new Card({ ...cardMap.thunderclap, id: uniqueId() }))
-    );
-    this.addStatus(StatusType.strength, 1);
-    // this.addStatus(StatusType.dexterity);
+    // range(0, 5).forEach(() =>
+    //   stats.deck.push(new Card({ ...cardMap.clothesline, id: uniqueId() }))
+    // );
+
+    // stats.deck.push(new Card({ ...cardMap.flex, id: uniqueId(), upgraded: true }))
   }
 
   @computed

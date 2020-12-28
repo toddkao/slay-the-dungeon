@@ -19,7 +19,7 @@ export const RenderMonster = observer(
       statuses,
       health,
       maxHealth,
-      extradamage,
+      extraDamage: extradamage,
       dead,
     } = monsterState;
     const monsterRef = useRef(null);

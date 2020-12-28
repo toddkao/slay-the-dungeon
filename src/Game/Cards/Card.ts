@@ -3,6 +3,7 @@ import { IStatus } from "../Common/StatusBar";
 import { Howl, HowlOptions } from "howler";
 import { Battle, IBattleState } from "../Battle/Battle";
 import { isCollidingWithEachOther } from "../Common/utility";
+import { Monster } from "../Entities/Monster/Monster";
 
 export enum CardEffectType {
   SpecificEnemy,
@@ -18,7 +19,7 @@ export class Card {
       damageInstances: computed,
       damage: computed,
       ref: computed,
-    })
+    });
   }
 
   @computed
@@ -31,15 +32,28 @@ export class Card {
     };
   }
 
-  get manaCost() { return this.get.manaCost?.(this.card.upgraded) ?? 0 };
-  get damageInstances() { return this.get.damageInstances?.(this.card.upgraded) ?? 1 };
-  get damage() { return this.get.damage?.(this.card.upgraded) ?? 0 };
-  get block() { return this.get.block?.(this.card.upgraded) ?? 0 };
-  get status() { return this.get.status?.(this.card.upgraded) ?? 0 };
-  get description() { return this.get.description?.(this.card.upgraded) ?? 0};
+  get manaCost() {
+    return this.get.manaCost?.(this.card.upgraded) ?? 0;
+  }
+  get damageInstances() {
+    return this.get.damageInstances?.(this.card.upgraded) ?? 1;
+  }
+  get damage() {
+    return this.get.damage?.(this.card.upgraded) ?? 0;
+  }
+  get block() {
+    return this.get.block?.(this.card.upgraded) ?? 0;
+  }
+  get status() {
+    return this.get.status?.(this.card.upgraded) ?? 0;
+  }
 
-  get ref(): React.MutableRefObject<any> | undefined { return this.card.ref };
-  set ref(ref: React.MutableRefObject<any> | undefined) { this.card.ref = ref };
+  get ref(): React.MutableRefObject<any> | undefined {
+    return this.card.ref;
+  }
+  set ref(ref: React.MutableRefObject<any> | undefined) {
+    this.card.ref = ref;
+  }
 
   public selectable = () => {
     return this.card.prerequisite ? this.card.prerequisite(Battle.get()) : true;
@@ -180,11 +194,18 @@ export interface ICard {
   ref?: React.MutableRefObject<any>;
   prerequisite?: (battleState: IBattleState) => boolean;
   manaCost: (upgraded?: boolean) => number;
-  damage?: (upgraded?: boolean) => number;
+  damage?: (upgraded?: boolean, target?: Monster) => number;
   damageInstances?: (upgraded?: boolean) => number;
   block?: (upgraded?: boolean) => number;
   status?: (upgraded?: boolean) => IStatus;
-  description: (upgraded?: boolean) => string;
+  description:
+    | ((upgraded: boolean) => string)
+    | ((
+        upgraded: boolean,
+        card: Card,
+        selected: boolean,
+        target?: Monster
+      ) => string);
 }
 
 export enum CardRarity {

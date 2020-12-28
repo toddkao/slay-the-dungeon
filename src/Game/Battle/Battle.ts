@@ -6,6 +6,7 @@ import { IntentType, Monster } from "../Entities/Monster/Monster";
 import { Player } from "../Entities/Player/Player";
 import { Map } from "../Map/Map";
 import { AppHistory } from "../../Router";
+import { IEntity } from "../Entities/entity";
 
 enum DeckPosition {
   top,
@@ -58,7 +59,7 @@ export class Battle {
       endTurnActions: [],
       cardsToShow: undefined,
     })
-  ) {}
+  ) { }
 
   @observable
   cardResolveQueue: (() => void)[] = [];
@@ -345,23 +346,22 @@ export class Battle {
       }
     }
     if (card.get.specialEffect) {
-      card.get.specialEffect();
+      card.get.specialEffect(card.get.upgraded);
     }
     this.selectedCard?.playAudioClips();
     this.callNextAction();
   });
 
-  public calculateDamage = action(
-    ({ damage, statuses }: { damage: number; statuses: IStatus[] }) => {
-      let amount = damage;
-      const vulnerable = statuses?.find(
+  public static calculateDamage = action(
+    ({ damage, target }: { damage: number; target?: Monster | Player }) => {
+      const vulnerable = target?.statuses?.find(
         (s) => s.type === StatusType.vulnerable
       );
       if (vulnerable && vulnerable.amount && vulnerable.amount >= 1) {
-        amount = Math.floor(amount * 1.5);
+        damage = Math.floor(damage * 1.5);
       }
 
-      return amount;
+      return damage;
     }
   );
 
@@ -380,9 +380,9 @@ export class Battle {
 
     if (card.damage && selectedMonster) {
       selectedMonster.takeDamage(
-        this.calculateDamage({
+        Battle.calculateDamage({
           damage: card.evaluateDamage(),
-          statuses: selectedMonster.get.statuses,
+          target: selectedMonster,
         })
       );
       const status = card.get.status?.();
@@ -412,7 +412,12 @@ export class Battle {
     this.monsters?.forEach((monster) => {
       switch (monster.get.currentIntent?.type) {
         case IntentType.Attack:
-          Player.get().takeDamage(this.calculateDamage(monster.get));
+          Player.get().takeDamage(
+            Battle.calculateDamage({
+              damage: monster.damage,
+              target: Player.get(),
+            })
+          );
           break;
         case IntentType.GainStrength:
           if (monster.get.currentIntent.amount) {
@@ -491,7 +496,6 @@ export class Battle {
   };
 
   public playSelectedCard = action(() => {
-    console.log(this.cardResolveQueue);
     if (
       // Ensure a card is selected
       !this.selectedCardId ||
@@ -520,9 +524,10 @@ export class Battle {
   });
 
   public initialize = action(() => {
+    Player.get().reset();
     this.initializeMonsters();
     this.initializeHand();
-    Player.get().clearBlock();
+    Player.get().addStatus(StatusType.strength, 2);
     this.battleState.cardsToShow = undefined;
     this.battleState.currentMana = Player.get().maxMana;
   });

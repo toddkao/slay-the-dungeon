@@ -1,5 +1,4 @@
 import { action, computed, observable } from "mobx";
-import { CardEffectType } from "../Cards/Card";
 import { IStatus, StatusType, StatusTypeToIStatus } from "../Common/StatusBar";
 
 export interface IEntity {
@@ -28,7 +27,7 @@ export class Entity {
   }
 
   @computed
-  get extradamage() {
+  get extraDamage() {
     return (
       this.statuses.find(
         (findStatus) => findStatus.type === StatusType.strength
@@ -114,11 +113,7 @@ export class Entity {
   });
 
   public cleanupStatuses = action(() => {
-    if (this.entity.statuses === undefined) {
-      return;
-    }
-
-    this.entity.statuses = this.entity.statuses.filter(
+    this.entity.statuses = this.entity.statuses?.filter(
       (status) => (status.amount ?? 0) > 0
     );
   });
@@ -140,6 +135,7 @@ export class Entity {
   public reset = action(() => {
     this.entity.health = this.maxHealth;
     this.entity.block = 0;
+    this.entity.statuses = [];
   });
 
   constructor(
@@ -151,5 +147,5 @@ export class Entity {
       maxHealth: 0,
       statuses: [],
     })
-  ) {}
+  ) { }
 }

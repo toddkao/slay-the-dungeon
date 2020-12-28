@@ -62,7 +62,16 @@ export const RenderCard = observer(
         </RenderCardName>
         <RenderCardType>{cardState.get.type}</RenderCardType>
         <CardTextContainer>
-          <RenderCardText>{cardState.description}</RenderCardText>
+          <RenderCardText>
+            {cardState.get.description(
+              cardState.get.upgraded,
+              cardState,
+              battleState.selectedCardId
+                ? battleState.selectedCardId === cardState.get.id
+                : false,
+              battleState.selectedMonsters?.[0]
+            )}
+          </RenderCardText>
         </CardTextContainer>
         <CardSpriteContainer>
           <Sprite
