@@ -108,7 +108,7 @@ export class Battle {
 
   @computed
   get selectedCardManaCost(): number {
-    return this.selectedCard?.get.manaCost() ?? 0;
+    return this.selectedCard?.manaCost ?? 0;
   }
 
   @computed
@@ -290,7 +290,7 @@ export class Battle {
   public resolveCardEffect = action(async (card: Card) => {
     switch (card.get.effect) {
       case CardEffectType.SpecificEnemy:
-        if (card.get.damage)
+        if (card.damage)
           this.resolveSingleTargetDamage({
             card: card,
             selectedMonster: this.selectedMonsters?.[0],
@@ -301,7 +301,7 @@ export class Battle {
         break;
       case CardEffectType.AllEnemies:
         this.monsters?.forEach((monster) => {
-          if (card.get.damage) {
+          if (card.damage) {
             this.resolveSingleTargetDamage({
               card: card,
               selectedMonster: monster,
@@ -378,7 +378,7 @@ export class Battle {
       ];
     }
 
-    if (card.get.damage && selectedMonster) {
+    if (card.damage && selectedMonster) {
       selectedMonster.takeDamage(
         this.calculateDamage({
           damage: card.evaluateDamage(),

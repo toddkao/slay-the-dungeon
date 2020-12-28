@@ -50,16 +50,19 @@ export const RenderCard = observer(
         <ManaCost
           notEnoughMana={
             showIfCastable
-              ? cardState.get.manaCost() > battleState.currentMana
+              ? cardState.manaCost > battleState.currentMana
               : false
           }
         >
-          {cardState.get.manaCost()}
+          {cardState.manaCost}
         </ManaCost>
-        <RenderCardName outline>{cardState.get.name}{cardState.get.upgraded ? '+' : ''}</RenderCardName>
+        <RenderCardName outline>
+          {cardState.get.name}
+          {cardState.get.upgraded ? "+" : ""}
+        </RenderCardName>
         <RenderCardType>{cardState.get.type}</RenderCardType>
         <CardTextContainer>
-          <RenderCardText>{cardState.get.description()}</RenderCardText>
+          <RenderCardText>{cardState.description}</RenderCardText>
         </CardTextContainer>
         <CardSpriteContainer>
           <Sprite
@@ -107,7 +110,7 @@ const DraggableWrapper = styled(PullRelease)<{
 `;
 
 const UndraggableWrapper = styled(DraggableWrapper).attrs({
-  as: 'div'
+  as: "div",
 })`
   transition: transform 0.2s;
   &:hover {

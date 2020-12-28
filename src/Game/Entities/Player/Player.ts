@@ -66,6 +66,8 @@ export class Player extends Entity {
     range(0, 5).forEach(() =>
       stats.deck.push(new Card({ ...cardMap.swordBoomerang, id: uniqueId() }))
     );
+
+    stats.deck.push(new Card({ ...cardMap.swordBoomerang, id: uniqueId(), upgraded: true }))
     
     range(0, 5).forEach(() =>
       stats.deck.push(new Card({ ...cardMap.thunderclap, id: uniqueId() }))

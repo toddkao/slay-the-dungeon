@@ -1,4 +1,4 @@
-import { computed } from "mobx";
+import { computed, makeObservable } from "mobx";
 import { IStatus } from "../Common/StatusBar";
 import { Howl, HowlOptions } from "howler";
 import { Battle, IBattleState } from "../Battle/Battle";
@@ -12,7 +12,14 @@ export enum CardEffectType {
 }
 
 export class Card {
-  constructor(private card: ICard) {}
+  constructor(private card: ICard) {
+    makeObservable(this, {
+      manaCost: computed,
+      damageInstances: computed,
+      damage: computed,
+      ref: computed,
+    })
+  }
 
   @computed
   public get get() {
@@ -24,18 +31,15 @@ export class Card {
     };
   }
 
-  @computed
-  get damageInstances () {
-    return this.get.damageInstances?.(this.card.upgraded) ?? 1;
-  }
+  get manaCost() { return this.get.manaCost?.(this.card.upgraded) ?? 0 };
+  get damageInstances() { return this.get.damageInstances?.(this.card.upgraded) ?? 1 };
+  get damage() { return this.get.damage?.(this.card.upgraded) ?? 0 };
+  get block() { return this.get.block?.(this.card.upgraded) ?? 0 };
+  get status() { return this.get.status?.(this.card.upgraded) ?? 0 };
+  get description() { return this.get.description?.(this.card.upgraded) ?? 0};
 
-  @computed
-  get ref(): React.MutableRefObject<any> | undefined {
-    return this.card.ref;
-  }
-  set ref(ref: React.MutableRefObject<any> | undefined) {
-    this.card.ref = ref;
-  }
+  get ref(): React.MutableRefObject<any> | undefined { return this.card.ref };
+  set ref(ref: React.MutableRefObject<any> | undefined) { this.card.ref = ref };
 
   public selectable = () => {
     return this.card.prerequisite ? this.card.prerequisite(Battle.get()) : true;
@@ -50,7 +54,7 @@ export class Card {
   };
 
   public playAudioClips = async () => {
-    // TODO stop currently playing audio clips when beginning 
+    // TODO stop currently playing audio clips when beginning
     // to play a new set of audio clips
     if (this.get.audio !== undefined) {
       for (const audioClip of this.get.audio) {
@@ -155,24 +159,16 @@ export enum CardType {
 export interface ICard {
   id?: string;
   name: string;
-  manaCost: (upgraded?: boolean) => number;
   type: CardType;
   effect: CardEffectType;
-  damage?: (upgraded?: boolean) => number;
-  damageInstances?: (upgraded?: boolean) => number;
   upgraded: boolean;
-  block?: (upgraded?: boolean) => number;
   cardSelection?: {
     amount: number;
     from: () => Card[];
     selectCards: (cards: Card[]) => void;
   };
-  prerequisite?: (battleState: IBattleState) => boolean;
-  status?: (upgraded?: boolean) => IStatus;
   specialEffect?: Function;
   rarity: CardRarity;
-
-  description: (upgraded?: boolean) => string;
   // assets
   image: {
     src: string;
@@ -182,6 +178,13 @@ export interface ICard {
   };
   audio?: string[];
   ref?: React.MutableRefObject<any>;
+  prerequisite?: (battleState: IBattleState) => boolean;
+  manaCost: (upgraded?: boolean) => number;
+  damage?: (upgraded?: boolean) => number;
+  damageInstances?: (upgraded?: boolean) => number;
+  block?: (upgraded?: boolean) => number;
+  status?: (upgraded?: boolean) => IStatus;
+  description: (upgraded?: boolean) => string;
 }
 
 export enum CardRarity {
