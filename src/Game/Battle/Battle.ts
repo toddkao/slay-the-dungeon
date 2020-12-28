@@ -404,7 +404,7 @@ export class Battle {
   }
 
   private resolveMonsterActions = action(() => {
-    this.monsters?.forEach((monster) => {
+    this.monstersAlive?.forEach((monster) => {
       switch (monster.get.currentIntent?.type) {
         case IntentType.ATTACK:
           Player.get().takeDamage(
