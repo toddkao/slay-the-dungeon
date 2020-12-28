@@ -353,6 +353,7 @@ export const cardMap: ICardMap = {
     audio: [heavyAtk], //TODO: sound effect
   },
   ironWave: {
+    // TODO can we add block and attack instead of using specialEffect for this?
     name: "Iron Wave",
     rarity: CardRarity.COMMON,
     upgraded: false,
