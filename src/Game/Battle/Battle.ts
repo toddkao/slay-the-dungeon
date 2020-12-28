@@ -1,20 +1,15 @@
 import { clone, random, range, sampleSize, shuffle } from "lodash";
 import { action, computed, observable } from "mobx";
 import { Card, CardEffectType } from "../Cards/Card";
-import { IStatus, StatusType } from "../Common/StatusBar";
+import { StatusType } from "../Common/StatusBar";
 import { IntentType, Monster } from "../Entities/Monster/Monster";
 import { Player } from "../Entities/Player/Player";
 import { Map } from "../Map/Map";
 import { AppHistory } from "../../Router";
-import { IEntity } from "../Entities/entity";
 
 enum DeckPosition {
   TOP,
   BOTTOM,
-}
-
-interface IPileOfCards {
-  [index: string]: Card[];
 }
 
 export enum PileOfCards {
@@ -59,7 +54,7 @@ export class Battle {
       endTurnActions: [],
       cardsToShow: undefined,
     })
-  ) { }
+  ) {}
 
   @observable
   cardResolveQueue: (() => void)[] = [];
@@ -472,9 +467,13 @@ export class Battle {
   });
 
   public initializeCardResolveQueue = () => {
+    // TODO
+    // Think about a way to allow cards to decide whether
+    // it shoud move to the discard pile before or after resolving?
     this.cardResolveQueue = [];
     this.cardResolveQueue.push(
       () => this.useMana(this.selectedCardManaCost),
+      () => this.resolveCardEffect(this.selectedCard as Card),
       () => {
         this.moveCards({
           cards: [this.selectedCard as Card],
@@ -483,7 +482,6 @@ export class Battle {
         });
         this.callNextAction();
       },
-      () => this.resolveCardEffect(this.selectedCard as Card),
       () => {
         this.selectCard();
         this.callNextAction();
