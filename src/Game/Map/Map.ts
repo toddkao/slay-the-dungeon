@@ -197,7 +197,9 @@ export class Map {
   });
 
   generateNodeType = (rowIndex: number) => {
-    return rowIndex === 1 ? MapNodeType.REST : MapNodeType.MONSTER;
+    return rowIndex === 1 || rowIndex === 13
+      ? MapNodeType.REST
+      : MapNodeType.MONSTER;
   };
 
   generateEncounter = (rowIndex: number) => {
@@ -237,11 +239,19 @@ export class Map {
         this.map.traversedNodeIds.push(this.currentNode?.id);
       }
       this.map.currentEncounter = this.currentNode?.encounter;
-      battleState.initialize();
-      setTimeout(() => {
-        AppHistory.push(`/battle/${node.id}`);
-        this.setShowingMap(false);
-      }, 0);
+      switch (node.type) {
+        case MapNodeType.MONSTER:
+          battleState.initialize();
+          AppHistory.push(`/battle/${node.id}`);
+          this.setShowingMap(false);
+          break;
+        case MapNodeType.REST:
+          AppHistory.push(`/rest`);
+          this.setShowingMap(false);
+          break;
+        default:
+          break;
+      }
     }
   });
 }

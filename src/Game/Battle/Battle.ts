@@ -524,10 +524,9 @@ export class Battle {
   });
 
   public initialize = action(() => {
-    Player.get().reset();
+    Player.get().initializeBattle();
     this.initializeMonsters();
     this.initializeHand();
-    Player.get().addStatus(StatusType.STRENGTH, 2);
     this.battleState.cardsToShow = undefined;
     this.battleState.currentMana = Player.get().maxMana;
   });

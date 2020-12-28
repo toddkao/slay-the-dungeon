@@ -142,7 +142,7 @@ const RewardBanner = styled.img`
   z-index: 1;
 `;
 
-const RewardBannerText = styled(Typography)`
+export const RewardBannerText = styled(Typography)`
   position: relative;
   ${horizontalCenterAbsolute};
   text-align: center;
@@ -178,7 +178,7 @@ const RewardItemDetails = styled(Row).attrs({
 
 const RewardListItemPanel = styled.img``;
 
-const ProceedButtonWrapper = styled(RelativeWrapper)`
+export const ProceedButtonWrapper = styled(RelativeWrapper)`
   filter: brightness(80%);
   &:hover {
     filter: brightness(100%);

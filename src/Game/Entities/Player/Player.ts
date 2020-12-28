@@ -83,6 +83,11 @@ export class Player extends Entity {
     return this.stats.maxMana;
   }
 
+  public initializeBattle = action(() => {
+    this.stats.block = 0;
+    this.stats.statuses = [];
+  });
+
   addCardToDeck = action((card: Card) => {
     this.stats.deck = [...this.stats.deck, card];
   });

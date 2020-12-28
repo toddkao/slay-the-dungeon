@@ -7,7 +7,14 @@ import { Column, Row } from "../../Layout";
 import { Typography } from "../../Typography";
 import { Player } from "../Entities/Player/Player";
 import { useState } from "react";
-import { Battle } from "../Battle/Battle";
+import {
+  ProceedButtonWrapper,
+  RewardBannerText,
+} from "../Battle/Rewards/RenderRewardsModal";
+import proceedButton from "../../Images/UI/reward/proceedButton.png";
+import { RenderMap } from "./RenderMap";
+import { Map } from "./Map";
+import { observer } from "mobx-react";
 
 enum RestSiteOptionType {
   SLEEP,
@@ -21,28 +28,31 @@ interface IRestSiteOption {
   onClick: () => void;
 }
 
-export const RenderRestSite = () => {
+export const RenderRestSite = observer(() => {
   const [hoveredOption, selectHoveredOption] = useState<
     IRestSiteOption | undefined
   >();
   const [optionUsed, setOptionUsed] = useState(false);
+
+  const mapState = Map.get();
+  const playerState = Player.get();
+
+  const thirtyPercentMaxHp = playerState.get.maxHealth * 0.3;
 
   const restSiteOptions: IRestSiteOption[] = [
     {
       type: RestSiteOptionType.SLEEP,
       img: sleep,
       description: () =>
-        `Heal for 30% of your max HP. (${
-          Player.get().maxHealth * 0.3
-        }) \n Current Health: ${Player.get().health}/${Player.get().maxHealth}`,
+        `Heal for 30% of your max HP. (${thirtyPercentMaxHp}) \n Current Health: ${playerState.get.health}/${playerState.get.maxHealth}`,
       onClick: () => {
         if (
-          Player.get().get.health + Player.get().maxHealth * 0.3 >=
-          Player.get().get.maxHealth
+          (playerState.get.health + thirtyPercentMaxHp) >=
+          playerState.get.maxHealth
         ) {
-          Player.get().get.health = Player.get().get.maxHealth;
+          playerState.get.health = playerState.get.maxHealth;
         } else {
-          Player.get().get.health += Player.get().maxHealth * 0.3;
+          playerState.get.health += thirtyPercentMaxHp;
         }
         setOptionUsed(true);
       },
@@ -59,7 +69,17 @@ export const RenderRestSite = () => {
     <ScreenWrapper>
       <Column style={{ width: "100vw" }} align="center">
         {optionUsed ? (
-          <>hi</>
+          <>
+            {mapState.showingMap ? (
+              <RenderMap onClose={() => mapState.setShowingMap(false)} />
+            ) : null}
+            <ProceedButtonWrapper onClick={() => mapState.setShowingMap(true)}>
+              <img src={proceedButton} alt="proceed" draggable={false} />
+              <RewardBannerText fontSize={40} outline style={{ top: 36 }}>
+                Proceed
+              </RewardBannerText>
+            </ProceedButtonWrapper>
+          </>
         ) : (
           <>
             <Typography
@@ -71,11 +91,11 @@ export const RenderRestSite = () => {
             >
               {hoveredOption?.description()}
             </Typography>
-            <Row style={{ zIndex: 2, width: "520px", flexWrap: "wrap" }}>
+            <Row style={{ width: "520px", flexWrap: "wrap" }}>
               {restSiteOptions.map((option) => (
                 <Option
                   onMouseEnter={() => selectHoveredOption(option)}
-                  onClick={option.onClick}
+                  onClick={() => option.onClick()}
                   src={option.img}
                   alt={option.description()}
                   draggable={false}
@@ -88,12 +108,12 @@ export const RenderRestSite = () => {
       <img
         src={overShoulder}
         alt="over-shoulder"
-        style={{ position: "absolute" }}
+        style={{ pointerEvents: "none", position: "absolute", bottom: 0 }}
         draggable={false}
       />
     </ScreenWrapper>
   );
-};
+});
 
 const Option = styled.img`
   animation: transform 1.2;
@@ -109,4 +129,5 @@ const ScreenWrapper = styled(Row).attrs({
   width: 100vw;
   height: 100vh;
   background-color: black;
+  overflow: hidden;
 `;
