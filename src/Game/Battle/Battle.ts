@@ -292,7 +292,7 @@ export class Battle {
             selectedMonster: this.selectedMonsters?.[0],
           });
         if (card.get.block) {
-          Player.get().addBlock(card.evaluateBlock());
+          Player.get().addBlock(card.block);
         }
         break;
       case CardEffectType.ALL_ENEMIES:
@@ -307,7 +307,7 @@ export class Battle {
         break;
       case CardEffectType.SELF:
         if (card.get.block && card.get.targetSelf) {
-          Player.get().addBlock(card.evaluateBlock());
+          Player.get().addBlock(card.block);
         }
         break;
       case CardEffectType.RANDOM:
@@ -376,11 +376,11 @@ export class Battle {
     if (card.damage && selectedMonster) {
       selectedMonster.takeDamage(
         Battle.calculateDamage({
-          damage: card.evaluateDamage(),
+          damage: card.damage,
           target: selectedMonster,
         })
       );
-      const status = card.get.status?.();
+      const status = card.status;
       if (status && selectedMonster) {
         switch (status.target) {
           case CardEffectType.SPECIFIC_ENEMY:

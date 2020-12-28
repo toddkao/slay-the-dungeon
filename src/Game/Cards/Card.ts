@@ -91,22 +91,6 @@ export class Card {
     });
   };
 
-  public evaluateDamage = () => {
-    return (
-      (typeof this.card.damage === "function"
-        ? this.card.damage()
-        : this.card.damage) ?? 0
-    );
-  };
-
-  public evaluateBlock = () => {
-    return (
-      (typeof this.card.block === "function"
-        ? this.card.block()
-        : this.card.block) ?? 0
-    );
-  };
-
   public onDrag = () => {
     const battleState = Battle.get();
     const cardBoundingRect = this.ref?.current?.getBoundingClientRect();
