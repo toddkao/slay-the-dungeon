@@ -30,7 +30,7 @@ export class Monster extends Entity {
   @computed
   public get damage() {
     let weakStatus = this.monster.statuses.find(
-      (status) => status.type === StatusType.weak
+      (status) => status.type === StatusType.WEAK
     );
     return weakStatus
       ? weakStatus?.amount >= 1
@@ -54,9 +54,9 @@ export class Monster extends Entity {
 }
 
 export enum IntentType {
-  Attack,
-  Shield,
-  GainStrength,
+  ATTACK,
+  SHIELD,
+  GAIN_STRENGTH,
 }
 
 interface IIntent {

@@ -7,7 +7,6 @@ import { Battle } from "./Battle";
 import { ManaCost } from "../Common";
 import background from "../../Images/background.jpg";
 import { ShowCardsModal } from "../Common/ShowCardsModal";
-import { useState } from "react";
 import {
   DiscardPileWithNumber,
   DrawPileWithNumber,

@@ -6,7 +6,7 @@ import dexterity from "../../Images/dexterity.png";
 import vulnerable from "../../Images/vulnerable.png";
 import weak from "../../Images/weak.png";
 import { Typography } from "../../Typography";
-import React from 'react';
+import React from "react";
 import { CardEffectType } from "../Cards/Card";
 
 const Wrapper = styled(Row)`
@@ -14,19 +14,18 @@ const Wrapper = styled(Row)`
   height: 30px;
 `;
 
-
 export enum StatusType {
-  strength = "strength",
-  dexterity = "dexterity",
-  vulnerable = "vulnerable",
-  weak = "Weak"
+  STRENGTH,
+  DEXTERITY,
+  VULNERABLE,
+  WEAK,
 }
 
 export const StatusTypeToIStatus = {
-  [StatusType.strength]: { degrades: false },
-  [StatusType.dexterity]: { degrades: false },
-  [StatusType.vulnerable]: { degrades: true },
-  [StatusType.weak]: { degrades: true },
+  [StatusType.STRENGTH]: { degrades: false },
+  [StatusType.DEXTERITY]: { degrades: false },
+  [StatusType.VULNERABLE]: { degrades: true },
+  [StatusType.WEAK]: { degrades: true },
 };
 
 type IStatusIconMap = {
@@ -34,10 +33,10 @@ type IStatusIconMap = {
 };
 
 const StatusIconMap: IStatusIconMap = {
-  [StatusType.strength]: strength,
-  [StatusType.dexterity]: dexterity,
-  [StatusType.vulnerable]: vulnerable,
-  [StatusType.weak]: weak,
+  [StatusType.STRENGTH]: strength,
+  [StatusType.DEXTERITY]: dexterity,
+  [StatusType.VULNERABLE]: vulnerable,
+  [StatusType.WEAK]: weak,
 };
 
 export interface IStatus {
@@ -75,7 +74,13 @@ export const StatusBar = observer((props: IProps) => {
 const RenderStatus = ({ status }: { status: IStatus }) => {
   return (
     <StatusWrapper>
-      <img src={StatusIconMap[status.type]} width={25} height={25} alt="status-icon" />
+      <img
+        src={StatusIconMap[status.type]}
+        width={25}
+        height={25}
+        alt="status-icon"
+        draggable={false}
+      />
       <StatusAmount>{status.amount}</StatusAmount>
     </StatusWrapper>
   );

@@ -3,7 +3,7 @@ import styled, { css } from "styled-components";
 import { Column, Row } from "../../Layout";
 import { Modal } from "../Common/Modal";
 import Xarrow from "react-xarrows";
-import { mapNodeType, mapNodeTypeToImage, Map } from "./Map";
+import { MapNodeType, mapNodeTypeToImage, Map } from "./Map";
 import { observer } from "mobx-react";
 import { Battle } from "../Battle/Battle";
 import { ReturnButton } from "../../Clickables";
@@ -91,7 +91,7 @@ const Wrapper = styled.div`
 `;
 
 const MapNode = styled.div<{
-  nodeType: mapNodeType;
+  nodeType: MapNodeType;
   selectable: boolean;
   alreadyTraveledTo: boolean;
 }>`

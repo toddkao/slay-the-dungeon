@@ -23,7 +23,7 @@ export const RenderDefeatScreen = () => {
       <Typography onClick={resetGame} color="white" outline fontSize={50}>
         Try again?
       </Typography>
-      <img src={corpse} alt="game-over" />
+      <img src={corpse} alt="game-over" draggable={false} />
     </ScreenWrapper>
   );
 };

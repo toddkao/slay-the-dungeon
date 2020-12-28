@@ -32,7 +32,7 @@ export const RenderRewardsModal = observer(
     const [rewards, setRewards] = useState<IReward[]>([
       {
         id: uniqueId(),
-        type: RewardTypes.card,
+        type: RewardTypes.CARD,
         cards: () => {
           return range(0, 3).map(
             () =>
@@ -55,7 +55,7 @@ export const RenderRewardsModal = observer(
         <RewardItem onClick={() => setSelectedReward(reward)}>
           <RewardListItemPanel src={rewardListItemPanel} />
           <RewardItemDetails>
-            <img src={normalCardReward} alt="Normal Card Reward" />
+            <img src={normalCardReward} alt="Normal Card Reward" draggable={false} />
             <Spacer size={10} />
             <Typography color="white" fontSize={20} outline>
               Add a card to your deck
@@ -81,7 +81,7 @@ export const RenderRewardsModal = observer(
                 <RewardsWrapper>
                   {rewards.map((reward) => {
                     switch (reward.type) {
-                      case RewardTypes.card:
+                      case RewardTypes.CARD:
                         return renderCardReward(reward);
                       default:
                         break;
@@ -90,13 +90,13 @@ export const RenderRewardsModal = observer(
                 </RewardsWrapper>
               </RelativeWrapper>
               <ProceedButtonWrapper onClick={onClickProceed}>
-                <img src={proceedButton} alt="proceed" />
+                <img src={proceedButton} alt="proceed" draggable={false} />
                 <RewardBannerText fontSize={40} outline style={{ top: 36 }}>
                   Proceed
                 </RewardBannerText>
               </ProceedButtonWrapper>
             </Column>
-          ) : selectedReward?.type === RewardTypes.card ? (
+          ) : selectedReward?.type === RewardTypes.CARD ? (
             <Column align="center">
               <RelativeWrapper style={{ zIndex: 1 }}>
                 <RewardBanner src={selectBanner} style={{ marginBottom: 0 }} />
@@ -124,7 +124,7 @@ export const RenderRewardsModal = observer(
               </Row>
               <Spacer size={70} />
               <SkipButtonWrapper onClick={() => setSelectedReward(undefined)}>
-                <SkipButton src={takeAll} alt="skip" style={{ zIndex: 1 }} />
+                <SkipButton src={takeAll} alt="skip" style={{ zIndex: 1 }} draggable={false} />
                 <RewardBannerText fontSize={40} outline style={{ top: 5 }}>
                   Skip
                 </RewardBannerText>

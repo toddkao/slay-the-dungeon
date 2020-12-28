@@ -6,10 +6,10 @@ import { isCollidingWithEachOther } from "../Common/utility";
 import { Monster } from "../Entities/Monster/Monster";
 
 export enum CardEffectType {
-  SpecificEnemy,
-  AllEnemies,
-  Self,
-  Random,
+  SPECIFIC_ENEMY,
+  ALL_ENEMIES,
+  SELF,
+  RANDOM,
 }
 
 export class Card {
@@ -26,9 +26,9 @@ export class Card {
   public get get() {
     return {
       ...this.card,
-      targetSpecificEnemy: this.card.effect === CardEffectType.SpecificEnemy,
-      targetSelf: this.card.effect === CardEffectType.Self,
-      targetAllEnemies: this.card.effect === CardEffectType.AllEnemies,
+      targetSpecificEnemy: this.card.effect === CardEffectType.SPECIFIC_ENEMY,
+      targetSelf: this.card.effect === CardEffectType.SELF,
+      targetAllEnemies: this.card.effect === CardEffectType.ALL_ENEMIES,
     };
   }
 
@@ -118,18 +118,18 @@ export class Card {
       );
     if (window.innerHeight / top > 1.7) {
       switch (this.card.effect) {
-        case CardEffectType.SpecificEnemy:
+        case CardEffectType.SPECIFIC_ENEMY:
           if (collisions && !battleState.getMonsterById(collisions.id)?.dead) {
             battleState.selectMonster([collisions.id]);
           } else {
             battleState.selectMonster();
           }
           return;
-        case CardEffectType.AllEnemies:
-        case CardEffectType.Random:
+        case CardEffectType.ALL_ENEMIES:
+        case CardEffectType.RANDOM:
           battleState.selectAllMonsters();
           return;
-        case CardEffectType.Self:
+        case CardEffectType.SELF:
           battleState.selectedSelf = true;
           break;
         default:
@@ -146,12 +146,12 @@ export class Card {
 
     if (window.innerHeight / top > 1.7) {
       switch (this.card.effect) {
-        case CardEffectType.Self:
+        case CardEffectType.SELF:
           battleState.playSelectedCard();
           break;
-        case CardEffectType.SpecificEnemy:
-        case CardEffectType.AllEnemies:
-        case CardEffectType.Random:
+        case CardEffectType.SPECIFIC_ENEMY:
+        case CardEffectType.ALL_ENEMIES:
+        case CardEffectType.RANDOM:
         default:
           if (
             (battleState.selectedMonsterIds?.length || 0) > 0 &&
@@ -166,8 +166,8 @@ export class Card {
 }
 
 export enum CardType {
-  Attack = "Attack",
-  Skill = "Skill",
+  ATTACK,
+  SKILL,
 }
 
 export interface ICard {
@@ -209,8 +209,8 @@ export interface ICard {
 }
 
 export enum CardRarity {
-  starter,
-  common,
-  uncommon,
-  rare,
+  STARTER,
+  COMMON,
+  UNCOMMON,
+  RARE,
 }

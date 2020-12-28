@@ -27,7 +27,7 @@ export const RenderMonster = observer(
 
     const renderIntentNumber = () => {
       switch (currentIntent?.type) {
-        case IntentType.Attack:
+        case IntentType.ATTACK:
           return (
             // TODO: update this to multiply (damage + extra damage) by modifier (eg. weak)
             <IntentNumber> {monsterState.damage + extradamage} </IntentNumber>

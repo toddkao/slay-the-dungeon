@@ -9,8 +9,8 @@ import { AppHistory } from "../../Router";
 import { IEntity } from "../Entities/entity";
 
 enum DeckPosition {
-  top,
-  bottom,
+  TOP,
+  BOTTOM,
 }
 
 interface IPileOfCards {
@@ -18,11 +18,11 @@ interface IPileOfCards {
 }
 
 export enum PileOfCards {
-  deck,
-  draw,
-  discard,
-  exhaust,
-  hand,
+  DECK,
+  DRAW,
+  DISCARD,
+  EXHAUST,
+  HAND,
 }
 
 export interface IBattleState {
@@ -222,7 +222,7 @@ export class Battle {
     ) {
       throw new Error("Trying to draw cards that don't exist in draw pile");
     } else {
-      this.moveCards({ cards, from: PileOfCards.draw, to: PileOfCards.hand });
+      this.moveCards({ cards, from: PileOfCards.DRAW, to: PileOfCards.HAND });
     }
   });
 
@@ -268,8 +268,8 @@ export class Battle {
   private removeCardsFromHand = () => {
     this.moveCards({
       cards: this.currentHand,
-      from: PileOfCards.hand,
-      to: PileOfCards.discard,
+      from: PileOfCards.HAND,
+      to: PileOfCards.DISCARD,
     });
   };
 
@@ -290,7 +290,7 @@ export class Battle {
 
   public resolveCardEffect = action(async (card: Card) => {
     switch (card.get.effect) {
-      case CardEffectType.SpecificEnemy:
+      case CardEffectType.SPECIFIC_ENEMY:
         if (card.damage)
           this.resolveSingleTargetDamage({
             card: card,
@@ -300,7 +300,7 @@ export class Battle {
           Player.get().addBlock(card.evaluateBlock());
         }
         break;
-      case CardEffectType.AllEnemies:
+      case CardEffectType.ALL_ENEMIES:
         this.monsters?.forEach((monster) => {
           if (card.damage) {
             this.resolveSingleTargetDamage({
@@ -310,12 +310,12 @@ export class Battle {
           }
         });
         break;
-      case CardEffectType.Self:
+      case CardEffectType.SELF:
         if (card.get.block && card.get.targetSelf) {
           Player.get().addBlock(card.evaluateBlock());
         }
         break;
-      case CardEffectType.Random:
+      case CardEffectType.RANDOM:
         for (const _instance of range(0, card.damageInstances)) {
           if ((this.monstersAlive?.length ?? 0) > 0) {
             await new Promise((resolve) =>
@@ -355,7 +355,7 @@ export class Battle {
   public static calculateDamage = action(
     ({ damage, target }: { damage: number; target?: Monster | Player }) => {
       const vulnerable = target?.statuses?.find(
-        (s) => s.type === StatusType.vulnerable
+        (s) => s.type === StatusType.VULNERABLE
       );
       if (vulnerable && vulnerable.amount && vulnerable.amount >= 1) {
         damage = Math.floor(damage * 1.5);
@@ -388,15 +388,15 @@ export class Battle {
       const status = card.get.status?.();
       if (status && selectedMonster) {
         switch (status.target) {
-          case CardEffectType.SpecificEnemy:
+          case CardEffectType.SPECIFIC_ENEMY:
             selectedMonster.addStatus(status.type, status.amount);
             break;
-          case CardEffectType.AllEnemies:
+          case CardEffectType.ALL_ENEMIES:
             this.monstersAlive?.forEach((monster) =>
               monster.addStatus(status.type, status.amount)
             );
             break;
-          case CardEffectType.Random:
+          case CardEffectType.RANDOM:
             this.monstersAlive?.[
               random(0, this.monstersAlive.length - 1)
             ].addStatus(status.type, status.amount);
@@ -411,7 +411,7 @@ export class Battle {
   private resolveMonsterActions = action(() => {
     this.monsters?.forEach((monster) => {
       switch (monster.get.currentIntent?.type) {
-        case IntentType.Attack:
+        case IntentType.ATTACK:
           Player.get().takeDamage(
             Battle.calculateDamage({
               damage: monster.damage,
@@ -419,10 +419,10 @@ export class Battle {
             })
           );
           break;
-        case IntentType.GainStrength:
+        case IntentType.GAIN_STRENGTH:
           if (monster.get.currentIntent.amount) {
             monster.addStatus(
-              StatusType.strength,
+              StatusType.STRENGTH,
               monster.get.currentIntent.amount
             );
           }
@@ -478,8 +478,8 @@ export class Battle {
       () => {
         this.moveCards({
           cards: [this.selectedCard as Card],
-          from: PileOfCards.hand,
-          to: PileOfCards.discard,
+          from: PileOfCards.HAND,
+          to: PileOfCards.DISCARD,
         });
         this.callNextAction();
       },
@@ -527,7 +527,7 @@ export class Battle {
     Player.get().reset();
     this.initializeMonsters();
     this.initializeHand();
-    Player.get().addStatus(StatusType.strength, 2);
+    Player.get().addStatus(StatusType.STRENGTH, 2);
     this.battleState.cardsToShow = undefined;
     this.battleState.currentMana = Player.get().maxMana;
   });
@@ -556,7 +556,7 @@ export class Battle {
       cards,
       to,
       from,
-      position = DeckPosition.top,
+      position = DeckPosition.TOP,
     }: {
       cards: Card[];
       to: PileOfCards;
@@ -579,11 +579,11 @@ export class Battle {
           fromPile.length = 0;
           fromPile.push(...newFromPile);
           switch (position) {
-            case DeckPosition.bottom:
+            case DeckPosition.BOTTOM:
               toPile.length = 0;
               toPile.push(...[...toPileCopy, cardToMove]);
               break;
-            case DeckPosition.top:
+            case DeckPosition.TOP:
             default:
               toPile.length = 0;
               toPile.push(...[cardToMove, ...toPileCopy]);
@@ -598,9 +598,9 @@ export class Battle {
 }
 
 const getPileOfCards = {
-  [PileOfCards.deck]: () => Player.get().get.deck,
-  [PileOfCards.draw]: () => Battle.get().drawPile,
-  [PileOfCards.discard]: () => Battle.get().discardPile,
-  [PileOfCards.exhaust]: () => Battle.get().exhaustPile,
-  [PileOfCards.hand]: () => Battle.get().currentHand,
+  [PileOfCards.DECK]: () => Player.get().get.deck,
+  [PileOfCards.DRAW]: () => Battle.get().drawPile,
+  [PileOfCards.DISCARD]: () => Battle.get().discardPile,
+  [PileOfCards.EXHAUST]: () => Battle.get().exhaustPile,
+  [PileOfCards.HAND]: () => Battle.get().currentHand,
 };

@@ -30,7 +30,7 @@ export class Entity {
   get extraDamage() {
     return (
       this.statuses.find(
-        (findStatus) => findStatus.type === StatusType.strength
+        (findStatus) => findStatus.type === StatusType.STRENGTH
       )?.amount || 0
     );
   }
@@ -39,7 +39,7 @@ export class Entity {
   get extrablock() {
     return (
       this.statuses.find(
-        (findStatus) => findStatus.type === StatusType.dexterity
+        (findStatus) => findStatus.type === StatusType.DEXTERITY
       )?.amount || 0
     );
   }
@@ -124,7 +124,7 @@ export class Entity {
     }
     this.entity.block +=
       amount +
-      (this.statuses.find((status) => status.type === StatusType.dexterity)
+      (this.statuses.find((status) => status.type === StatusType.DEXTERITY)
         ?.amount ?? 0);
   });
 

@@ -8,7 +8,7 @@ export interface IReward {
 }
 
 export enum RewardTypes {
-  card,
-  potion,
-  gold,
+  CARD,
+  POTION,
+  GOLD,
 }

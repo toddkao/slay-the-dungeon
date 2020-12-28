@@ -14,7 +14,7 @@ import { AppHistory } from "../../Router";
 
 interface IMapNode {
   id: string;
-  type: mapNodeType;
+  type: MapNodeType;
   left: number;
   top: number;
   encounter: Monster[];
@@ -197,7 +197,7 @@ export class Map {
   });
 
   generateNodeType = (rowIndex: number) => {
-    return rowIndex === 1 ? mapNodeType.rest : mapNodeType.monster;
+    return rowIndex === 1 ? MapNodeType.REST : MapNodeType.MONSTER;
   };
 
   generateEncounter = (rowIndex: number) => {
@@ -246,20 +246,20 @@ export class Map {
   });
 }
 
-export enum mapNodeType {
-  monster,
-  chest,
-  rest,
-  shop,
-  event,
-  elite,
+export enum MapNodeType {
+  MONSTER,
+  CHEST,
+  REST,
+  SHOP,
+  EVENT,
+  ELITE,
 }
 
 export const mapNodeTypeToImage = {
-  [mapNodeType.monster]: monster,
-  [mapNodeType.chest]: chest,
-  [mapNodeType.rest]: rest,
-  [mapNodeType.shop]: shop,
-  [mapNodeType.event]: event,
-  [mapNodeType.elite]: elite,
+  [MapNodeType.MONSTER]: monster,
+  [MapNodeType.CHEST]: chest,
+  [MapNodeType.REST]: rest,
+  [MapNodeType.SHOP]: shop,
+  [MapNodeType.EVENT]: event,
+  [MapNodeType.ELITE]: elite,
 };

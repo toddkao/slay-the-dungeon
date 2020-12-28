@@ -5,8 +5,8 @@ import { Entity, IEntity } from "../entity";
 import { cardMap } from "../../Cards/CardDefinitions";
 
 export enum PlayerClass {
-  Ironclad,
-  Silent,
+  IRONCLAD,
+  SILENT,
 }
 
 export class Player extends Entity {
@@ -21,7 +21,7 @@ export class Player extends Entity {
       maxHealth: 80,
       statuses: [],
       maxMana: 9,
-      class: PlayerClass.Ironclad,
+      class: PlayerClass.IRONCLAD,
       deck: [],
       block: 0,
       damage: 0,

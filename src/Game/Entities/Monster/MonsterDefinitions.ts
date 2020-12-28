@@ -20,12 +20,12 @@ const Louse = (id: string) => {
       statuses: [],
       intent: [
         {
-          type: IntentType.Attack,
+          type: IntentType.ATTACK,
           intentImage: attackIntent,
           chance: 0.75,
         },
         {
-          type: IntentType.GainStrength,
+          type: IntentType.GAIN_STRENGTH,
           intentImage: spellIntent,
           chance: 0.25,
           amount: 3,
@@ -50,12 +50,12 @@ const JawWorm = (id: string) => {
       image: jawworm,
       intent: [
         {
-          type: IntentType.Attack,
+          type: IntentType.ATTACK,
           intentImage: attackIntent,
           chance: 0.75,
         },
         {
-          type: IntentType.GainStrength,
+          type: IntentType.GAIN_STRENGTH,
           intentImage: spellIntent,
           chance: 0.25,
         },
