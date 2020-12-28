@@ -166,8 +166,8 @@ export class Card {
 }
 
 export enum CardType {
-  ATTACK,
-  SKILL,
+  ATTACK = 'Attack',
+  SKILL = 'Skill',
 }
 
 export interface ICard {
