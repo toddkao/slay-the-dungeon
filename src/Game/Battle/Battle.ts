@@ -108,7 +108,7 @@ export class Battle {
 
   @computed
   get selectedCardManaCost(): number {
-    return this.selectedCard?.get.manaCost ?? 0;
+    return this.selectedCard?.get.manaCost() ?? 0;
   }
 
   @computed
@@ -354,14 +354,12 @@ export class Battle {
   public calculateDamage = action(
     ({
       damage,
-      extradamage = 0,
       statuses,
     }: {
       damage: number;
-      extradamage?: number;
       statuses: IStatus[];
     }) => {
-      let amount = damage + extradamage;
+      let amount = damage;
       const vulnerable = statuses?.find(
         (s) => s.type === StatusType.vulnerable
       );
@@ -390,12 +388,12 @@ export class Battle {
       selectedMonster.takeDamage(
         this.calculateDamage({
           damage: card.evaluateDamage(),
-          extradamage: Player.get().extradamage,
           statuses: selectedMonster.get.statuses,
         })
       );
-      if (card.get.status && selectedMonster) {
-        selectedMonster.addStatus(card.get.status.type, card.get.status.amount);
+      const status = card.get.status?.();
+      if (status && selectedMonster) {
+        selectedMonster.addStatus(status.type, status.amount);
       }
     }
   }

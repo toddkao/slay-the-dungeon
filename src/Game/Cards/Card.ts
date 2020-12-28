@@ -150,24 +150,24 @@ export enum CardType {
 export interface ICard {
   id?: string;
   name: string;
-  manaCost: number;
+  manaCost: () => number;
   type: CardType;
   effect: CardEffectType;
-  damage?: number | (() => number);
+  damage?: () => number;
   damageInstances?: number;
-  block?: number | (() => number);
+  upgraded: boolean;
+  block?: () => number;
   cardSelection?: {
     amount: number;
     from: () => Card[];
     selectCards: (cards: Card[]) => void;
   };
   prerequisite?: (battleState: IBattleState) => boolean;
-  status?: IStatus;
+  status?: () => IStatus;
   specialEffect?: Function;
   rarity: CardRarity;
 
-  description: string;
-  descriptionVariables?: string[];
+  description: () => string;
   // assets
   image: {
     src: string;

@@ -29,20 +29,6 @@ export const RenderCard = observer(
     const cardRef = useRef(null);
 
     cardState.ref = cardRef;
-    const parseCardText = () => {
-      const player = Player.get();
-      let text = cardState.get.description;
-      cardState.get.descriptionVariables?.forEach((variable) => {
-        const variableValue = (cardState as any)?.get?.[variable];
-        text = text.replace(
-          "{}", //TODO: don't show updated number when evaluating
-          (typeof variableValue === "function"
-            ? variableValue()
-            : variableValue) + (player as any)?.[`extra${variable}`]
-        );
-      });
-      return text;
-    };
 
     const { src, position, width, height } = cardState.get.image;
     const [x, y] = position;
@@ -64,16 +50,16 @@ export const RenderCard = observer(
         <ManaCost
           notEnoughMana={
             showIfCastable
-              ? cardState.get.manaCost > battleState.currentMana
+              ? cardState.get.manaCost() > battleState.currentMana
               : false
           }
         >
-          {cardState.get.manaCost}
+          {cardState.get.manaCost()}
         </ManaCost>
         <RenderCardName outline>{cardState.get.name}</RenderCardName>
         <RenderCardType>{cardState.get.type}</RenderCardType>
         <CardTextContainer>
-          <RenderCardText>{parseCardText()}</RenderCardText>
+          <RenderCardText>{cardState.get.description()}</RenderCardText>
         </CardTextContainer>
         <CardSpriteContainer>
           <Sprite
