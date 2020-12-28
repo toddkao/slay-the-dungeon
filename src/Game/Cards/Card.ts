@@ -25,6 +25,11 @@ export class Card {
   }
 
   @computed
+  get damageInstances () {
+    return this.get.damageInstances?.(this.card.upgraded) ?? 1;
+  }
+
+  @computed
   get ref(): React.MutableRefObject<any> | undefined {
     return this.card.ref;
   }
@@ -150,24 +155,24 @@ export enum CardType {
 export interface ICard {
   id?: string;
   name: string;
-  manaCost: () => number;
+  manaCost: (upgraded?: boolean) => number;
   type: CardType;
   effect: CardEffectType;
-  damage?: () => number;
-  damageInstances?: number;
+  damage?: (upgraded?: boolean) => number;
+  damageInstances?: (upgraded?: boolean) => number;
   upgraded: boolean;
-  block?: () => number;
+  block?: (upgraded?: boolean) => number;
   cardSelection?: {
     amount: number;
     from: () => Card[];
     selectCards: (cards: Card[]) => void;
   };
   prerequisite?: (battleState: IBattleState) => boolean;
-  status?: () => IStatus;
+  status?: (upgraded?: boolean) => IStatus;
   specialEffect?: Function;
   rarity: CardRarity;
 
-  description: () => string;
+  description: (upgraded?: boolean) => string;
   // assets
   image: {
     src: string;

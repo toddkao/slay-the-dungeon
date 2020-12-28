@@ -56,7 +56,7 @@ export const RenderCard = observer(
         >
           {cardState.get.manaCost()}
         </ManaCost>
-        <RenderCardName outline>{cardState.get.name}</RenderCardName>
+        <RenderCardName outline>{cardState.get.name}{cardState.get.upgraded ? '+' : ''}</RenderCardName>
         <RenderCardType>{cardState.get.type}</RenderCardType>
         <CardTextContainer>
           <RenderCardText>{cardState.get.description()}</RenderCardText>

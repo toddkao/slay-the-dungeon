@@ -7,6 +7,7 @@ import vulnerable from "../../Images/vulnerable.png";
 import weak from "../../Images/weak.png";
 import { Typography } from "../../Typography";
 import React from 'react';
+import { CardEffectType } from "../Cards/Card";
 
 const Wrapper = styled(Row)`
   gap: 20px;
@@ -41,6 +42,7 @@ const StatusIconMap: IStatusIconMap = {
 
 export interface IStatus {
   type: StatusType;
+  target?: CardEffectType;
   degrades: boolean;
   amount: number;
 }

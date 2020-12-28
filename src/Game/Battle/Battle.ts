@@ -315,7 +315,7 @@ export class Battle {
         }
         break;
       case CardEffectType.Random:
-        for (const _instance of range(0, card.get.damageInstances)) {
+        for (const _instance of range(0, card.damageInstances)) {
           if ((this.monstersAlive?.length ?? 0) > 0) {
             await new Promise((resolve) =>
               setTimeout(() => {
@@ -352,13 +352,7 @@ export class Battle {
   });
 
   public calculateDamage = action(
-    ({
-      damage,
-      statuses,
-    }: {
-      damage: number;
-      statuses: IStatus[];
-    }) => {
+    ({ damage, statuses }: { damage: number; statuses: IStatus[] }) => {
       let amount = damage;
       const vulnerable = statuses?.find(
         (s) => s.type === StatusType.vulnerable
@@ -393,7 +387,23 @@ export class Battle {
       );
       const status = card.get.status?.();
       if (status && selectedMonster) {
-        selectedMonster.addStatus(status.type, status.amount);
+        switch (status.target) {
+          case CardEffectType.SpecificEnemy:
+            selectedMonster.addStatus(status.type, status.amount);
+            break;
+          case CardEffectType.AllEnemies:
+            this.monstersAlive?.forEach((monster) =>
+              monster.addStatus(status.type, status.amount)
+            );
+            break;
+          case CardEffectType.Random:
+            this.monstersAlive?.[
+              random(0, this.monstersAlive.length - 1)
+            ].addStatus(status.type, status.amount);
+            break;
+          default:
+            break;
+        }
       }
     }
   }
@@ -492,7 +502,7 @@ export class Battle {
 
       // TODO maybe instead just push the new card onto the queue?
       // need to check in game and think about the best way to handle it
-      // currentlySelectedCard / currentlySelectedMonster would have to be 
+      // currentlySelectedCard / currentlySelectedMonster would have to be
       // re-designed to be attached to card themselves instead of battleState
       this.cardResolveQueue.length !== 0
     ) {

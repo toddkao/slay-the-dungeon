@@ -1,4 +1,5 @@
 import { action, computed, observable } from "mobx";
+import { CardEffectType } from "../Cards/Card";
 import { IStatus, StatusType, StatusTypeToIStatus } from "../Common/StatusBar";
 
 export interface IEntity {
@@ -59,25 +60,30 @@ export class Entity {
     return this.entity.statuses;
   }
 
-  public addStatus = action((type: StatusType, amount: number = 1) => {
-    const statusFound = this.statuses.find((status) => status.type === type);
-    if (statusFound) {
-      this.entity.statuses = this.statuses.map((status) =>
-        status.type === type
-          ? { ...status, amount: status.amount + amount }
-          : status
-      );
-    } else {
-      this.entity.statuses.push({
-        type,
-        amount,
-        degrades: StatusTypeToIStatus[type].degrades,
-      });
+  public addStatus = action(
+    (
+      type: StatusType,
+      amount: number = 1,
+    ) => {
+      const statusFound = this.statuses.find((status) => status.type === type);
+      if (statusFound) {
+        this.entity.statuses = this.statuses.map((status) =>
+          status.type === type
+            ? { ...status, amount: status.amount + amount }
+            : status
+        );
+      } else {
+        this.entity.statuses.push({
+          type,
+          amount,
+          degrades: StatusTypeToIStatus[type].degrades,
+        });
+      }
     }
-  });
+  );
 
   public removeStatus = action((type: StatusType, amount: number = -1) => {
-    this.addStatus(type, amount*-1);
+    this.addStatus(type, amount * -1);
   });
 
   public updateStatuses = action(() => {
@@ -121,7 +127,10 @@ export class Entity {
     if (this.entity.block === undefined) {
       return;
     }
-    this.entity.block += amount + (this.statuses.find(status => status.type === StatusType.dexterity)?.amount ?? 0);
+    this.entity.block +=
+      amount +
+      (this.statuses.find((status) => status.type === StatusType.dexterity)
+        ?.amount ?? 0);
   });
 
   public clearBlock = action(() => {
@@ -142,5 +151,5 @@ export class Entity {
       maxHealth: 0,
       statuses: [],
     })
-  ) { }
+  ) {}
 }
