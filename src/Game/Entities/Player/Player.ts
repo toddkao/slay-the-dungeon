@@ -1,5 +1,5 @@
 import { action, computed, observable } from "mobx";
-import { ICard } from "../../Cards/Card";
+import { ICard, ICardWithId } from "../../Cards/Card";
 import { range, uniqueId } from "lodash";
 import { Entity, IEntity } from "../entity";
 import { cardMap } from "../../Cards/CardDefinitions";
@@ -61,11 +61,11 @@ export class Player extends Entity {
     //   range(0, 5).forEach(() =>
     //   stats.deck.push(new Card({ ...cardMap.swordBoomerang, id: uniqueId() }))
     // );
-    range(0, 4).forEach(() => stats.deck.push(cardMap["Strike"]));
+    range(0, 4).forEach(() => stats.deck.push({...cardMap["Strike"], id: uniqueId()}));
 
-    range(0, 4).forEach(() => stats.deck.push(cardMap["Defend"]));
+    range(0, 4).forEach(() => stats.deck.push({...cardMap["Defend"], id: uniqueId()}));
 
-    stats.deck.push({...cardMap["Armament"], upgraded: true});
+    stats.deck.push({...cardMap["Armament"], id: uniqueId()});
     // range(0, 5).forEach(() =>
     //   stats.deck.push(new Card({ ...cardMap.clothesline, id: uniqueId() }))
     // );
@@ -80,6 +80,9 @@ export class Player extends Entity {
   get deck() {
     return this.stats.deck;
   }
+  set deck(newDeck: ICardWithId[]) {
+    this.stats.deck = newDeck;
+  }
 
   @computed
   get maxMana() {
@@ -92,7 +95,10 @@ export class Player extends Entity {
   });
 
   addCardToDeck = action((cardName: string) => {
-    const card = cardMap[cardName];
+    const card = {
+      ...cardMap[cardName],
+      id: uniqueId(),
+    };
     if (card) {
       this.stats.deck = [...this.stats.deck, card];
     }
@@ -103,5 +109,5 @@ interface IPlayer extends IEntity {
   maxMana: number;
   health: number;
   class: PlayerClass;
-  deck: ICard[];
+  deck: ICardWithId[];
 }

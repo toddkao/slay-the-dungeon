@@ -258,11 +258,7 @@ export class Battle {
     this.battleState.discardPile = [];
     console.log(Player.get().deck);
     this.battleState.drawPile = Player.get().deck.map((card) => {
-      return new Card({
-        ...cardMap[card.name],
-        upgraded: card.upgraded,
-        id: uniqueId(),
-      });
+      return new Card(card);
     });
     this.battleState.drawPile = shuffle(this.battleState.drawPile);
     this.draw(5);
@@ -563,7 +559,6 @@ export class Battle {
       () => this.wonBattle,
       () => {
         if (this.wonBattle) {
-          console.log("Won Battle");
           this.resolveEndCombatActions();
         }
       }

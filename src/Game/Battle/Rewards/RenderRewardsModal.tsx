@@ -37,13 +37,15 @@ export const RenderRewardsModal = observer(
           return range(0, 3).map(
             () =>
               new Card({
-                ...(sample(
-                  new Chance().weighted(
-                    Object.values(cardsByRarity),
-                    rarityChance
-                  )
-                ) as ICard),
+                name:
+                  sample(
+                    new Chance().weighted(
+                      Object.values(cardsByRarity),
+                      rarityChance
+                    )
+                  )?.name || "",
                 id: uniqueId(),
+                upgraded: false,
               })
           );
         },
@@ -55,7 +57,11 @@ export const RenderRewardsModal = observer(
         <RewardItem onClick={() => setSelectedReward(reward)}>
           <RewardListItemPanel src={rewardListItemPanel} />
           <RewardItemDetails>
-            <img src={normalCardReward} alt="Normal Card Reward" draggable={false} />
+            <img
+              src={normalCardReward}
+              alt="Normal Card Reward"
+              draggable={false}
+            />
             <Spacer size={10} />
             <Typography color="white" fontSize={20} outline>
               Add a card to your deck
@@ -123,7 +129,12 @@ export const RenderRewardsModal = observer(
               </Row>
               <Spacer size={70} />
               <SkipButtonWrapper onClick={() => setSelectedReward(undefined)}>
-                <SkipButton src={takeAll} alt="skip" style={{ zIndex: 1 }} draggable={false} />
+                <SkipButton
+                  src={takeAll}
+                  alt="skip"
+                  style={{ zIndex: 1 }}
+                  draggable={false}
+                />
                 <RewardBannerText fontSize={40} outline style={{ top: 5 }}>
                   Skip
                 </RewardBannerText>

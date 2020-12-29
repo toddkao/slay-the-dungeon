@@ -1,10 +1,11 @@
-import { action, computed, makeObservable } from "mobx";
+import { action, computed, makeObservable, observable } from "mobx";
 import { IStatus } from "../Common/StatusBar";
 import { Howl, HowlOptions } from "howler";
 import { Battle, IBattleState } from "../Battle/Battle";
 import { isCollidingWithEachOther } from "../Common/utility";
 import { Monster } from "../Entities/Monster/Monster";
-import { startCase } from "lodash";
+import { uniqueId } from "lodash";
+import { cardMap } from "./CardDefinitions";
 
 export enum CardEffectType {
   SPECIFIC_ENEMY,
@@ -14,7 +15,24 @@ export enum CardEffectType {
 }
 
 export class Card {
-  constructor(private card: ICard) {
+  @observable
+  card: ICardWithId;
+
+  constructor({
+    name,
+    id,
+    upgraded,
+  }: {
+    name: string;
+    id: string;
+    upgraded: boolean;
+  }) {
+    this.card = {
+      ...cardMap[name],
+      id,
+      upgraded,
+    };
+
     makeObservable(this, {
       manaCost: computed,
       damageInstances: computed,
@@ -26,7 +44,7 @@ export class Card {
 
   @computed
   get id() {
-    return this.card.id ?? "";
+    return this.card.id;
   }
   set id(id: string) {
     this.card.id = id;
@@ -223,6 +241,10 @@ export interface ICard {
     selected?: boolean;
     target?: Monster;
   }) => string;
+}
+
+export interface ICardWithId extends ICard {
+  id: string;
 }
 
 export enum CardRarity {

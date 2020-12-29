@@ -15,6 +15,9 @@ import proceedButton from "../../Images/UI/reward/proceedButton.png";
 import { RenderMap } from "./RenderMap";
 import { Map } from "./Map";
 import { observer } from "mobx-react";
+import { ShowCardsModal } from "../Common/ShowCardsModal";
+import { Card } from "../Cards/Card";
+import { cardMap } from "../Cards/CardDefinitions";
 
 enum RestSiteOptionType {
   SLEEP,
@@ -33,6 +36,7 @@ export const RenderRestSite = observer(() => {
     IRestSiteOption | undefined
   >();
   const [optionUsed, setOptionUsed] = useState(false);
+  const [showDeck, setShowDeck] = useState(false);
 
   const mapState = Map.get();
   const playerState = Player.get();
@@ -47,7 +51,7 @@ export const RenderRestSite = observer(() => {
         `Heal for 30% of your max HP. (${thirtyPercentMaxHp}) \n Current Health: ${playerState.get.health}/${playerState.get.maxHealth}`,
       onClick: () => {
         if (
-          (playerState.get.health + thirtyPercentMaxHp) >=
+          playerState.get.health + thirtyPercentMaxHp >=
           playerState.get.maxHealth
         ) {
           playerState.get.health = playerState.get.maxHealth;
@@ -61,13 +65,35 @@ export const RenderRestSite = observer(() => {
       type: RestSiteOptionType.SMITH,
       img: smith,
       description: () => "Upgrade 1 card of your choice",
-      onClick: () => null,
+      onClick: () => {
+        setShowDeck(true);
+      },
     },
   ];
 
   return (
     <ScreenWrapper>
       <Column style={{ width: "100vw" }} align="center">
+        {showDeck && !optionUsed ? (
+          <ShowCardsModal
+            cards={Player.get().deck.map(
+              (card) => new Card(card)
+            )}
+            onClose={() => setShowDeck(false)}
+            cardsToSelect={1}
+            onFinishSelectingCards={(cards: Card[]) => {
+              Player.get().deck = Player.get().deck.map((card) => {
+                if (card.id === cards[0].id) {
+                  card.upgraded = true;
+                }
+                return card;
+              });
+              setShowDeck(false);
+              setOptionUsed(true);
+            }}
+          />
+        ) : null}
+
         {optionUsed ? (
           <>
             {mapState.showingMap ? (

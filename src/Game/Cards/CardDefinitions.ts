@@ -164,14 +164,14 @@ export const cardMap: ICardMap = {
     manaCost: () => 0,
     damage: (upgraded = false) => (upgraded ? 8 : 6 + Player.get().extraDamage),
     image: getImage({ sheetNumber: 3, position: [4, 3] }),
-    specialEffect: () => {
+    specialEffect: (upgraded = false) => {
       let battle = Battle.get();
       if (!battle.discardPile) {
         return;
       }
       battle.discardPile = [
         ...battle.discardPile,
-        new Card({ ..._this["Anger"], id: uniqueId() }),
+        new Card({ name: "Anger", id: uniqueId(), upgraded }),
       ];
     },
     type: CardType.ATTACK,
