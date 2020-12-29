@@ -94,7 +94,7 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.STARTER,
     manaCost: () => 2,
     damage: (upgraded = false) =>
-      upgraded ? 10 : 8 + Player.get().extraDamage,
+      (upgraded ? 10 : 8) + Player.get().extraDamage,
     upgraded: false,
     status: (upgraded = false) => ({
       type: StatusType.VULNERABLE,
@@ -125,7 +125,7 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.STARTER,
     manaCost: () => 1,
     upgraded: false,
-    block: (upgraded = false) => (upgraded ? 8 : 5 + Player.get().extraDamage),
+    block: (upgraded = false) => (upgraded ? 8 : 5) + Player.get().extraBlock,
     image: getImage({ sheetNumber: 1, position: [6, 4] }),
     type: CardType.SKILL,
     effect: CardEffectType.SELF,
@@ -138,7 +138,7 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.STARTER,
     upgraded: false,
     manaCost: () => 1,
-    damage: (upgraded = false) => (upgraded ? 9 : 6 + Player.get().extraDamage),
+    damage: (upgraded = false) => (upgraded ? 9 : 6) + Player.get().extraDamage,
     image: getImage({ sheetNumber: 5, position: [4, 2] }),
     type: CardType.ATTACK,
     effect: CardEffectType.SPECIFIC_ENEMY,
@@ -162,7 +162,7 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.COMMON,
     upgraded: false,
     manaCost: () => 0,
-    damage: (upgraded = false) => (upgraded ? 8 : 6 + Player.get().extraDamage),
+    damage: (upgraded = false) => (upgraded ? 8 : 6) + Player.get().extraDamage,
     image: getImage({ sheetNumber: 3, position: [4, 3] }),
     specialEffect: (upgraded = false) => {
       let battle = Battle.get();
@@ -255,7 +255,7 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.COMMON,
     manaCost: () => 0,
     upgraded: false,
-    damage: (upgraded = false) => (upgraded ? 18 : 14 + Player.get().damage),
+    damage: (upgraded = false) => (upgraded ? 18 : 14) + Player.get().damage,
     prerequisite: (battleState: IBattleState) => {
       return battleState.currentHand.every(
         (card) => card.get.type === CardType.ATTACK
@@ -284,7 +284,7 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.COMMON,
     upgraded: false,
     manaCost: () => 1,
-    damage: (upgraded = false) => (upgraded ? 11 : 8 + Player.get().damage),
+    damage: (upgraded = false) => (upgraded ? 11 : 8) + Player.get().damage,
     image: getImage({ sheetNumber: 3, position: [6, 1] }),
     type: CardType.ATTACK,
     effect: CardEffectType.ALL_ENEMIES,
@@ -297,7 +297,7 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.COMMON,
     upgraded: false,
     manaCost: () => 2,
-    damage: (upgraded = false) => (upgraded ? 14 : 12 + Player.get().damage),
+    damage: (upgraded = false) => (upgraded ? 14 : 12) + Player.get().damage,
     status: (upgraded = false) => ({
       type: StatusType.WEAK,
       target: CardEffectType.SPECIFIC_ENEMY,
@@ -368,7 +368,7 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.COMMON,
     upgraded: false,
     manaCost: () => 1,
-    damage: (upgraded = false) => (upgraded ? 12 : 9 + Player.get().damage),
+    damage: (upgraded = false) => (upgraded ? 12 : 9) + Player.get().damage,
     cardSelection: () => ({
       amount: 1,
       from: () => {
@@ -411,7 +411,7 @@ export const cardMap: ICardMap = {
     manaCost: () => 2,
     image: getImage({ sheetNumber: 4, position: [3, 5] }),
     damage: (upgraded = false) => {
-      return 14 + (upgraded ? 5 : 3 * Player.get().extraDamage);
+      return 14 + (upgraded ? 5 : 3) * Player.get().extraDamage;
     },
     type: CardType.ATTACK,
     effect: CardEffectType.SPECIFIC_ENEMY,
@@ -436,8 +436,8 @@ export const cardMap: ICardMap = {
     upgraded: false,
     manaCost: () => 1,
     image: getImage({ sheetNumber: 4, position: [4, 8] }),
-    block: (upgraded = false) => (upgraded ? 7 : 5 + Player.get().extraBlock),
-    damage: (upgraded = false) => (upgraded ? 7 : 5 + Player.get().extraDamage),
+    block: (upgraded = false) => (upgraded ? 7 : 5) + Player.get().extraBlock,
+    damage: (upgraded = false) => (upgraded ? 7 : 5) + Player.get().extraDamage,
     type: CardType.ATTACK,
     effect: CardEffectType.SPECIFIC_ENEMY,
     description: ({
@@ -498,7 +498,7 @@ export const cardMap: ICardMap = {
     manaCost: () => 1,
     image: getImage({ sheetNumber: 5, position: [0, 0] }),
     damage: (upgraded = false) =>
-      upgraded ? 10 : 9 + Player.get().extraDamage,
+      (upgraded ? 10 : 9) + Player.get().extraDamage,
     specialEffect: (upgraded = false) => {
       Battle.get().draw(upgraded ? 2 : 1);
     },
@@ -525,7 +525,7 @@ export const cardMap: ICardMap = {
     upgraded: false,
     manaCost: () => 1,
     image: getImage({ sheetNumber: 2, position: [3, 2] }),
-    block: (upgraded = false) => (upgraded ? 11 : 8 + Player.get().extraBlock),
+    block: (upgraded = false) => ((upgraded ? 11 : 8) + Player.get().extraBlock),
     specialEffect: () => Battle.get().draw(1),
     type: CardType.SKILL,
     effect: CardEffectType.SELF,
@@ -557,7 +557,7 @@ export const cardMap: ICardMap = {
     upgraded: false,
     manaCost: () => 1,
     image: getImage({ sheetNumber: 5, position: [4, 1] }),
-    damage: (upgraded = false) => (upgraded ? 7 : 4 + Player.get().extraDamage),
+    damage: (upgraded = false) => ((upgraded ? 7 : 4) + Player.get().extraDamage),
     status: () => ({
       type: StatusType.VULNERABLE,
       target: CardEffectType.ALL_ENEMIES,

@@ -63,7 +63,7 @@ export class Player extends Entity {
     // );
     range(0, 4).forEach(() => stats.deck.push({...cardMap["Strike"], id: uniqueId()}));
 
-    range(0, 4).forEach(() => stats.deck.push({...cardMap["Defend"], id: uniqueId()}));
+    range(0, 4).forEach(() => stats.deck.push({...cardMap["Flex"], id: uniqueId()}));
 
     stats.deck.push({...cardMap["Armament"], id: uniqueId()});
     // range(0, 5).forEach(() =>
