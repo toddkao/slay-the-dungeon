@@ -17,7 +17,6 @@ import { Map } from "./Map";
 import { observer } from "mobx-react";
 import { ShowCardsModal } from "../Common/ShowCardsModal";
 import { Card } from "../Cards/Card";
-import { cardMap } from "../Cards/CardDefinitions";
 
 enum RestSiteOptionType {
   SLEEP,
@@ -32,17 +31,6 @@ interface IRestSiteOption {
 }
 
 export const RenderRestSite = observer(() => {
-  const [hoveredOption, selectHoveredOption] = useState<
-    IRestSiteOption | undefined
-  >();
-  const [optionUsed, setOptionUsed] = useState(false);
-  const [showDeck, setShowDeck] = useState(false);
-
-  const mapState = Map.get();
-  const playerState = Player.get();
-
-  const thirtyPercentMaxHp = playerState.get.maxHealth * 0.3;
-
   const restSiteOptions: IRestSiteOption[] = [
     {
       type: RestSiteOptionType.SLEEP,
@@ -71,14 +59,21 @@ export const RenderRestSite = observer(() => {
     },
   ];
 
+  const [hoveredOption, selectHoveredOption] = useState(restSiteOptions[0]);
+  const [optionUsed, setOptionUsed] = useState(false);
+  const [showDeck, setShowDeck] = useState(false);
+
+  const mapState = Map.get();
+  const playerState = Player.get();
+
+  const thirtyPercentMaxHp = playerState.get.maxHealth * 0.3;
+
   return (
     <ScreenWrapper>
       <Column style={{ width: "100vw" }} align="center">
         {showDeck && !optionUsed ? (
           <ShowCardsModal
-            cards={Player.get().deck.map(
-              (card) => new Card(card)
-            )}
+            cards={Player.get().deck.map((card) => new Card(card))}
             onClose={() => setShowDeck(false)}
             cardsToSelect={1}
             onFinishSelectingCards={(cards: Card[]) => {

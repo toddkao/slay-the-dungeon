@@ -70,14 +70,16 @@ export class Card {
     return this.card.damage?.({
       upgraded: this.card.upgraded,
       selected: Battle.get().selectedCardId === this.id,
-      target: Battle.get().selectedMonsters?.[0]
+      target: Battle.get().selectedMonsters?.[0],
+      includeStatuses: true,
     }) ?? 0;
   }
   get block() {
     return this.card.block?.({
       upgraded: this.card.upgraded,
       selected: Battle.get().selectedCardId === this.id,
-      target: Battle.get().selectedMonsters?.[0]
+      target: Battle.get().selectedMonsters?.[0],
+      includeStatuses: true,
     }) ?? 0;
   }
   get status() {

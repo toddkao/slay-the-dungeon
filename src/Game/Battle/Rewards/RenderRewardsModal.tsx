@@ -1,4 +1,4 @@
-import { range, sample, uniqueId } from "lodash";
+import { clone, range, sample, uniqueId } from "lodash";
 import { observer } from "mobx-react";
 import React, { useState } from "react";
 import { cardsByRarity, rarityChance } from "../../Cards/CardDefinitions";
@@ -29,28 +29,27 @@ export const RenderRewardsModal = observer(
   ({ onClickProceed }: { onClickProceed: () => void }) => {
     const player = Player.get();
     const [selectedReward, setSelectedReward] = useState<IReward | undefined>();
-    const [rewards, setRewards] = useState<IReward[]>([
+    const rewardList = [
       {
         id: uniqueId(),
         type: RewardTypes.CARD,
-        cards: () => {
-          return range(0, 3).map(
-            () =>
-              new Card({
-                name:
-                  sample(
-                    new Chance().weighted(
-                      Object.values(cardsByRarity),
-                      rarityChance
-                    )
-                  )?.name || "",
-                id: uniqueId(),
-                upgraded: false,
-              })
-          );
-        },
+        cards: range(0, 3).map(
+          () =>
+            new Card({
+              name:
+                sample(
+                  new Chance().weighted(
+                    Object.values(cardsByRarity),
+                    rarityChance
+                  )
+                )?.name || "",
+              id: uniqueId(),
+              upgraded: false,
+            })
+        ),
       },
-    ]);
+    ];
+    const [rewards, setRewards] = useState<IReward[]>(rewardList);
 
     const renderCardReward = (reward: IReward) => {
       return (
@@ -112,7 +111,7 @@ export const RenderRewardsModal = observer(
                 </RewardBannerText>
               </RelativeWrapper>
               <Row style={{ gap: 50 }}>
-                {selectedReward?.cards()?.map((card) => (
+                {selectedReward?.cards?.map((card) => (
                   <RenderCard
                     cardState={card}
                     onClick={() => {
