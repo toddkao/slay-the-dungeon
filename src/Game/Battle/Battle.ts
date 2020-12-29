@@ -1,11 +1,18 @@
-import { clone, random, range, sampleSize, shuffle } from "lodash";
-import { action, computed, observable } from "mobx";
+import { clone, random, range, sampleSize, shuffle, uniqueId } from "lodash";
+import {
+  action,
+  computed,
+  IReactionDisposer,
+  observable,
+  reaction,
+} from "mobx";
 import { Card, CardEffectType } from "../Cards/Card";
 import { StatusType } from "../Common/StatusBar";
 import { IntentType, Monster } from "../Entities/Monster/Monster";
 import { Player } from "../Entities/Player/Player";
 import { Map } from "../Map/Map";
 import { AppHistory } from "../../Router";
+import { cardMap } from "../Cards/CardDefinitions";
 
 enum DeckPosition {
   TOP,
@@ -13,7 +20,6 @@ enum DeckPosition {
 }
 
 export enum PileOfCards {
-  DECK,
   DRAW,
   DISCARD,
   EXHAUST,
@@ -40,6 +46,8 @@ export class Battle {
     return Battle.instance;
   }
 
+  public battleReactionDisposer?: IReactionDisposer;
+
   private constructor(
     private battleState: IBattleState = observable({
       selectedCardId: undefined,
@@ -58,6 +66,9 @@ export class Battle {
 
   @observable
   cardResolveQueue: (() => void)[] = [];
+
+  @observable
+  endCombatActions: (() => void)[] = [];
 
   @computed
   get wonBattle() {
@@ -149,6 +160,9 @@ export class Battle {
   get currentHand() {
     return this.battleState.currentHand;
   }
+  set currentHand(cards: Card[]) {
+    this.battleState.currentHand = cards;
+  }
 
   @computed
   get drawPile() {
@@ -170,6 +184,9 @@ export class Battle {
   get exhaustPile() {
     return this.battleState.exhaustPile;
   }
+  set exhaustPile(cards: Card[]) {
+    this.battleState.discardPile = cards;
+  }
 
   @computed
   get cardsToShow() {
@@ -187,32 +204,36 @@ export class Battle {
   public log = () => {
     console.log(
       "draw",
-      this.battleState.drawPile.map((card) => card.get.id)
+      this.battleState.drawPile.map((card) => card.id)
     );
     console.log(
       "hand",
-      this.battleState.currentHand.map((card) => card.get.id)
+      this.battleState.currentHand.map((card) => card.id)
     );
     console.log(
       "discard",
-      this.battleState.discardPile.map((card) => card.get.id)
+      this.battleState.discardPile.map((card) => card.id)
     );
     console.log(
       "exhaust",
-      this.battleState.exhaustPile.map((card) => card.get.id)
+      this.battleState.exhaustPile.map((card) => card.id)
     );
   };
 
   private getCardFromId = (cardId: string) => {
-    return Player.get().get.deck.find((card) => card.get.id === cardId);
+    return (
+      this.currentHand.find((card) => card.id === cardId) ??
+      this.drawPile.find((card) => card.id === cardId) ??
+      this.exhaustPile.find((card) => card.id === cardId)
+    );
   };
 
   private drawCards = action((cards: Card[]) => {
     if (
       !cards.every((card) =>
         this.battleState.drawPile
-          .map((drawCard) => drawCard.get.id)
-          .includes(card.get.id)
+          .map((drawCard) => drawCard.id)
+          .includes(card.id)
       )
     ) {
       throw new Error("Trying to draw cards that don't exist in draw pile");
@@ -235,7 +256,14 @@ export class Battle {
     this.battleState.currentHand = [];
     this.battleState.exhaustPile = [];
     this.battleState.discardPile = [];
-    this.battleState.drawPile = Player.get().get.deck;
+    console.log(Player.get().deck);
+    this.battleState.drawPile = Player.get().deck.map((card) => {
+      return new Card({
+        ...cardMap[card.name],
+        upgraded: card.upgraded,
+        id: uniqueId(),
+      });
+    });
     this.battleState.drawPile = shuffle(this.battleState.drawPile);
     this.draw(5);
   });
@@ -271,13 +299,13 @@ export class Battle {
   public exhaustCards(cards: Card[]) {
     cards.forEach((card) => {
       this.battleState.drawPile = this.battleState.drawPile.filter(
-        (drawCard) => drawCard.get.id !== card.get.id
+        (drawCard) => drawCard.id !== card.id
       );
       this.battleState.currentHand = this.battleState.currentHand.filter(
-        (handCard) => handCard.get.id !== card.get.id
+        (handCard) => handCard.id !== card.id
       );
       this.battleState.discardPile = this.battleState.discardPile.filter(
-        (exhaustCard) => exhaustCard.get.id !== card.get.id
+        (exhaustCard) => exhaustCard.id !== card.id
       );
       this.battleState.exhaustPile = [...this.battleState.exhaustPile, card];
     });
@@ -291,7 +319,7 @@ export class Battle {
             card: card,
             selectedMonster: this.selectedMonsters?.[0],
           });
-        if (card.get.block) {
+        if (card.block) {
           Player.get().addBlock(card.block);
         }
         break;
@@ -306,7 +334,7 @@ export class Battle {
         });
         break;
       case CardEffectType.SELF:
-        if (card.get.block && card.get.targetSelf) {
+        if (card.block && card.get.targetSelf) {
           Player.get().addBlock(card.block);
         }
         break;
@@ -332,16 +360,18 @@ export class Battle {
       default:
         break;
     }
-    if (card.get.cardSelection) {
-      if (card.get.cardSelection.from().length <= 1) {
-        card.get.cardSelection.selectCards(card.get.cardSelection.from());
-      } else {
-        this.battleState.cardsToShow = card.get.cardSelection.from();
-        return;
-      }
-    }
+
     if (card.get.specialEffect) {
       card.get.specialEffect(card.get.upgraded);
+    }
+
+    if (card.cardSelection) {
+      if (card.cardSelection.from().length <= 1) {
+        card.cardSelection.selectCards(card.cardSelection.from());
+      } else {
+        this.battleState.cardsToShow = card.cardSelection.from();
+        return;
+      }
     }
     this.selectedCard?.playAudioClips();
     this.callNextAction();
@@ -466,7 +496,7 @@ export class Battle {
     nextAction?.();
   });
 
-  public initializeCardResolveQueue = () => {
+  public initializeCardResolveQueue = action(() => {
     // TODO
     // Think about a way to allow cards to decide whether
     // it shoud move to the discard pile before or after resolving?
@@ -492,7 +522,7 @@ export class Battle {
         this.callNextAction();
       }
     );
-  };
+  });
 
   public playSelectedCard = action(() => {
     if (
@@ -528,7 +558,25 @@ export class Battle {
     this.initializeHand();
     this.battleState.cardsToShow = undefined;
     this.battleState.currentMana = Player.get().maxMana;
+
+    this.battleReactionDisposer = reaction(
+      () => this.wonBattle,
+      () => {
+        if (this.wonBattle) {
+          console.log("Won Battle");
+          this.resolveEndCombatActions();
+        }
+      }
+    );
   });
+
+  public endCombat = () => {
+    this.resolveEndCombatActions();
+  };
+
+  public resolveEndCombatActions = () => {
+    this.endCombatActions.forEach((action) => action());
+  };
 
   selectCard = action((id?: string) => {
     this.battleState.selectedCardId = id;
@@ -568,11 +616,9 @@ export class Battle {
 
         const fromPileCopy = clone(fromPile);
         const toPileCopy = clone(toPile);
-        if (
-          fromPileCopy.map((card) => card.get.id).includes(cardToMove.get.id)
-        ) {
+        if (fromPileCopy.map((card) => card.id).includes(cardToMove.id)) {
           const newFromPile = fromPileCopy.filter(
-            (card) => card.get.id !== cardToMove.get.id
+            (card) => card.id !== cardToMove.id
           );
           fromPile.length = 0;
           fromPile.push(...newFromPile);
@@ -596,7 +642,6 @@ export class Battle {
 }
 
 const getPileOfCards = {
-  [PileOfCards.DECK]: () => Player.get().get.deck,
   [PileOfCards.DRAW]: () => Battle.get().drawPile,
   [PileOfCards.DISCARD]: () => Battle.get().discardPile,
   [PileOfCards.EXHAUST]: () => Battle.get().exhaustPile,

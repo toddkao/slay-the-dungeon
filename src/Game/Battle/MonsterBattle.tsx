@@ -67,7 +67,12 @@ export const RenderBattle = observer(() => {
         <>
           <CurrentHandContainer>
             {battleState.currentHand.map((card) => (
-              <RenderCard cardState={card} />
+              <RenderCard
+                cardState={card}
+                showIfCastable
+                draggable
+                calculateStatusesInCardText
+              />
             ))}
           </CurrentHandContainer>
           <EndTurnButton onClick={() => battleState.endTurn()}>
@@ -99,10 +104,10 @@ export const RenderBattle = observer(() => {
               cards={battleState.cardsToShow}
               onClose={() => battleState.setCardsToShow(undefined)}
               cardsToSelect={
-                battleState.selectedCard?.get.cardSelection?.amount
+                battleState.selectedCard?.cardSelection?.amount
               }
               onFinishSelectingCards={(cards: Card[]) => {
-                battleState.selectedCard?.get.cardSelection?.selectCards(cards);
+                battleState.selectedCard?.cardSelection?.selectCards(cards);
                 battleState.setCardsToShow();
               }}
             />

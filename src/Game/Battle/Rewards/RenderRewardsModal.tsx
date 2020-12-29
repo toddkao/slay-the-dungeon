@@ -86,6 +86,7 @@ export const RenderRewardsModal = observer(
                       default:
                         break;
                     }
+                    return null;
                   })}
                 </RewardsWrapper>
               </RelativeWrapper>
@@ -109,7 +110,7 @@ export const RenderRewardsModal = observer(
                   <RenderCard
                     cardState={card}
                     onClick={() => {
-                      player.addCardToDeck(card);
+                      player.addCardToDeck(card.get.name);
                       setRewards(
                         rewards.filter(
                           (reward) => reward.id !== selectedReward.id
@@ -117,8 +118,6 @@ export const RenderRewardsModal = observer(
                       );
                       setSelectedReward(undefined);
                     }}
-                    showIfCastable={false}
-                    draggable={false}
                   />
                 ))}
               </Row>

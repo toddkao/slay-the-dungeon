@@ -36,7 +36,7 @@ export class Entity {
   }
 
   @computed
-  get extrablock() {
+  get extraBlock() {
     return (
       this.statuses.find(
         (findStatus) => findStatus.type === StatusType.DEXTERITY

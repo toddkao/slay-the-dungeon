@@ -17,19 +17,24 @@ export const RenderCard = observer(
   ({
     cardState,
     onClick,
-    showIfCastable = true,
-    draggable = true,
+    showIfCastable = false,
+    draggable = false,
+    calculateStatusesInCardText = false,
   }: {
     cardState: Card;
     onClick?: () => void;
     showIfCastable?: boolean;
     draggable?: boolean;
+    calculateStatusesInCardText?: boolean;
   }) => {
     const battleState = Battle.get();
     const cardRef = useRef(null);
 
     cardState.ref = cardRef;
 
+    if (!cardState?.get?.image) {
+      return null;
+    }
     const { src, position, width, height } = cardState.get.image;
     const [x, y] = position;
 
@@ -63,14 +68,18 @@ export const RenderCard = observer(
         <RenderCardType>{cardState.get.type}</RenderCardType>
         <CardTextContainer>
           <RenderCardText>
-            {cardState.get.description(
-              cardState.get.upgraded,
-              cardState,
-              battleState.selectedCardId
-                ? battleState.selectedCardId === cardState.get.id
-                : false,
-              battleState.selectedMonsters?.[0]
-            )}
+            {cardState.get.description({
+              upgraded: cardState.get.upgraded,
+              card: cardState,
+              ...(calculateStatusesInCardText
+                ? {
+                    selected: battleState.selectedCardId
+                      ? battleState.selectedCardId === cardState.get.id
+                      : false,
+                    target: battleState.selectedMonsters?.[0],
+                  }
+                : {}),
+            })}
           </RenderCardText>
         </CardTextContainer>
         <CardSpriteContainer>

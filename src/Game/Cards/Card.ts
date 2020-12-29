@@ -1,9 +1,10 @@
-import { computed, makeObservable } from "mobx";
+import { action, computed, makeObservable } from "mobx";
 import { IStatus } from "../Common/StatusBar";
 import { Howl, HowlOptions } from "howler";
 import { Battle, IBattleState } from "../Battle/Battle";
 import { isCollidingWithEachOther } from "../Common/utility";
 import { Monster } from "../Entities/Monster/Monster";
+import { startCase } from "lodash";
 
 export enum CardEffectType {
   SPECIFIC_ENEMY,
@@ -19,7 +20,16 @@ export class Card {
       damageInstances: computed,
       damage: computed,
       ref: computed,
+      upgraded: computed,
     });
+  }
+
+  @computed
+  get id() {
+    return this.card.id ?? "";
+  }
+  set id(id: string) {
+    this.card.id = id;
   }
 
   @computed
@@ -33,19 +43,19 @@ export class Card {
   }
 
   get manaCost() {
-    return this.get.manaCost?.(this.card.upgraded) ?? 0;
+    return this.card.manaCost?.(this.card.upgraded) ?? 0;
   }
   get damageInstances() {
-    return this.get.damageInstances?.(this.card.upgraded) ?? 1;
+    return this.card.damageInstances?.(this.card.upgraded) ?? 1;
   }
   get damage() {
-    return this.get.damage?.(this.card.upgraded) ?? 0;
+    return this.card.damage?.(this.card.upgraded) ?? 0;
   }
   get block() {
-    return this.get.block?.(this.card.upgraded) ?? 0;
+    return this.card.block?.(this.card.upgraded) ?? 0;
   }
   get status() {
-    return this.get.status?.(this.card.upgraded) ?? 0;
+    return this.card.status?.(this.card.upgraded) ?? 0;
   }
 
   get ref(): React.MutableRefObject<any> | undefined {
@@ -54,6 +64,18 @@ export class Card {
   set ref(ref: React.MutableRefObject<any> | undefined) {
     this.card.ref = ref;
   }
+
+  get cardSelection() {
+    return this.card.cardSelection?.(this.card.upgraded);
+  }
+
+  get upgraded() {
+    return this.card.upgraded;
+  }
+
+  upgradeCard = action(() => {
+    this.card.upgraded = true;
+  });
 
   public selectable = () => {
     return this.card.prerequisite ? this.card.prerequisite(Battle.get()) : true;
@@ -91,9 +113,12 @@ export class Card {
     });
   };
 
-  public onDrag = () => {
+  public onDrag = action(() => {
     const battleState = Battle.get();
     const cardBoundingRect = this.ref?.current?.getBoundingClientRect();
+    if (!cardBoundingRect) {
+      return;
+    }
     const { top } = cardBoundingRect;
     const collisions = battleState.monstersWithBoundingRef
       ?.filter((monster) => !battleState.getMonsterById(monster.id)?.dead)
@@ -122,9 +147,9 @@ export class Card {
     }
     battleState.selectedSelf = false;
     battleState.selectMonster();
-  };
+  });
 
-  public onReleaseDrag = () => {
+  public onReleaseDrag = action(() => {
     const battleState = Battle.get();
     const cardBoundingRect = this.ref?.current?.getBoundingClientRect();
     const { top } = cardBoundingRect;
@@ -147,12 +172,12 @@ export class Card {
           break;
       }
     }
-  };
+  });
 }
 
 export enum CardType {
-  ATTACK = 'Attack',
-  SKILL = 'Skill',
+  ATTACK = "Attack",
+  SKILL = "Skill",
 }
 
 export interface ICard {
@@ -161,11 +186,15 @@ export interface ICard {
   type: CardType;
   effect: CardEffectType;
   upgraded: boolean;
-  cardSelection?: {
-    amount: number;
-    from: () => Card[];
-    selectCards: (cards: Card[]) => void;
-  };
+  cardSelection?: (
+    upgraded?: boolean
+  ) =>
+    | {
+        amount: number;
+        from: () => Card[];
+        selectCards: (cards: Card[]) => void;
+      }
+    | undefined;
   specialEffect?: Function;
   rarity: CardRarity;
   // assets
@@ -183,14 +212,17 @@ export interface ICard {
   damageInstances?: (upgraded?: boolean) => number;
   block?: (upgraded?: boolean) => number;
   status?: (upgraded?: boolean) => IStatus;
-  description:
-    | ((upgraded: boolean) => string)
-    | ((
-        upgraded: boolean,
-        card: Card,
-        selected: boolean,
-        target?: Monster
-      ) => string);
+  description: ({
+    upgraded,
+    card,
+    selected,
+    target,
+  }: {
+    upgraded: boolean;
+    card?: Card;
+    selected?: boolean;
+    target?: Monster;
+  }) => string;
 }
 
 export enum CardRarity {
