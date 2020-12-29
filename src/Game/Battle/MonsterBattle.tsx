@@ -40,8 +40,8 @@ export const RenderBattle = observer(() => {
   const onRightClick = (e: { preventDefault: () => void }) => {
     // TODO Move logic onto onReleaseDrag on card
     e.preventDefault();
-    battleState.selectCard();
-    battleState.selectedSelf = false;
+    // battleState.selectCard();
+    // battleState.selectedSelf = false;
   };
 
   return (
@@ -103,13 +103,12 @@ export const RenderBattle = observer(() => {
             <ShowCardsModal
               cards={battleState.cardsToShow}
               onClose={() => battleState.setCardsToShow(undefined)}
-              cardsToSelect={
-                battleState.selectedCard?.cardSelection?.amount
-              }
+              cardsToSelect={battleState.selectedCard?.cardSelection?.amount}
               onFinishSelectingCards={(cards: Card[]) => {
                 battleState.selectedCard?.cardSelection?.selectCards(cards);
                 battleState.setCardsToShow();
               }}
+              showReturnButton={!battleState.selectedCard?.cardSelection}
             />
           ) : null}
         </>

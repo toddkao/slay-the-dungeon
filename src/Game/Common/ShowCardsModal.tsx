@@ -1,12 +1,12 @@
 import { observer } from "mobx-react";
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Row } from "../../Layout";
 import { Card } from "../Cards/Card";
 import { Modal } from "./Modal";
 
 import { RenderCard } from "../Cards/RenderCard";
-import { ReturnButton } from "../../Clickables";
+import { PeekButton, ReturnButton } from "../../Clickables";
 import { observable } from "mobx";
 
 export const CardRow = styled(Row)`
@@ -44,6 +44,7 @@ export const ShowCardsModal = observer(
     showReturnButton = true,
   }: IProps) => {
     const state = new State();
+    const [hideModal, setHideModal] = useState(false);
 
     const onSelectCard = (card: Card) => {
       if (cardsToSelect) {
@@ -57,23 +58,33 @@ export const ShowCardsModal = observer(
         }, 0);
       }
     };
+
+    const toggleHideModal = () => {
+      setHideModal(!hideModal);
+    };
+
     return (
-      <Modal>
-        <>
-          {showReturnButton ? (
-            <ReturnButton onClick={onClose}>Return</ReturnButton>
-          ) : null}
-          <CardRow>
-            {cards.map((card) => (
-              <RenderCard
-                cardState={card}
-                onClick={() => onSelectCard(card)}
-                draggable={false}
-              />
-            ))}
-          </CardRow>
-        </>
-      </Modal>
+      <>
+        {!showReturnButton ? <PeekButton onClick={() => toggleHideModal()} /> : null}
+        {!hideModal ? (
+          <Modal>
+            <>
+              {showReturnButton ? (
+                <ReturnButton onClick={onClose}>Return</ReturnButton>
+              ) : null}
+              <CardRow>
+                {cards.map((card) => (
+                  <RenderCard
+                    cardState={card}
+                    onClick={() => onSelectCard(card)}
+                    draggable={false}
+                  />
+                ))}
+              </CardRow>
+            </>
+          </Modal>
+        ) : null}
+      </>
     );
   }
 );

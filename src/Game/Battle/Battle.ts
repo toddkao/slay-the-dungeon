@@ -256,7 +256,7 @@ export class Battle {
     this.battleState.currentHand = [];
     this.battleState.exhaustPile = [];
     this.battleState.discardPile = [];
-    console.log(Player.get().deck);
+
     this.battleState.drawPile = Player.get().deck.map((card) => {
       return new Card(card);
     });
