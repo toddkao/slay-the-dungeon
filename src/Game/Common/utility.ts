@@ -1,3 +1,5 @@
+import { Howl, HowlOptions } from "howler";
+
 interface IBoundingRect {
   x: number;
   y: number;
@@ -27,4 +29,24 @@ export const isCollidingWithEachOther = (
     );
   }
   return false;
+};
+
+export const playAudioClip = (src?: string, options?: HowlOptions) => {
+  if (!src) {
+    return;
+  }
+  const sound = new Howl({
+    src: [src],
+    ...{
+      ...options,
+      volume: 0.5,
+    },
+  });
+
+  return new Promise((resolve) => {
+    sound.on("end", () => {
+      resolve(sound);
+    });
+    sound.play();
+  });
 };

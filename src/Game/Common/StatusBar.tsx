@@ -8,7 +8,8 @@ import vulnerable from "../../Images/vulnerable.png";
 import weak from "../../Images/weak.png";
 import { Typography } from "../../Typography";
 import React from "react";
-import { CardEffectType } from "../Cards/Card";
+import { CardEffectType } from "../Cards/CardState";
+import { buff1, debuff3 } from "../../Audio/Audio";
 
 const Wrapper = styled(Row)`
   gap: 20px;
@@ -24,11 +25,15 @@ export enum StatusType {
 }
 
 export const StatusTypeToIStatus = {
-  [StatusType.STRENGTH]: { degrades: false, fleeting: false },
-  [StatusType.DEXTERITY]: { degrades: false, fleeting: false },
-  [StatusType.VULNERABLE]: { degrades: true, fleeting: false },
-  [StatusType.WEAK]: { degrades: true, fleeting: false },
-  [StatusType.STRENGTH_DOWN]: { degrades: false, fleeting: true },
+  [StatusType.STRENGTH]: { degrades: false, fleeting: false, audio: buff1 },
+  [StatusType.DEXTERITY]: { degrades: false, fleeting: false, audio: debuff3 },
+  [StatusType.VULNERABLE]: { degrades: true, fleeting: false, audio: debuff3 },
+  [StatusType.WEAK]: { degrades: true, fleeting: false, audio: debuff3 },
+  [StatusType.STRENGTH_DOWN]: {
+    degrades: false,
+    fleeting: true,
+    audio: debuff3,
+  },
 };
 
 type IStatusIconMap = {
@@ -48,6 +53,7 @@ export interface IStatus {
   target?: CardEffectType;
   degrades: boolean;
   fleeting?: boolean;
+  audio?: string;
   amount: number;
 }
 

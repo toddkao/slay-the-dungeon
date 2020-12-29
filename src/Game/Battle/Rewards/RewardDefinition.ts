@@ -1,9 +1,9 @@
-import { Card } from "../../Cards/Card";
+import { CardState } from "../../Cards/CardState";
 
 export interface IReward {
   id: string;
   type: RewardTypes;
-  cards: Card[];
+  cards: CardState[];
   // TODO add more reward types
 }
 

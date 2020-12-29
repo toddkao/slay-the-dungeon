@@ -4,23 +4,19 @@ import cards3 from "../../Images/cards3.jpg";
 import cards4 from "../../Images/cards4.jpg";
 import cards5 from "../../Images/cards5.jpg";
 import {
-  Card,
+  CardState,
   CardEffectType,
   CardRarity,
   CardType,
   ICard,
   IEvaluatedCardProperty,
-} from "./Card";
+} from "./CardState";
 import { StatusType } from "../Common/StatusBar";
-// @ts-ignore
-import fastAtk from "../../Audio/fastAtk.ogg";
-// @ts-ignore
-import heavyAtk from "../../Audio/heavyAtk.ogg";
-// @ts-ignore
-import addBlock from "../../Audio/addBlock.ogg";
-import { Battle, IBattleState, PileOfCards } from "../Battle/Battle";
+import { BattleState, IBattleState, PileOfCards } from "../Battle/BattleState";
 import { groupBy, uniqueId } from "lodash";
-import { Player } from "../Entities/Player/Player";
+import { PlayerState } from "../Entities/Player/PlayerState";
+import { addBlock, fastAtk, heavyAtk, upgradeCard } from "../../Audio/Audio";
+import { playAudioClip } from "../Common/utility";
 
 interface ISpriteToCardSize {
   [index: string]: { CARD_WIDTH: number; CARD_HEIGHT: number };
@@ -90,9 +86,9 @@ interface ICardMap {
 }
 
 const singleTargetDamage = (damage: number, selected?: boolean) =>
-  Battle.calculateDamage({
+  BattleState.calculateDamage({
     damage,
-    target: selected ? Battle.get().selectedMonsters?.[0] : undefined,
+    target: selected ? BattleState.get().selectedMonsters?.[0] : undefined,
   });
 
 export const cardMap: ICardMap = {
@@ -112,7 +108,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SPECIFIC_ENEMY,
     damage: (prop: IEvaluatedCardProperty) =>
       (prop.upgraded ? 10 : 8) +
-      (prop.includeStatuses ? Player.get().extraDamage : 0),
+      (prop.includeStatuses ? PlayerState.get().extraDamage : 0),
     description: (props: IEvaluatedCardProperty) =>
       `Deal ${singleTargetDamage(
         cardMap["Bash"].damage?.(props) ?? 0,
@@ -129,7 +125,7 @@ export const cardMap: ICardMap = {
     upgraded: false,
     block: (prop: IEvaluatedCardProperty) =>
       (prop.upgraded ? 8 : 5) +
-      (prop.includeStatuses ? Player.get().extraBlock : 0),
+      (prop.includeStatuses ? PlayerState.get().extraBlock : 0),
     image: getImage({ sheetNumber: 1, position: [6, 4] }),
     type: CardType.SKILL,
     effect: CardEffectType.SELF,
@@ -144,7 +140,7 @@ export const cardMap: ICardMap = {
     manaCost: () => 1,
     damage: (prop: IEvaluatedCardProperty) =>
       (prop.upgraded ? 9 : 6) +
-      (prop.includeStatuses ? Player.get().extraDamage : 0),
+      (prop.includeStatuses ? PlayerState.get().extraDamage : 0),
     image: getImage({ sheetNumber: 5, position: [4, 2] }),
     type: CardType.ATTACK,
     effect: CardEffectType.SPECIFIC_ENEMY,
@@ -162,16 +158,16 @@ export const cardMap: ICardMap = {
     manaCost: () => 0,
     damage: (prop: IEvaluatedCardProperty) =>
       (prop.upgraded ? 8 : 6) +
-      (prop.includeStatuses ? Player.get().extraDamage : 0),
+      (prop.includeStatuses ? PlayerState.get().extraDamage : 0),
     image: getImage({ sheetNumber: 3, position: [4, 3] }),
     specialEffect: (upgraded = false) => {
-      const battle = Battle.get();
+      const battle = BattleState.get();
       if (!battle.discardPile) {
         return;
       }
       battle.discardPile = [
         ...battle.discardPile,
-        new Card({ name: "Anger", id: uniqueId(), upgraded }),
+        new CardState({ name: "Anger", id: uniqueId(), upgraded }),
       ];
     },
     type: CardType.ATTACK,
@@ -188,11 +184,12 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.COMMON,
     manaCost: () => 1,
     upgraded: false,
-    block: () => 5 + Player.get().extraBlock,
+    block: () => 5 + PlayerState.get().extraBlock,
     specialEffect: (upgraded?: boolean) => {
       if (upgraded) {
-        Battle.get().currentHand.forEach((card) => {
+        BattleState.get().currentHand.forEach((card) => {
           card.upgradeCard();
+          playAudioClip(upgradeCard);
         });
       }
     },
@@ -202,20 +199,21 @@ export const cardMap: ICardMap = {
         : {
             amount: 1,
             from: () => {
-              return Battle.get().currentHand.filter(
-                (card) => card.id !== Battle.get().selectedCardId
+              return BattleState.get().currentHand.filter(
+                (card) => card.id !== BattleState.get().selectedCardId
               );
             },
-            selectCards: (cards: Card[]) => {
+            selectCards: (cards: CardState[]) => {
               if (cards.length > 1) {
                 throw new Error("Armament can only select 1 card!");
               }
-              Battle.get().currentHand.forEach((card) => {
+              BattleState.get().currentHand.forEach((card) => {
                 if (card.id === cards[0]?.get?.id) {
                   card.upgradeCard();
                 }
               });
-              Battle.get().callNextAction();
+              playAudioClip(upgradeCard);
+              BattleState.get().callNextAction();
             },
           },
     image: getImage({ sheetNumber: 1, position: [0, 9] }),
@@ -223,7 +221,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SELF,
     description: (prop: IEvaluatedCardProperty) =>
       `Gain ${
-        5 + (prop.includeStatuses ? Player.get().extraBlock : 0)
+        5 + (prop.includeStatuses ? PlayerState.get().extraBlock : 0)
       } Block.\nUpgrade ${
         prop.upgraded ? "all cards" : "a card"
       } in your\nhand for the rest of \nthe combat.`,
@@ -235,7 +233,7 @@ export const cardMap: ICardMap = {
     upgraded: false,
     manaCost: (upgraded = false) => (upgraded ? 0 : 1),
     damage: () => {
-      return Player.get().block + Player.get().extraDamage;
+      return PlayerState.get().block + PlayerState.get().extraDamage;
     },
     image: getImage({ sheetNumber: 3, position: [5, 2] }),
     type: CardType.ATTACK,
@@ -250,7 +248,7 @@ export const cardMap: ICardMap = {
     upgraded: false,
     damage: (prop: IEvaluatedCardProperty) =>
       (prop.upgraded ? 18 : 14) +
-      (prop.includeStatuses ? Player.get().extraDamage : 0),
+      (prop.includeStatuses ? PlayerState.get().extraDamage : 0),
     prerequisite: (battleState: IBattleState) => {
       return battleState.currentHand.every(
         (card) => card.get.type === CardType.ATTACK
@@ -273,7 +271,7 @@ export const cardMap: ICardMap = {
     manaCost: () => 1,
     damage: (prop: IEvaluatedCardProperty) =>
       (prop.upgraded ? 11 : 8) +
-      (prop.includeStatuses ? Player.get().extraDamage : 0),
+      (prop.includeStatuses ? PlayerState.get().extraDamage : 0),
     image: getImage({ sheetNumber: 3, position: [6, 1] }),
     type: CardType.ATTACK,
     effect: CardEffectType.ALL_ENEMIES,
@@ -288,7 +286,7 @@ export const cardMap: ICardMap = {
     manaCost: () => 2,
     damage: (prop: IEvaluatedCardProperty) =>
       (prop.upgraded ? 14 : 12) +
-      (prop.includeStatuses ? Player.get().extraDamage : 0),
+      (prop.includeStatuses ? PlayerState.get().extraDamage : 0),
     status: (upgraded = false) => ({
       type: StatusType.WEAK,
       target: CardEffectType.SPECIFIC_ENEMY,
@@ -314,10 +312,10 @@ export const cardMap: ICardMap = {
     manaCost: () => 0,
     image: getImage({ sheetNumber: 1, position: [0, 0] }),
     specialEffect: (upgraded = false) => {
-      Player.get().addStatus(StatusType.STRENGTH, upgraded ? 4 : 2);
-      Player.get().addStatus(StatusType.STRENGTH_DOWN, upgraded ? 4 : 2);
-      Battle.get().endTurnActions.push(() => {
-        Player.get().removeStatus(StatusType.STRENGTH, upgraded ? 4 : 2);
+      PlayerState.get().addStatus(StatusType.STRENGTH, upgraded ? 4 : 2);
+      PlayerState.get().addStatus(StatusType.STRENGTH_DOWN, upgraded ? 4 : 2);
+      BattleState.get().endTurnActions.push(() => {
+        PlayerState.get().removeStatus(StatusType.STRENGTH, upgraded ? 4 : 2);
       });
     },
     type: CardType.SKILL,
@@ -335,7 +333,7 @@ export const cardMap: ICardMap = {
     manaCost: () => 1,
     image: getImage({ sheetNumber: 2, position: [2, 10] }),
     specialEffect: () => {
-      let battle = Battle.get();
+      let battle = BattleState.get();
       if (battle.drawPile.length + battle.discardPile.length >= 1) {
         let nextCard = battle.draw(1);
         battle.resolveCardEffect(nextCard[0]);
@@ -353,22 +351,22 @@ export const cardMap: ICardMap = {
     upgraded: false,
     manaCost: () => 1,
     damage: ({ upgraded, selected }: IEvaluatedCardProperty) =>
-      (upgraded ? 12 : 9) + (selected ? Player.get().extraDamage : 0),
+      (upgraded ? 12 : 9) + (selected ? PlayerState.get().extraDamage : 0),
     cardSelection: () => ({
       amount: 1,
       from: () => {
-        return Battle.get().discardPile;
+        return BattleState.get().discardPile;
       },
-      selectCards: (cards: Card[]) => {
+      selectCards: (cards: CardState[]) => {
         if (cards.length > 1) {
           throw new Error("Headbutt can only select 1 card!");
         }
-        Battle.get().moveCards({
+        BattleState.get().moveCards({
           cards,
           from: PileOfCards.DISCARD,
           to: PileOfCards.DRAW,
         });
-        Battle.get().callNextAction();
+        BattleState.get().callNextAction();
       },
     }),
     image: getImage({ sheetNumber: 1, position: [0, 9] }),
@@ -390,7 +388,7 @@ export const cardMap: ICardMap = {
     damage: ({ upgraded, includeStatuses }: IEvaluatedCardProperty) => {
       return (
         14 +
-        (upgraded ? 5 : 3) * (includeStatuses ? Player.get().extraDamage : 1)
+        (upgraded ? 5 : 3) * (includeStatuses ? PlayerState.get().extraDamage : 1)
       );
     },
     type: CardType.ATTACK,
@@ -412,10 +410,10 @@ export const cardMap: ICardMap = {
     image: getImage({ sheetNumber: 4, position: [4, 8] }),
     block: (props: IEvaluatedCardProperty) =>
       (props.upgraded ? 7 : 5) +
-      (props.includeStatuses ? Player.get().extraBlock : 0),
+      (props.includeStatuses ? PlayerState.get().extraBlock : 0),
     damage: (props: IEvaluatedCardProperty) =>
       (props.upgraded ? 7 : 5) +
-      (props.includeStatuses ? Player.get().extraDamage : 0),
+      (props.includeStatuses ? PlayerState.get().extraDamage : 0),
     type: CardType.ATTACK,
     effect: CardEffectType.SPECIFIC_ENEMY,
     description: (props: IEvaluatedCardProperty) =>
@@ -436,11 +434,11 @@ export const cardMap: ICardMap = {
     damage: ({ upgraded, includeStatuses }: IEvaluatedCardProperty) => {
       return (
         6 +
-        Player.get().deck.filter((card) =>
+        PlayerState.get().deck.filter((card) =>
           card.name.toLowerCase().includes("strike")
         ).length *
           (upgraded ? 3 : 2) +
-        (includeStatuses ? Player.get().extraDamage : 0)
+        (includeStatuses ? PlayerState.get().extraDamage : 0)
       );
     },
     type: CardType.ATTACK,
@@ -461,9 +459,9 @@ export const cardMap: ICardMap = {
     manaCost: () => 1,
     image: getImage({ sheetNumber: 5, position: [0, 0] }),
     damage: ({ upgraded, includeStatuses }: IEvaluatedCardProperty) =>
-      (upgraded ? 10 : 9) + (includeStatuses ? Player.get().extraDamage : 0),
+      (upgraded ? 10 : 9) + (includeStatuses ? PlayerState.get().extraDamage : 0),
     specialEffect: (upgraded = false) => {
-      Battle.get().draw(upgraded ? 2 : 1);
+      BattleState.get().draw(upgraded ? 2 : 1);
     },
     type: CardType.ATTACK,
     effect: CardEffectType.SPECIFIC_ENEMY,
@@ -481,8 +479,8 @@ export const cardMap: ICardMap = {
     manaCost: () => 1,
     image: getImage({ sheetNumber: 2, position: [3, 2] }),
     block: ({ upgraded, includeStatuses }: IEvaluatedCardProperty) =>
-      (upgraded ? 11 : 8) + (includeStatuses ? Player.get().extraBlock : 0),
-    specialEffect: () => Battle.get().draw(1),
+      (upgraded ? 11 : 8) + (includeStatuses ? PlayerState.get().extraBlock : 0),
+    specialEffect: () => BattleState.get().draw(1),
     type: CardType.SKILL,
     effect: CardEffectType.SELF,
     description: (props: IEvaluatedCardProperty) =>
@@ -497,7 +495,7 @@ export const cardMap: ICardMap = {
     image: getImage({ sheetNumber: 5, position: [3, 0] }),
     damageInstances: (upgraded = false) => (upgraded ? 4 : 3),
     damage: ({ includeStatuses }: IEvaluatedCardProperty) =>
-      3 + (includeStatuses ? Player.get().extraDamage : 0),
+      3 + (includeStatuses ? PlayerState.get().extraDamage : 0),
     type: CardType.ATTACK,
     effect: CardEffectType.RANDOM,
     description: (props: IEvaluatedCardProperty) =>
@@ -515,7 +513,7 @@ export const cardMap: ICardMap = {
     manaCost: () => 1,
     image: getImage({ sheetNumber: 5, position: [4, 1] }),
     damage: ({ upgraded, includeStatuses }: IEvaluatedCardProperty) =>
-      (upgraded ? 7 : 4) + (includeStatuses ? Player.get().extraDamage : 0),
+      (upgraded ? 7 : 4) + (includeStatuses ? PlayerState.get().extraDamage : 0),
     status: () => ({
       type: StatusType.VULNERABLE,
       target: CardEffectType.ALL_ENEMIES,

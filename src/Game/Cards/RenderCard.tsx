@@ -2,11 +2,11 @@ import { observer } from "mobx-react";
 import React, { useRef } from "react";
 import styled, { css } from "styled-components";
 import { Typography } from "../../Typography";
-import { Battle } from "../Battle/Battle";
-import { Card } from "./Card";
+import { BattleState } from "../Battle/BattleState";
+import { CardState } from "./CardState";
 import { ManaCost } from "../Common";
 import cardImage from "../../Images/card.png";
-import { Player } from "../Entities/Player/Player";
+import { PlayerState } from "../Entities/Player/PlayerState";
 
 // @ts-ignore
 import { Sprite } from "react-spritesheet";
@@ -21,13 +21,13 @@ export const RenderCard = observer(
     draggable = false,
     calculateStatusesInCardText = false,
   }: {
-    cardState: Card;
+    cardState: CardState;
     onClick?: () => void;
     showIfCastable?: boolean;
     draggable?: boolean;
     calculateStatusesInCardText?: boolean;
   }) => {
-    const battleState = Battle.get();
+    const battleState = BattleState.get();
     const cardRef = useRef(null);
 
     cardState.ref = cardRef;

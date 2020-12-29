@@ -4,18 +4,18 @@ import corpse from "../../Images/corpse.png";
 import { Row } from "../../Layout";
 import { AppHistory } from "../../Router";
 import { Typography } from "../../Typography";
-import { Player } from "../Entities/Player/Player";
-import { Map } from "./Map";
-import { Battle } from "../Battle/Battle";
+import { PlayerState } from "../Entities/Player/PlayerState";
+import { MapState } from "./MapState";
+import { BattleState } from "../Battle/BattleState";
 
 export const RenderDefeatScreen = () => {
   const resetGame = () => {
-    Map.get().reset();
-    const battleState = Battle.get();
+    MapState.get().reset();
+    const battleState = BattleState.get();
     battleState.battleReactionDisposer?.();
     battleState.setMonsters(undefined);
     battleState.setCardsToShow();
-    Player.get().reset();
+    PlayerState.get().reset();
     AppHistory.push('/');
   }
   return (

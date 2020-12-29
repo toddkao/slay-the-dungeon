@@ -1,6 +1,6 @@
 import { random } from "lodash";
 import { observable } from "mobx";
-import { Monster, IntentType } from "./Monster";
+import { MonsterState, IntentType } from "./MonsterState";
 import louse from "../../../Images/louse.png";
 import jawworm from "../../../Images/jawworm.png";
 import attackIntent from "../../../Images/attack-intent.png";
@@ -8,7 +8,7 @@ import spellIntent from "../../../Images/spell-intent.png";
 
 const Louse = (id: string) => {
   const health = random(10, 25);
-  return new Monster(
+  return new MonsterState(
     observable({
       id,
       name: "Louse",
@@ -38,7 +38,7 @@ const Louse = (id: string) => {
 const JawWorm = (id: string) => {
   const health = random(40, 44);
 
-  return new Monster(
+  return new MonsterState(
     observable({
       id,
       name: "JawWorm",

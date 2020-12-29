@@ -2,12 +2,12 @@ import { observer } from "mobx-react";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Row } from "../../Layout";
-import { Card } from "../Cards/Card";
+import { CardState } from "../Cards/CardState";
 import { Modal } from "./Modal";
 
 import { RenderCard } from "../Cards/RenderCard";
-import { PeekButton, ReturnButton } from "../../Clickables";
 import { observable } from "mobx";
+import { PeekButton, ReturnButton } from "./Clickables";
 
 export const CardRow = styled(Row)`
   max-width: 1050px;
@@ -23,9 +23,9 @@ export const CardRow = styled(Row)`
 `;
 
 interface IProps {
-  cards: Card[];
+  cards: CardState[];
   onClose: () => void;
-  onFinishSelectingCards?: (cards: Card[]) => void;
+  onFinishSelectingCards?: (cards: CardState[]) => void;
   cardsToSelect?: number;
   showReturnButton?: boolean;
   calculateStatusesInCardText?: boolean;
@@ -33,7 +33,7 @@ interface IProps {
 
 class State {
   @observable
-  selectedCards: Card[] = [];
+  selectedCards: CardState[] = [];
 }
 
 export const ShowCardsModal = observer(
@@ -48,7 +48,7 @@ export const ShowCardsModal = observer(
     const state = new State();
     const [hideModal, setHideModal] = useState(false);
 
-    const onSelectCard = (card: Card) => {
+    const onSelectCard = (card: CardState) => {
       if (cardsToSelect) {
         state.selectedCards = [...state.selectedCards, card];
         console.log("selectedCards");

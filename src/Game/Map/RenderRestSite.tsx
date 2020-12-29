@@ -5,7 +5,7 @@ import smith from "../../Images/restsite/smith.png";
 import overShoulder from "../../Images/restsite/shoulder.png";
 import { Column, Row } from "../../Layout";
 import { Typography } from "../../Typography";
-import { Player } from "../Entities/Player/Player";
+import { PlayerState } from "../Entities/Player/PlayerState";
 import { useState } from "react";
 import {
   ProceedButtonWrapper,
@@ -13,10 +13,12 @@ import {
 } from "../Battle/Rewards/RenderRewardsModal";
 import proceedButton from "../../Images/UI/reward/proceedButton.png";
 import { RenderMap } from "./RenderMap";
-import { Map } from "./Map";
+import { MapState } from "./MapState";
 import { observer } from "mobx-react";
 import { ShowCardsModal } from "../Common/ShowCardsModal";
-import { Card } from "../Cards/Card";
+import { CardState } from "../Cards/CardState";
+import { playAudioClip } from "../Common/utility";
+import { upgradeCard } from "../../Audio/Audio";
 
 enum RestSiteOptionType {
   SLEEP,
@@ -63,8 +65,8 @@ export const RenderRestSite = observer(() => {
   const [optionUsed, setOptionUsed] = useState(false);
   const [showDeck, setShowDeck] = useState(false);
 
-  const mapState = Map.get();
-  const playerState = Player.get();
+  const mapState = MapState.get();
+  const playerState = PlayerState.get();
 
   const thirtyPercentMaxHp = playerState.get.maxHealth * 0.3;
 
@@ -73,11 +75,11 @@ export const RenderRestSite = observer(() => {
       <Column style={{ width: "100vw" }} align="center">
         {showDeck && !optionUsed ? (
           <ShowCardsModal
-            cards={Player.get().deck.map((card) => new Card(card))}
+            cards={PlayerState.get().deck.map((card) => new CardState(card))}
             onClose={() => setShowDeck(false)}
             cardsToSelect={1}
-            onFinishSelectingCards={(cards: Card[]) => {
-              Player.get().deck = Player.get().deck.map((card) => {
+            onFinishSelectingCards={(cards: CardState[]) => {
+              PlayerState.get().deck = PlayerState.get().deck.map((card) => {
                 if (card.id === cards[0].id) {
                   card.upgraded = true;
                 }
@@ -85,6 +87,7 @@ export const RenderRestSite = observer(() => {
               });
               setShowDeck(false);
               setOptionUsed(true);
+              playAudioClip(upgradeCard);
             }}
           />
         ) : null}

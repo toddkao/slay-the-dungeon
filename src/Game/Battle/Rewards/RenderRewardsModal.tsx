@@ -19,15 +19,15 @@ import {
 import { Typography } from "../../../Typography";
 import { IReward, RewardTypes } from "./RewardDefinition";
 import takeAll from "../../../Images/UI/reward/takeAll.png";
-import { Player } from "../../Entities/Player/Player";
+import { PlayerState } from "../../Entities/Player/PlayerState";
 import proceedButton from "../../../Images/UI/reward/proceedButton.png";
-import { Card, ICard } from "../../Cards/Card";
+import { CardState, ICard } from "../../Cards/CardState";
 
 import { Chance } from "chance";
 
 export const RenderRewardsModal = observer(
   ({ onClickProceed }: { onClickProceed: () => void }) => {
-    const player = Player.get();
+    const player = PlayerState.get();
     const [selectedReward, setSelectedReward] = useState<IReward | undefined>();
     const rewardList = [
       {
@@ -35,7 +35,7 @@ export const RenderRewardsModal = observer(
         type: RewardTypes.CARD,
         cards: range(0, 3).map(
           () =>
-            new Card({
+            new CardState({
               name:
                 sample(
                   new Chance().weighted(

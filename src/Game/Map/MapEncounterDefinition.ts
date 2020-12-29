@@ -1,10 +1,10 @@
 import { uniqueId } from "lodash";
-import { Monster } from "../Entities/Monster/Monster";
+import { MonsterState } from "../Entities/Monster/MonsterState";
 
 import { monsterMap } from "../Entities/Monster/MonsterDefinitions";
 
 interface IMapEncounterType {
-  [index: string]: ((id: string) => Monster)[][];
+  [index: string]: ((id: string) => MonsterState)[][];
 }
 
 export const mapEncounterType: IMapEncounterType = {
@@ -16,4 +16,5 @@ export const mapEncounterType: IMapEncounterType = {
     [monsterMap.louse, monsterMap.louse, monsterMap.louse],
     [monsterMap.jawWorm, monsterMap.jawWorm],
   ],
+  eliteEncounters: [[monsterMap.jawWorm, monsterMap.jawWorm]],
 };

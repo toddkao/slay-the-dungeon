@@ -3,10 +3,10 @@ import styled, { css } from "styled-components";
 import { Column, Row } from "../../Layout";
 import { Modal } from "../Common/Modal";
 import Xarrow from "react-xarrows";
-import { MapNodeType, mapNodeTypeToImage, Map } from "./Map";
+import { MapNodeType, mapNodeTypeToImage, MapState } from "./MapState";
 import { observer } from "mobx-react";
-import { Battle } from "../Battle/Battle";
-import { ReturnButton } from "../../Clickables";
+import { BattleState } from "../Battle/BattleState";
+import { ReturnButton } from "../Common/Clickables";
 
 export const RenderMap = observer(
   ({
@@ -16,18 +16,15 @@ export const RenderMap = observer(
     onClose?: () => void;
     hideReturn?: boolean;
   }) => {
-    const battleState = Battle.get();
-    const mapState = Map.get();
-    const useMountEffect = (fun: () => any) => useEffect(fun, []);
+    const mapState = MapState.get();
     const mapRef = useRef(null);
 
-    const scrollToBottom = () => {
-      (mapRef.current as any).scrollTop = (mapRef.current as any)?.scrollHeight;
-    };
-
-    useMountEffect(() => {
+    useEffect(() => {
+      const scrollToBottom = () => {
+        (mapRef.current as any).scrollTop = (mapRef.current as any)?.scrollHeight;
+      };
       scrollToBottom();
-    });
+    }, []);
 
     const { matrix, paths } = mapState.currentFloor;
     const { selectNode, selectableNodeIds, traversedNodeIds } = mapState;

@@ -2,40 +2,37 @@ import { observer } from "mobx-react";
 import React, { useEffect } from "react";
 import styled from "styled-components";
 import { horizontalCenterAbsolute, Row } from "../../Layout";
-import { Typography } from "../../Typography";
-import { Battle } from "./Battle";
+import { BattleState } from "./BattleState";
 import { ManaCost } from "../Common";
 import background from "../../Images/background.jpg";
 import { ShowCardsModal } from "../Common/ShowCardsModal";
 import {
   DiscardPileWithNumber,
   DrawPileWithNumber,
+  EndTurnButton,
   MapButton,
-} from "../Common/icons";
-import { Card } from "../Cards/Card";
+} from "../Common/Clickables";
+import { CardState } from "../Cards/CardState";
 import { RenderCard } from "../Cards/RenderCard";
 import { RenderPlayer } from "../Entities/Player/RenderPlayer";
 import { RenderMonster } from "../Entities/Monster/RenderMonster";
 import { RenderMap } from "../Map/RenderMap";
-import { Map } from "../Map/Map";
-import { useHistory } from "react-router-dom";
+import { MapState } from "../Map/MapState";
 import { RenderRewardsModal } from "./Rewards/RenderRewardsModal";
-import { Player } from "../Entities/Player/Player";
+import { PlayerState } from "../Entities/Player/PlayerState";
+import { AppHistory } from "../../Router";
 
 export const RenderBattle = observer(() => {
-  const history = useHistory();
-  const battleState = Battle.get();
-  const playerState = Player.get();
-  const mapState = Map.get();
-  const useMountEffect = (fun: () => any) => useEffect(fun, []);
+  const battleState = BattleState.get();
+  const playerState = PlayerState.get();
+  const mapState = MapState.get();
 
-  useMountEffect(() => {
-    const mapState = Map.get();
-    // redirects you to base path if currentNode is undefined (if you refresh the page)
-    if (mapState.currentNode === undefined) {
-      history.push("/");
+  useEffect(() => {
+    const mapState = MapState.get();
+    if (!mapState.currentNode) {
+      AppHistory.push("/");
     }
-  });
+  }, []);
 
   const onRightClick = (e: { preventDefault: () => void }) => {
     // TODO Move logic onto onReleaseDrag on card
@@ -51,7 +48,7 @@ export const RenderBattle = observer(() => {
           <RenderPlayer />
         </UnitContainer>
         <UnitContainer>
-          {Battle.get().monsters?.map((monster) => (
+          {BattleState.get().monsters?.map((monster) => (
             <RenderMonster monsterState={monster} />
           ))}
         </UnitContainer>
@@ -76,7 +73,7 @@ export const RenderBattle = observer(() => {
             ))}
           </CurrentHandContainer>
           <EndTurnButton onClick={() => battleState.endTurn()}>
-            <Typography fontSize={25}>End Turn</Typography>
+            End Turn
           </EndTurnButton>
           <ManaAmount notEnoughMana={battleState.currentMana === 0}>
             {battleState.currentMana}/{playerState.maxMana}
@@ -104,7 +101,7 @@ export const RenderBattle = observer(() => {
               cards={battleState.cardsToShow}
               onClose={() => battleState.setCardsToShow(undefined)}
               cardsToSelect={battleState.selectedCard?.cardSelection?.amount}
-              onFinishSelectingCards={(cards: Card[]) => {
+              onFinishSelectingCards={(cards: CardState[]) => {
                 battleState.selectedCard?.cardSelection?.selectCards(cards);
                 battleState.setCardsToShow();
               }}
@@ -121,20 +118,6 @@ export const RenderBattle = observer(() => {
     </Wrapper>
   );
 });
-
-const EndTurnButton = styled.button`
-  background-color: lightgreen;
-  border-radius: 5px;
-  color: inherit;
-  border: none;
-  padding: 20px;
-  font: inherit;
-  cursor: pointer;
-  outline: inherit;
-  position: absolute;
-  top: 70%;
-  right: 5%;
-`;
 
 const ManaAmount = styled(ManaCost)`
   position: absolute;

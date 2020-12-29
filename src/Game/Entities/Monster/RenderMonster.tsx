@@ -3,16 +3,16 @@ import React, { useRef } from "react";
 import styled, { css } from "styled-components";
 import { Column, Spacer } from "../../../Layout";
 import { Typography } from "../../../Typography";
-import { Battle } from "../../Battle/Battle";
+import { BattleState } from "../../Battle/BattleState";
 import { HealthBar } from "../../Common/HealthBar";
 import { StatusBar } from "../../Common/StatusBar";
-import { IntentType, Monster } from "./Monster";
+import { IntentType, MonsterState } from "./MonsterState";
 import reticleCorner from "../../../Images/combat/reticleCorner.png";
 import { ReticleWrapper } from "../../Common/ReticleWrapper";
 
 export const RenderMonster = observer(
-  ({ monsterState }: { monsterState: Monster }) => {
-    const battleState = Battle.get();
+  ({ monsterState }: { monsterState: MonsterState }) => {
+    const battleState = BattleState.get();
 
     const {
       get: { id, currentIntent, image },
