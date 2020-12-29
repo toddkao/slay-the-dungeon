@@ -2,6 +2,7 @@ import { observer } from "mobx-react";
 import styled from "styled-components";
 import { Row } from "../../Layout";
 import strength from "../../Images/strength.png";
+import strengthDown from "../../Images/strengthDown.png";
 import dexterity from "../../Images/dexterity.png";
 import vulnerable from "../../Images/vulnerable.png";
 import weak from "../../Images/weak.png";
@@ -19,13 +20,15 @@ export enum StatusType {
   DEXTERITY,
   VULNERABLE,
   WEAK,
+  STRENGTH_DOWN,
 }
 
 export const StatusTypeToIStatus = {
-  [StatusType.STRENGTH]: { degrades: false },
-  [StatusType.DEXTERITY]: { degrades: false },
-  [StatusType.VULNERABLE]: { degrades: true },
-  [StatusType.WEAK]: { degrades: true },
+  [StatusType.STRENGTH]: { degrades: false, fleeting: false },
+  [StatusType.DEXTERITY]: { degrades: false, fleeting: false },
+  [StatusType.VULNERABLE]: { degrades: true, fleeting: false },
+  [StatusType.WEAK]: { degrades: true, fleeting: false },
+  [StatusType.STRENGTH_DOWN]: { degrades: false, fleeting: true },
 };
 
 type IStatusIconMap = {
@@ -37,12 +40,14 @@ const StatusIconMap: IStatusIconMap = {
   [StatusType.DEXTERITY]: dexterity,
   [StatusType.VULNERABLE]: vulnerable,
   [StatusType.WEAK]: weak,
+  [StatusType.STRENGTH_DOWN]: strengthDown,
 };
 
 export interface IStatus {
   type: StatusType;
   target?: CardEffectType;
   degrades: boolean;
+  fleeting?: boolean;
   amount: number;
 }
 

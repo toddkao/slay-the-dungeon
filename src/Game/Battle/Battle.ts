@@ -454,18 +454,18 @@ export class Battle {
       if (Player.get().health <= 0) {
         AppHistory.push("/defeat");
       }
-      monster.updateStatuses();
-      monster.cleanupStatuses();
-      monster.pickRandomIntent();
+      this.endTurnActions.push(
+        ...[() => monster.updateStatuses(), () => monster.pickRandomIntent()]
+      );
     });
   });
 
   private resolvePlayerActions = action(() => {
     const player = Player.get();
 
-    player.cleanupStatuses();
-    player.updateStatuses();
-    player.clearBlock();
+    this.endTurnActions.push(
+      ...[() => player.updateStatuses(), () => player.clearBlock()]
+    );
   });
 
   private resolveGameActions = action(() => {

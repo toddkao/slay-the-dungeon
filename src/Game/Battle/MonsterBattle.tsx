@@ -109,6 +109,11 @@ export const RenderBattle = observer(() => {
                 battleState.setCardsToShow();
               }}
               showReturnButton={!battleState.selectedCard?.cardSelection}
+              calculateStatusesInCardText={
+                // we want to calculate statuses in card text during combat
+                // but not during card reward screen
+                !!battleState.selectedCard?.cardSelection
+              }
             />
           ) : null}
         </>

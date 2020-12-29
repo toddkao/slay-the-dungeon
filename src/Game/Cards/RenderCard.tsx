@@ -70,12 +70,12 @@ export const RenderCard = observer(
           <RenderCardText>
             {cardState.get.description({
               upgraded: cardState.get.upgraded,
-              card: cardState,
+              selected: battleState.selectedCardId
+                ? battleState.selectedCardId === cardState.get.id
+                : false,
+              includeStatuses: calculateStatusesInCardText,
               ...(calculateStatusesInCardText
                 ? {
-                    selected: battleState.selectedCardId
-                      ? battleState.selectedCardId === cardState.get.id
-                      : false,
                     target: battleState.selectedMonsters?.[0],
                   }
                 : {}),

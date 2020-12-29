@@ -1,3 +1,4 @@
+import { clone } from "lodash";
 import { action, computed, observable } from "mobx";
 import { IStatus, StatusType, StatusTypeToIStatus } from "../Common/StatusBar";
 
@@ -59,35 +60,40 @@ export class Entity {
     return this.entity.statuses;
   }
 
-  public addStatus = action(
-    (
-      type: StatusType,
-      amount: number = 1,
-    ) => {
-      const statusFound = this.statuses.find((status) => status.type === type);
-      if (statusFound) {
-        this.entity.statuses = this.statuses.map((status) =>
-          status.type === type
-            ? { ...status, amount: status.amount + amount }
-            : status
-        );
-      } else {
-        this.entity.statuses.push({
-          type,
-          amount,
-          degrades: StatusTypeToIStatus[type].degrades,
-        });
-      }
+  public addStatus = action((type: StatusType, amount: number = 1) => {
+    const statusFound = this.statuses.find((status) => status.type === type);
+    if (statusFound) {
+      this.entity.statuses = this.statuses.map((status) =>
+        status.type === type
+          ? { ...status, amount: status.amount + amount }
+          : status
+      );
+    } else {
+      this.entity.statuses.push({
+        type,
+        amount,
+        degrades: StatusTypeToIStatus[type]?.degrades,
+        fleeting: StatusTypeToIStatus[type]?.fleeting,
+      });
     }
-  );
+  });
 
   public removeStatus = action((type: StatusType, amount: number = -1) => {
     this.addStatus(type, amount * -1);
   });
 
   public updateStatuses = action(() => {
-    this.entity.statuses = this.statuses.map((status) =>
-      status.degrades ? { ...status, amount: (status.amount ?? 0) - 1 } : status
+    const oldStatuses = clone(this.entity.statuses);
+    this.entity.statuses.length = 0;
+    this.entity.statuses.push(
+      ...oldStatuses.filter(
+        (status) => {
+          if (status.degrades) {
+            status.amount -= 1;
+          }
+          return status.amount > 0 && !status.fleeting;
+        }
+      )
     );
   });
 
@@ -110,12 +116,6 @@ export class Entity {
     } else {
       this.entity.health = 0;
     }
-  });
-
-  public cleanupStatuses = action(() => {
-    this.entity.statuses = this.entity.statuses?.filter(
-      (status) => (status.amount ?? 0) > 0
-    );
   });
 
   public addBlock = action((amount: number) => {
@@ -147,5 +147,5 @@ export class Entity {
       maxHealth: 0,
       statuses: [],
     })
-  ) { }
+  ) {}
 }

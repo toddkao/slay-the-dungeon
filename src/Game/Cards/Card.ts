@@ -67,10 +67,18 @@ export class Card {
     return this.card.damageInstances?.(this.card.upgraded) ?? 1;
   }
   get damage() {
-    return this.card.damage?.(this.card.upgraded) ?? 0;
+    return this.card.damage?.({
+      upgraded: this.card.upgraded,
+      selected: Battle.get().selectedCardId === this.id,
+      target: Battle.get().selectedMonsters?.[0]
+    }) ?? 0;
   }
   get block() {
-    return this.card.block?.(this.card.upgraded) ?? 0;
+    return this.card.block?.({
+      upgraded: this.card.upgraded,
+      selected: Battle.get().selectedCardId === this.id,
+      target: Battle.get().selectedMonsters?.[0]
+    }) ?? 0;
   }
   get status() {
     return this.card.status?.(this.card.upgraded) ?? 0;
@@ -226,25 +234,23 @@ export interface ICard {
   ref?: React.MutableRefObject<any>;
   prerequisite?: (battleState: IBattleState) => boolean;
   manaCost: (upgraded?: boolean) => number;
-  damage?: (upgraded?: boolean, target?: Monster) => number;
   damageInstances?: (upgraded?: boolean) => number;
-  block?: (upgraded?: boolean) => number;
   status?: (upgraded?: boolean) => IStatus;
-  description: ({
-    upgraded,
-    card,
-    selected,
-    target,
-  }: {
-    upgraded: boolean;
-    card?: Card;
-    selected?: boolean;
-    target?: Monster;
-  }) => string;
+
+  damage?: (prop: IEvaluatedCardProperty) => number;
+  block?: (prop: IEvaluatedCardProperty) => number;
+  description: (prop: IEvaluatedCardProperty) => string;
 }
 
 export interface ICardWithId extends ICard {
   id: string;
+}
+
+export interface IEvaluatedCardProperty {
+  upgraded: boolean;
+  selected: boolean;
+  includeStatuses?: boolean;
+  target?: Monster;
 }
 
 export enum CardRarity {

@@ -28,6 +28,7 @@ interface IProps {
   onFinishSelectingCards?: (cards: Card[]) => void;
   cardsToSelect?: number;
   showReturnButton?: boolean;
+  calculateStatusesInCardText?: boolean;
 }
 
 class State {
@@ -42,6 +43,7 @@ export const ShowCardsModal = observer(
     onFinishSelectingCards,
     cardsToSelect,
     showReturnButton = true,
+    calculateStatusesInCardText = false,
   }: IProps) => {
     const state = new State();
     const [hideModal, setHideModal] = useState(false);
@@ -65,7 +67,9 @@ export const ShowCardsModal = observer(
 
     return (
       <>
-        {!showReturnButton ? <PeekButton onClick={() => toggleHideModal()} /> : null}
+        {!showReturnButton ? (
+          <PeekButton onClick={() => toggleHideModal()} />
+        ) : null}
         {!hideModal ? (
           <Modal>
             <>
@@ -78,6 +82,7 @@ export const ShowCardsModal = observer(
                     cardState={card}
                     onClick={() => onSelectCard(card)}
                     draggable={false}
+                    calculateStatusesInCardText={calculateStatusesInCardText}
                   />
                 ))}
               </CardRow>
