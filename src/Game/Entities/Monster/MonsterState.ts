@@ -64,6 +64,7 @@ interface IMonster extends IEntity {
   };
   intent: () => IIntent[];
   currentIntent?: IIntent;
+  event?: () => void;
   effect?: any;
   ref?: React.MutableRefObject<any>;
   dead?: boolean;

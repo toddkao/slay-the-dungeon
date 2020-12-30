@@ -41,6 +41,28 @@ export const RenderCard = observer(
 
     const CardWrapper = draggable ? DraggableWrapper : UndraggableWrapper;
 
+    const upgraded = cardState.get.upgraded;
+
+    const selected = battleState.selectedCardId
+      ? battleState.selectedCardId === cardState.get.id
+      : false;
+
+    const damage =
+      ((cardMap?.[cardState.get.name]?.damage?.({
+        selected,
+        upgraded,
+      }) ?? 0) +
+      (calculateStatusesInCardText ? PlayerState.get().strength : 0)) *
+      (calculateStatusesInCardText ? PlayerState.get().damageMultiplier : 1);
+
+    const block =
+      ((cardMap?.[cardState.get.name]?.block?.({
+        selected,
+        upgraded,
+      }) ?? 0) +
+      (calculateStatusesInCardText ? PlayerState.get().dexterity : 0)) *
+      (calculateStatusesInCardText ? PlayerState.get().blockMultiplier : 1);
+
     return (
       <CardWrapper
         ref={cardRef}
@@ -70,28 +92,10 @@ export const RenderCard = observer(
         <CardTextContainer>
           <RenderCardText>
             {cardState.get.description({
-              damage:
-                ((cardMap?.[cardState.get.name]?.damage?.({
-                  selected: battleState.selectedCardId
-                    ? battleState.selectedCardId === cardState.get.id
-                    : false,
-                  upgraded: cardState.get.upgraded,
-                }) ?? 0) +
-                  PlayerState.get().strength) *
-                PlayerState.get().damageMultiplier,
-              block:
-                ((cardMap?.[cardState.get.name]?.block?.({
-                  selected: battleState.selectedCardId
-                    ? battleState.selectedCardId === cardState.get.id
-                    : false,
-                  upgraded: cardState.get.upgraded,
-                }) ?? 0) +
-                  PlayerState.get().dexterity) *
-                PlayerState.get().blockMultiplier,
-              upgraded: cardState.get.upgraded,
-              selected: battleState.selectedCardId
-                ? battleState.selectedCardId === cardState.get.id
-                : false,
+              damage,
+              block,
+              upgraded,
+              selected,
               includeStatuses: calculateStatusesInCardText,
               ...(calculateStatusesInCardText
                 ? {

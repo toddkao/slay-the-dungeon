@@ -22,7 +22,7 @@ export const RenderMonster = observer(
       statuses,
       health,
       maxHealth,
-      strength: extraDamage,
+      strength,
       dead,
     } = monsterState;
     const monsterRef = useRef(null);
@@ -34,7 +34,7 @@ export const RenderMonster = observer(
           return (
             // TODO: update this to multiply (damage + extra damage) by modifier (eg. weak)
             <IntentNumber>
-              {(currentIntent?.amount ?? 0) + extraDamage}
+              {(currentIntent?.amount ?? 0) + strength}
             </IntentNumber>
           );
         default:

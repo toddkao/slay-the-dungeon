@@ -103,12 +103,13 @@ const gremlinNob = (id: string) => {
           {
             type: IntentType.ATTACK,
             intentImage: attackIntent,
+            amount: 14,
             chance: 0.67,
           },
           {
             type: IntentType.ATTACK,
             intentImage: attackDebuff,
-            amount: 3,
+            amount: 6,
             chance: 0.33,
           },
         ];

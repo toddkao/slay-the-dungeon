@@ -5,7 +5,7 @@ import { BattleState, IBattleState } from "../Battle/BattleState";
 import { isCollidingWithEachOther, playAudioClip } from "../Common/utility";
 import { MonsterState } from "../Entities/Monster/MonsterState";
 import { uniqueId } from "lodash";
-import { cardMap } from "./CardDefinitions";
+import { cardMap, CardRarity } from "./CardDefinitions";
 
 export enum CardEffectType {
   SPECIFIC_ENEMY,
@@ -70,16 +70,12 @@ export class CardState {
     return this.card.damage?.({
       upgraded: this.card.upgraded,
       selected: BattleState.get().selectedCardId === this.id,
-      target: BattleState.get().selectedMonsters?.[0],
-      includeStatuses: true,
     }) ?? 0;
   }
   get block() {
     return this.card.block?.({
       upgraded: this.card.upgraded,
       selected: BattleState.get().selectedCardId === this.id,
-      target: BattleState.get().selectedMonsters?.[0],
-      includeStatuses: true,
     }) ?? 0;
   }
   get status() {
@@ -241,11 +237,4 @@ export interface IEvaluatedCardProperty {
   selected: boolean;
   includeStatuses?: boolean;
   target?: MonsterState;
-}
-
-export enum CardRarity {
-  STARTER,
-  COMMON,
-  UNCOMMON,
-  RARE,
 }

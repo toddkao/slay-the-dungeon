@@ -6,7 +6,6 @@ import cards5 from "../../Images/cards5.jpg";
 import {
   CardState,
   CardEffectType,
-  CardRarity,
   CardType,
   ICard,
   IEvaluatedCardProperty,
@@ -17,6 +16,13 @@ import { groupBy, uniqueId } from "lodash";
 import { PlayerState } from "../Entities/Player/PlayerState";
 import { addBlock, fastAtk, heavyAtk, upgradeCard } from "../../Audio/Audio";
 import { playAudioClip } from "../Common/utility";
+
+export enum CardRarity {
+  STARTER,
+  COMMON,
+  UNCOMMON,
+  RARE,
+}
 
 interface ISpriteToCardSize {
   [index: string]: { CARD_WIDTH: number; CARD_HEIGHT: number };

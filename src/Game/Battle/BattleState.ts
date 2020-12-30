@@ -6,7 +6,7 @@ import {
   observable,
   reaction,
 } from "mobx";
-import { CardState, CardEffectType } from "../Cards/CardState";
+import { CardState, CardEffectType, CardType } from "../Cards/CardState";
 import { StatusType } from "../Common/StatusBar";
 import { IntentType, MonsterState } from "../Entities/Monster/MonsterState";
 import { PlayerState } from "../Entities/Player/PlayerState";
@@ -14,6 +14,7 @@ import { MapState } from "../Map/MapState";
 import { AppHistory } from "../../Router";
 import { playAudioClip } from "../Common/utility";
 import { combatVictory } from "../../Audio/Audio";
+import { AppEvent } from "../../Events";
 
 enum DeckPosition {
   TOP,
@@ -76,6 +77,9 @@ export class BattleState {
     () => MapState.get().battleBgMusic?.stop(),
     () => playAudioClip(combatVictory),
   ];
+
+  @observable
+  cardsPlayed: CardState[] = [];
 
   @computed
   get wonBattle() {
@@ -444,12 +448,13 @@ export class BattleState {
 
   private resolveMonsterActions = action(() => {
     this.monstersAlive?.forEach((monster) => {
+      const { strength } = monster;
       const { currentIntent } = monster.get;
       switch (currentIntent?.type) {
         case IntentType.ATTACK:
           PlayerState.get().takeDamage(
             BattleState.calculateDamage({
-              damage: currentIntent.amount ?? 0,
+              damage: (currentIntent.amount ?? 0) + strength,
               target: PlayerState.get(),
             })
           );
@@ -462,6 +467,11 @@ export class BattleState {
         case IntentType.ENRAGE:
           if (currentIntent.amount) {
             monster.addStatus(StatusType.ENRAGE, currentIntent.amount);
+            AppEvent.cardPlayed.on(({card}) => {
+              if (card.get.type === CardType.SKILL) {
+                monster.addStatus(StatusType.STRENGTH, currentIntent.amount);
+              }
+          })
           }
           break;
         default:
@@ -517,6 +527,8 @@ export class BattleState {
       () => this.useMana(this.selectedCardManaCost),
       () => this.resolveCardEffect(this.selectedCard as CardState),
       () => {
+        this.cardsPlayed.push(this.selectedCard as CardState);
+        AppEvent.cardPlayed({ card: this.selectedCard as CardState });
         this.moveCards({
           cards: [this.selectedCard as CardState],
           from: PileOfCards.HAND,
