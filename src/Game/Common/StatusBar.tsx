@@ -5,6 +5,7 @@ import strength from "../../Images/strength.png";
 import strengthDown from "../../Images/strengthDown.png";
 import dexterity from "../../Images/dexterity.png";
 import vulnerable from "../../Images/vulnerable.png";
+import rage from "../../Images/rage.png";
 import weak from "../../Images/weak.png";
 import { Typography } from "../../Typography";
 import React from "react";
@@ -22,6 +23,7 @@ export enum StatusType {
   VULNERABLE,
   WEAK,
   STRENGTH_DOWN,
+  ENRAGE,
 }
 
 export const StatusTypeToIStatus = {
@@ -33,6 +35,11 @@ export const StatusTypeToIStatus = {
     degrades: false,
     fleeting: true,
     audio: debuff3,
+  },
+  [StatusType.ENRAGE]: {
+    degrades: false,
+    fleeting: false,
+    audio: buff1,
   },
 };
 
@@ -46,6 +53,7 @@ const StatusIconMap: IStatusIconMap = {
   [StatusType.VULNERABLE]: vulnerable,
   [StatusType.WEAK]: weak,
   [StatusType.STRENGTH_DOWN]: strengthDown,
+  [StatusType.ENRAGE]: rage,
 };
 
 export interface IStatus {

@@ -106,12 +106,10 @@ export const cardMap: ICardMap = {
     image: getImage({ sheetNumber: 3, position: [7, 3] }),
     type: CardType.ATTACK,
     effect: CardEffectType.SPECIFIC_ENEMY,
-    damage: (prop: IEvaluatedCardProperty) =>
-      (prop.upgraded ? 10 : 8) +
-      (prop.includeStatuses ? PlayerState.get().extraDamage : 0),
+    damage: (prop: IEvaluatedCardProperty) => (prop.upgraded ? 10 : 8),
     description: (props: IEvaluatedCardProperty) =>
       `Deal ${singleTargetDamage(
-        cardMap["Bash"].damage?.(props) ?? 0,
+        props.damage ?? 0,
         props.selected
       )} damage.\nApply ${
         cardMap["Bash"].status?.(props.upgraded).amount
@@ -123,14 +121,12 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.STARTER,
     manaCost: () => 1,
     upgraded: false,
-    block: (prop: IEvaluatedCardProperty) =>
-      (prop.upgraded ? 8 : 5) +
-      (prop.includeStatuses ? PlayerState.get().extraBlock : 0),
+    block: (prop: IEvaluatedCardProperty) => (prop.upgraded ? 8 : 5),
     image: getImage({ sheetNumber: 1, position: [6, 4] }),
     type: CardType.SKILL,
     effect: CardEffectType.SELF,
     description: (props: IEvaluatedCardProperty) =>
-      `Gain ${cardMap["Defend"].block?.(props)} Block.`,
+      `Gain ${props.block} Block.`,
     audio: [addBlock],
   },
   Strike: {
@@ -138,17 +134,12 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.STARTER,
     upgraded: false,
     manaCost: () => 1,
-    damage: (prop: IEvaluatedCardProperty) =>
-      (prop.upgraded ? 9 : 6) +
-      (prop.includeStatuses ? PlayerState.get().extraDamage : 0),
+    damage: (prop: IEvaluatedCardProperty) => (prop.upgraded ? 9 : 6),
     image: getImage({ sheetNumber: 5, position: [4, 2] }),
     type: CardType.ATTACK,
     effect: CardEffectType.SPECIFIC_ENEMY,
-    description: (prop: IEvaluatedCardProperty) =>
-      `Deal ${singleTargetDamage(
-        cardMap["Strike"].damage?.(prop) ?? 0,
-        prop.selected
-      )} damage.`,
+    description: (props: IEvaluatedCardProperty) =>
+      `Deal ${singleTargetDamage(props.damage ?? 0, props.selected)} damage.`,
     audio: [fastAtk],
   },
   Anger: {
@@ -156,9 +147,7 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.COMMON,
     upgraded: false,
     manaCost: () => 0,
-    damage: (prop: IEvaluatedCardProperty) =>
-      (prop.upgraded ? 8 : 6) +
-      (prop.includeStatuses ? PlayerState.get().extraDamage : 0),
+    damage: (prop: IEvaluatedCardProperty) => (prop.upgraded ? 8 : 6),
     image: getImage({ sheetNumber: 3, position: [4, 3] }),
     specialEffect: (upgraded = false) => {
       const battle = BattleState.get();
@@ -172,10 +161,10 @@ export const cardMap: ICardMap = {
     },
     type: CardType.ATTACK,
     effect: CardEffectType.SPECIFIC_ENEMY,
-    description: (prop: IEvaluatedCardProperty) =>
+    description: (props: IEvaluatedCardProperty) =>
       `Deal ${singleTargetDamage(
-        cardMap["Anger"].damage?.(prop) ?? 0,
-        prop.selected
+        props.damage ?? 0,
+        props.selected
       )} damage.\nAdd a copy of this card\ninto your discard pile.`,
     audio: [heavyAtk], //TODO: sound effect
   },
@@ -184,7 +173,7 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.COMMON,
     manaCost: () => 1,
     upgraded: false,
-    block: () => 5 + PlayerState.get().extraBlock,
+    block: () => 5,
     specialEffect: (upgraded?: boolean) => {
       if (upgraded) {
         BattleState.get().currentHand.forEach((card) => {
@@ -219,11 +208,9 @@ export const cardMap: ICardMap = {
     image: getImage({ sheetNumber: 1, position: [0, 9] }),
     type: CardType.SKILL,
     effect: CardEffectType.SELF,
-    description: (prop: IEvaluatedCardProperty) =>
-      `Gain ${
-        5 + (prop.includeStatuses ? PlayerState.get().extraBlock : 0)
-      } Block.\nUpgrade ${
-        prop.upgraded ? "all cards" : "a card"
+    description: (props: IEvaluatedCardProperty) =>
+      `Gain ${props.block} Block.\nUpgrade ${
+        props.upgraded ? "all cards" : "a card"
       } in your\nhand for the rest of \nthe combat.`,
     audio: [addBlock], //TODO: sound effect
   },
@@ -232,9 +219,7 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.COMMON,
     upgraded: false,
     manaCost: (upgraded = false) => (upgraded ? 0 : 1),
-    damage: () => {
-      return PlayerState.get().block + PlayerState.get().extraDamage;
-    },
+    damage: () => PlayerState.get().block,
     image: getImage({ sheetNumber: 3, position: [5, 2] }),
     type: CardType.ATTACK,
     effect: CardEffectType.SPECIFIC_ENEMY,
@@ -246,9 +231,7 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.COMMON,
     manaCost: () => 0,
     upgraded: false,
-    damage: (prop: IEvaluatedCardProperty) =>
-      (prop.upgraded ? 18 : 14) +
-      (prop.includeStatuses ? PlayerState.get().extraDamage : 0),
+    damage: (prop: IEvaluatedCardProperty) => (prop.upgraded ? 18 : 14),
     prerequisite: (battleState: IBattleState) => {
       return battleState.currentHand.every(
         (card) => card.get.type === CardType.ATTACK
@@ -257,10 +240,10 @@ export const cardMap: ICardMap = {
     image: getImage({ sheetNumber: 3, position: [4, 1] }),
     type: CardType.ATTACK,
     effect: CardEffectType.SPECIFIC_ENEMY,
-    description: (prop: IEvaluatedCardProperty) =>
+    description: (props: IEvaluatedCardProperty) =>
       `Can only be played if\nevery card in your\nhand is an Attack.\nDeal ${singleTargetDamage(
-        cardMap["Clash"].damage?.(prop) ?? 0,
-        prop.selected
+        props.damage ?? 0,
+        props.selected
       )} damage.`,
     audio: [heavyAtk], //TODO: sound effect
   },
@@ -269,14 +252,12 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.COMMON,
     upgraded: false,
     manaCost: () => 1,
-    damage: (prop: IEvaluatedCardProperty) =>
-      (prop.upgraded ? 11 : 8) +
-      (prop.includeStatuses ? PlayerState.get().extraDamage : 0),
+    damage: (prop: IEvaluatedCardProperty) => (prop.upgraded ? 11 : 8),
     image: getImage({ sheetNumber: 3, position: [6, 1] }),
     type: CardType.ATTACK,
     effect: CardEffectType.ALL_ENEMIES,
     description: (props: IEvaluatedCardProperty) =>
-      `Deal ${cardMap["Cleave"].damage?.(props)} damage to ALL\n enemies.`,
+      `Deal ${props.damage} damage to ALL\n enemies.`,
     audio: [heavyAtk], //TODO: sound effect
   },
   Clothesline: {
@@ -284,9 +265,7 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.COMMON,
     upgraded: false,
     manaCost: () => 2,
-    damage: (prop: IEvaluatedCardProperty) =>
-      (prop.upgraded ? 14 : 12) +
-      (prop.includeStatuses ? PlayerState.get().extraDamage : 0),
+    damage: (prop: IEvaluatedCardProperty) => (prop.upgraded ? 14 : 12),
     status: (upgraded = false) => ({
       type: StatusType.WEAK,
       target: CardEffectType.SPECIFIC_ENEMY,
@@ -298,7 +277,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SPECIFIC_ENEMY,
     description: (props: IEvaluatedCardProperty) =>
       `Deal ${singleTargetDamage(
-        cardMap["Clothesline"].damage?.(props) ?? 0,
+        props.damage ?? 0,
         props.selected
       )} damage.\nApply ${
         cardMap["Clothesline"].status?.(props.upgraded).amount
@@ -350,8 +329,7 @@ export const cardMap: ICardMap = {
     rarity: CardRarity.COMMON,
     upgraded: false,
     manaCost: () => 1,
-    damage: ({ upgraded, selected }: IEvaluatedCardProperty) =>
-      (upgraded ? 12 : 9) + (selected ? PlayerState.get().extraDamage : 0),
+    damage: ({ upgraded }: IEvaluatedCardProperty) => (upgraded ? 12 : 9),
     cardSelection: () => ({
       amount: 1,
       from: () => {
@@ -374,7 +352,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SPECIFIC_ENEMY,
     description: (props: IEvaluatedCardProperty) =>
       `Deal ${singleTargetDamage(
-        cardMap["Headbutt"].damage?.(props) ?? 0,
+        props.damage ?? 0,
         props.selected
       )} damage.\nPut a card from your\ndiscard pile on top of\nyour draw pile.`,
     audio: [heavyAtk], //TODO: sound effect
@@ -388,14 +366,14 @@ export const cardMap: ICardMap = {
     damage: ({ upgraded, includeStatuses }: IEvaluatedCardProperty) => {
       return (
         14 +
-        (upgraded ? 5 : 3) * (includeStatuses ? PlayerState.get().extraDamage : 1)
+        (upgraded ? 5 : 3) * (includeStatuses ? PlayerState.get().strength : 0)
       );
     },
     type: CardType.ATTACK,
     effect: CardEffectType.SPECIFIC_ENEMY,
     description: (props: IEvaluatedCardProperty) =>
       `Deal ${singleTargetDamage(
-        cardMap["Heavy Blade"].damage?.(props) ?? 0,
+        props.damage ?? 0,
         props.selected
       )} damage.\nStrength affects this\n card ${
         props.upgraded ? 5 : 3
@@ -408,19 +386,13 @@ export const cardMap: ICardMap = {
     upgraded: false,
     manaCost: () => 1,
     image: getImage({ sheetNumber: 4, position: [4, 8] }),
-    block: (props: IEvaluatedCardProperty) =>
-      (props.upgraded ? 7 : 5) +
-      (props.includeStatuses ? PlayerState.get().extraBlock : 0),
-    damage: (props: IEvaluatedCardProperty) =>
-      (props.upgraded ? 7 : 5) +
-      (props.includeStatuses ? PlayerState.get().extraDamage : 0),
+    block: (props: IEvaluatedCardProperty) => (props.upgraded ? 7 : 5),
+    damage: (props: IEvaluatedCardProperty) => (props.upgraded ? 7 : 5),
     type: CardType.ATTACK,
     effect: CardEffectType.SPECIFIC_ENEMY,
     description: (props: IEvaluatedCardProperty) =>
-      `Gain ${cardMap["Iron Wave"].block?.(
-        props
-      )} Block.\nDeal ${singleTargetDamage(
-        cardMap["Iron Wave"].damage?.(props) ?? 0,
+      `Gain ${props.block} Block.\nDeal ${singleTargetDamage(
+        props.damage ?? 0,
         props.selected
       )} damage.`,
     audio: [addBlock, fastAtk],
@@ -438,14 +410,14 @@ export const cardMap: ICardMap = {
           card.name.toLowerCase().includes("strike")
         ).length *
           (upgraded ? 3 : 2) +
-        (includeStatuses ? PlayerState.get().extraDamage : 0)
+        (includeStatuses ? PlayerState.get().strength : 0)
       );
     },
     type: CardType.ATTACK,
     effect: CardEffectType.SPECIFIC_ENEMY,
     description: (props: IEvaluatedCardProperty) =>
       `Deal ${singleTargetDamage(
-        cardMap["Perfected Strike"].damage?.(props) ?? 0,
+        props.damage ?? 0,
         props.selected
       )} damage.\n Deals an additional\n${
         props.upgraded ? 3 : 2
@@ -459,7 +431,7 @@ export const cardMap: ICardMap = {
     manaCost: () => 1,
     image: getImage({ sheetNumber: 5, position: [0, 0] }),
     damage: ({ upgraded, includeStatuses }: IEvaluatedCardProperty) =>
-      (upgraded ? 10 : 9) + (includeStatuses ? PlayerState.get().extraDamage : 0),
+      upgraded ? 10 : 9,
     specialEffect: (upgraded = false) => {
       BattleState.get().draw(upgraded ? 2 : 1);
     },
@@ -467,7 +439,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.SPECIFIC_ENEMY,
     description: (props: IEvaluatedCardProperty) =>
       `Deal ${singleTargetDamage(
-        cardMap["Pommel Strike"].damage?.(props) ?? 0,
+        props.damage ?? 0,
         props.selected
       )} damage.\nDraw ${props.upgraded ? 2 : 1} card.`,
     audio: [heavyAtk], //TODO: sound effect
@@ -479,12 +451,12 @@ export const cardMap: ICardMap = {
     manaCost: () => 1,
     image: getImage({ sheetNumber: 2, position: [3, 2] }),
     block: ({ upgraded, includeStatuses }: IEvaluatedCardProperty) =>
-      (upgraded ? 11 : 8) + (includeStatuses ? PlayerState.get().extraBlock : 0),
+      upgraded ? 11 : 8,
     specialEffect: () => BattleState.get().draw(1),
     type: CardType.SKILL,
     effect: CardEffectType.SELF,
     description: (props: IEvaluatedCardProperty) =>
-      `Gain ${cardMap["Shrug It Off"].block?.(props)} Block.\nDraw 1 card.`,
+      `Gain ${props.block} Block.\nDraw 1 card.`,
     audio: addBlock,
   },
   "Sword Boomerang": {
@@ -494,14 +466,11 @@ export const cardMap: ICardMap = {
     manaCost: () => 1,
     image: getImage({ sheetNumber: 5, position: [3, 0] }),
     damageInstances: (upgraded = false) => (upgraded ? 4 : 3),
-    damage: ({ includeStatuses }: IEvaluatedCardProperty) =>
-      3 + (includeStatuses ? PlayerState.get().extraDamage : 0),
+    damage: () => 3,
     type: CardType.ATTACK,
     effect: CardEffectType.RANDOM,
     description: (props: IEvaluatedCardProperty) =>
-      `Deal ${cardMap["Sword Boomerang"].damage?.(
-        props
-      )} damage to a\nrandom enemy ${cardMap[
+      `Deal ${props.damage} damage to a\nrandom enemy ${cardMap[
         "Sword Boomerang"
       ].damageInstances?.(props.upgraded)} times.`,
     audio: [fastAtk],
@@ -512,8 +481,7 @@ export const cardMap: ICardMap = {
     upgraded: false,
     manaCost: () => 1,
     image: getImage({ sheetNumber: 5, position: [4, 1] }),
-    damage: ({ upgraded, includeStatuses }: IEvaluatedCardProperty) =>
-      (upgraded ? 7 : 4) + (includeStatuses ? PlayerState.get().extraDamage : 0),
+    damage: ({ upgraded }: IEvaluatedCardProperty) => (upgraded ? 7 : 4),
     status: () => ({
       type: StatusType.VULNERABLE,
       target: CardEffectType.ALL_ENEMIES,
@@ -524,7 +492,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.ALL_ENEMIES,
     description: (props: IEvaluatedCardProperty) =>
       `Deal ${singleTargetDamage(
-        cardMap["Thunderclap"].damage?.(props) ?? 0,
+        props.damage ?? 0,
         props.selected
       )} damage and\napply 1 Vulnerable to\nALL enemies.`,
     audio: [heavyAtk], //TODO: sound effect

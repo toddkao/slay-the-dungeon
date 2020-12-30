@@ -9,7 +9,6 @@ export interface IEntity {
   id: string;
   health: number;
   maxHealth: number;
-  damage: number;
   block: number;
 }
 
@@ -20,17 +19,12 @@ export class EntityState {
   }
 
   @computed
-  get damage() {
-    return this.entity.damage;
-  }
-
-  @computed
   get block() {
     return this.entity.block;
   }
 
   @computed
-  get extraDamage() {
+  get strength() {
     return (
       this.statuses.find(
         (findStatus) => findStatus.type === StatusType.STRENGTH
@@ -39,12 +33,26 @@ export class EntityState {
   }
 
   @computed
-  get extraBlock() {
+  get damageMultiplier() {
+    return (
+      this.statuses.find(
+        (findStatus) => findStatus.type === StatusType.WEAK
+      ) ? 0.75 : 1
+    );
+  }
+
+  @computed
+  get dexterity() {
     return (
       this.statuses.find(
         (findStatus) => findStatus.type === StatusType.DEXTERITY
       )?.amount || 0
     );
+  }
+
+  @computed
+  get blockMultiplier() {
+    return 1;
   }
 
   @computed
@@ -143,10 +151,9 @@ export class EntityState {
 
   constructor(
     private entity: IEntity = observable({
+      id: "",
       health: 0,
       block: 0,
-      damage: 0,
-      id: "",
       maxHealth: 0,
       statuses: [],
     })

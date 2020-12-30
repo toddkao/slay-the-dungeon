@@ -235,6 +235,8 @@ export interface ICardWithId extends ICard {
 }
 
 export interface IEvaluatedCardProperty {
+  damage?: number;
+  block?: number;
   upgraded: boolean;
   selected: boolean;
   includeStatuses?: boolean;

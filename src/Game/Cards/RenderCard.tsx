@@ -12,6 +12,7 @@ import { PlayerState } from "../Entities/Player/PlayerState";
 import { Sprite } from "react-spritesheet";
 import { horizontalCenterAbsolute, Row } from "../../Layout";
 import { PullRelease } from "../Common/Draggable";
+import { cardMap } from "./CardDefinitions";
 
 export const RenderCard = observer(
   ({
@@ -69,6 +70,24 @@ export const RenderCard = observer(
         <CardTextContainer>
           <RenderCardText>
             {cardState.get.description({
+              damage:
+                ((cardMap?.[cardState.get.name]?.damage?.({
+                  selected: battleState.selectedCardId
+                    ? battleState.selectedCardId === cardState.get.id
+                    : false,
+                  upgraded: cardState.get.upgraded,
+                }) ?? 0) +
+                  PlayerState.get().strength) *
+                PlayerState.get().damageMultiplier,
+              block:
+                ((cardMap?.[cardState.get.name]?.block?.({
+                  selected: battleState.selectedCardId
+                    ? battleState.selectedCardId === cardState.get.id
+                    : false,
+                  upgraded: cardState.get.upgraded,
+                }) ?? 0) +
+                  PlayerState.get().dexterity) *
+                PlayerState.get().blockMultiplier,
               upgraded: cardState.get.upgraded,
               selected: battleState.selectedCardId
                 ? battleState.selectedCardId === cardState.get.id

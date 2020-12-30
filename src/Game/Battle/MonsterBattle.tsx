@@ -154,7 +154,6 @@ const CurrentHandContainer = styled(Row).attrs({
 
 const UnitWrappers = styled(Row)`
   width: 100%;
-  margin-top: 100px;
 `;
 
 const DrawPile = styled(DrawPileWithNumber)`

@@ -7,7 +7,6 @@ import { BattleState } from "../../Battle/BattleState";
 import { HealthBar } from "../../Common/HealthBar";
 import { StatusBar } from "../../Common/StatusBar";
 import { IntentType, MonsterState } from "./MonsterState";
-import reticleCorner from "../../../Images/combat/reticleCorner.png";
 import { ReticleWrapper } from "../../Common/ReticleWrapper";
 
 export const RenderMonster = observer(
@@ -15,11 +14,15 @@ export const RenderMonster = observer(
     const battleState = BattleState.get();
 
     const {
-      get: { id, currentIntent, image },
+      get: {
+        id,
+        currentIntent,
+        image: { src, height },
+      },
       statuses,
       health,
       maxHealth,
-      extraDamage,
+      strength: extraDamage,
       dead,
     } = monsterState;
     const monsterRef = useRef(null);
@@ -30,7 +33,9 @@ export const RenderMonster = observer(
         case IntentType.ATTACK:
           return (
             // TODO: update this to multiply (damage + extra damage) by modifier (eg. weak)
-            <IntentNumber> {monsterState.damage + extraDamage} </IntentNumber>
+            <IntentNumber>
+              {(currentIntent?.amount ?? 0) + extraDamage}
+            </IntentNumber>
           );
         default:
           return null;
@@ -59,9 +64,9 @@ export const RenderMonster = observer(
             {renderIntentNumber()}
           </MonsterIntentWrapper>
           <img
-            src={image}
-            width={150}
-            height={150}
+            src={src}
+            width="auto"
+            height={height}
             draggable={false}
             alt="monster"
           />
@@ -90,10 +95,7 @@ const MonsterWrapper = styled(Column)<{
           opacity: 0;
         `
       : ""};
-  ${({ disabled, dead }) =>
-    disabled || dead
-      ? "pointer-events: none"
-      : ''}
+  ${({ disabled, dead }) => (disabled || dead ? "pointer-events: none" : "")}
 `;
 
 const MonsterIntentWrapper = styled.div`

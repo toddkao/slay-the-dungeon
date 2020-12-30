@@ -66,6 +66,9 @@ export class BattleState {
   ) {}
 
   @observable
+  currentTurn: number = 1;
+
+  @observable
   cardResolveQueue: (() => void)[] = [];
 
   @observable
@@ -320,7 +323,7 @@ export class BattleState {
             selectedMonster: this.selectedMonsters?.[0],
           });
         if (card.block) {
-          PlayerState.get().addBlock(card.block);
+          PlayerState.get().addBlock(card.block + PlayerState.get().dexterity);
         }
         break;
       case CardEffectType.ALL_ENEMIES:
@@ -412,7 +415,7 @@ export class BattleState {
     if (card.damage && selectedMonster) {
       selectedMonster.takeDamage(
         BattleState.calculateDamage({
-          damage: card.damage,
+          damage: card.damage + PlayerState.get().strength,
           target: selectedMonster,
         })
       );
@@ -441,21 +444,24 @@ export class BattleState {
 
   private resolveMonsterActions = action(() => {
     this.monstersAlive?.forEach((monster) => {
-      switch (monster.get.currentIntent?.type) {
+      const { currentIntent } = monster.get;
+      switch (currentIntent?.type) {
         case IntentType.ATTACK:
           PlayerState.get().takeDamage(
             BattleState.calculateDamage({
-              damage: monster.damage,
+              damage: currentIntent.amount ?? 0,
               target: PlayerState.get(),
             })
           );
           break;
         case IntentType.GAIN_STRENGTH:
-          if (monster.get.currentIntent.amount) {
-            monster.addStatus(
-              StatusType.STRENGTH,
-              monster.get.currentIntent.amount
-            );
+          if (currentIntent.amount) {
+            monster.addStatus(StatusType.STRENGTH, currentIntent.amount);
+          }
+          break;
+        case IntentType.ENRAGE:
+          if (currentIntent.amount) {
+            monster.addStatus(StatusType.ENRAGE, currentIntent.amount);
           }
           break;
         default:
@@ -556,6 +562,7 @@ export class BattleState {
     this.resolvePlayerActions();
     this.resolveGameActions();
     this.resolveEndTurnActions();
+    this.currentTurn++;
   });
 
   public initialize = action(() => {

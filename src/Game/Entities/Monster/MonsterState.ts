@@ -27,23 +27,11 @@ export class MonsterState extends EntityState {
     return this.monster;
   }
 
-  @computed
-  public get damage() {
-    let weakStatus = this.monster.statuses.find(
-      (status) => status.type === StatusType.WEAK
-    );
-    return weakStatus
-      ? weakStatus?.amount >= 1
-        ? Math.floor(this.monster.damage * 0.75)
-        : this.monster.damage
-      : this.monster.damage;
-  }
-
   public pickRandomIntent = action(() => {
     const chance = new Chance();
     const intent: IIntent = chance.weighted(
-      this.monster.intent,
-      this.monster.intent.map((intent) => intent.chance)
+      this.monster.intent(),
+      this.monster.intent().map((intent) => intent.chance)
     );
     this.setCurrentIntent(intent);
   });
@@ -54,9 +42,11 @@ export class MonsterState extends EntityState {
 }
 
 export enum IntentType {
+  SLEEP,
   ATTACK,
   SHIELD,
   GAIN_STRENGTH,
+  ENRAGE,
 }
 
 interface IIntent {
@@ -68,8 +58,11 @@ interface IIntent {
 
 interface IMonster extends IEntity {
   name: string;
-  image: string;
-  intent: IIntent[];
+  image: {
+    src: string;
+    height: number;
+  };
+  intent: () => IIntent[];
   currentIntent?: IIntent;
   effect?: any;
   ref?: React.MutableRefObject<any>;
