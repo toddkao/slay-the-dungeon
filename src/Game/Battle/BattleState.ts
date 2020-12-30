@@ -75,7 +75,6 @@ export class BattleState {
   @observable
   endCombatActions: (() => void)[] = [
     () => MapState.get().battleBgMusic?.stop(),
-    () => playAudioClip(combatVictory),
   ];
 
   @observable
@@ -451,6 +450,21 @@ export class BattleState {
       const { strength } = monster;
       const { currentIntent } = monster.get;
       switch (currentIntent?.type) {
+        case IntentType.ATTACK_DEBUFF:
+          PlayerState.get().takeDamage(
+            BattleState.calculateDamage({
+              damage: (currentIntent.amount ?? 0) + strength,
+              target: PlayerState.get(),
+            })
+          );
+          if (!currentIntent?.status?.type || !currentIntent?.status?.amount) {
+            return;
+          }
+          PlayerState.get().addStatus(
+            currentIntent.status?.type,
+            currentIntent.status?.amount
+          );
+          break;
         case IntentType.ATTACK:
           PlayerState.get().takeDamage(
             BattleState.calculateDamage({
@@ -467,17 +481,19 @@ export class BattleState {
         case IntentType.ENRAGE:
           if (currentIntent.amount) {
             monster.addStatus(StatusType.ENRAGE, currentIntent.amount);
-            AppEvent.cardPlayed.on(({card}) => {
+            const unsubscribe = AppEvent.cardPlayed.on(({ card }) => {
               if (card.get.type === CardType.SKILL) {
                 monster.addStatus(StatusType.STRENGTH, currentIntent.amount);
               }
-          })
+            });
+            this.endCombatActions.push(() => unsubscribe());
           }
           break;
         default:
           break;
       }
       if (PlayerState.get().health <= 0) {
+        this.resolveEndCombatActions();
         AppHistory.push("/defeat");
       }
       this.endTurnActions.push(
@@ -573,8 +589,9 @@ export class BattleState {
     this.resolveMonsterActions();
     this.resolvePlayerActions();
     this.resolveGameActions();
-    this.resolveEndTurnActions();
+
     this.currentTurn++;
+    this.resolveEndTurnActions();
   });
 
   public initialize = action(() => {
@@ -589,6 +606,7 @@ export class BattleState {
       () => {
         if (this.wonBattle) {
           this.resolveEndCombatActions();
+          playAudioClip(combatVictory);
         }
       }
     );

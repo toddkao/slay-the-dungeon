@@ -11,17 +11,22 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {
   ref?: React.MutableRefObject<any>;
 }
 export const PullRelease = React.forwardRef(
-  ({ className, children, onDragStart, onDrag, draggable, ...rest }: IProps, ref) => {
+  (
+    { className, children, onDragStart, onDrag, draggable, ...rest }: IProps,
+    ref
+  ) => {
     const [{ x, y }, set] = useSpring(() => ({ x: 0, y: 0 }));
     // Set the drag hook and define component movement based on gesture data
 
-    const bind = useGesture({
-      onDrag: ({ down, movement: [mx, my] }) => {
-        set({ x: down ? mx : 0, y: down ? my : 0 });
-        onDrag?.();
-      },
-      onDragStart: ({ event, ...sharedState }) => onDragStart?.(),
-    });
+    const bind = useGesture(
+      {
+        onDrag: ({ down, movement: [mx, my] }) => {
+          set({ x: down ? mx : 0, y: down ? my : 0 });
+          onDrag?.();
+        },
+        onDragStart: ({ event, ...sharedState }) => onDragStart?.(),
+      }
+    );
 
     return (
       <animated.div

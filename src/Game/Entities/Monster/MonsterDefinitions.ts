@@ -8,6 +8,8 @@ import attackIntent from "../../../Images/attack-intent.png";
 import spellIntent from "../../../Images/spell-intent.png";
 import attackDebuff from "../../../Images/attack-debuff.png";
 import { BattleState } from "../../Battle/BattleState";
+import { CardEffectType } from "../../Cards/CardState";
+import { StatusType } from "../../Common/StatusBar";
 
 const louse = (id: string) => {
   const health = random(10, 25);
@@ -54,7 +56,7 @@ const jawWorm = (id: string) => {
       statuses: [],
       image: {
         src: jawWormImage,
-        height: 100,
+        height: 150,
       },
       intent: () => [
         {
@@ -107,10 +109,16 @@ const gremlinNob = (id: string) => {
             chance: 0.67,
           },
           {
-            type: IntentType.ATTACK,
+            type: IntentType.ATTACK_DEBUFF,
             intentImage: attackDebuff,
             amount: 6,
             chance: 0.33,
+            status: {
+              type: StatusType.WEAK,
+              target: CardEffectType.SPECIFIC_ENEMY,
+              amount: 3,
+              degrades: true,
+            }
           },
         ];
       },

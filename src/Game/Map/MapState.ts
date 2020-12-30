@@ -12,15 +12,38 @@ import { MonsterState } from "../Entities/Monster/MonsterState";
 import { mapEncounterType } from "./MapEncounterDefinition";
 import { AppHistory } from "../../Router";
 import { playAudioClip } from "../Common/utility";
-import { level1AmbienceBG, level1EliteBG, level1MonsterBG } from "../../Audio/Audio";
+import {
+  level1AmbienceBG,
+  level1EliteBG,
+  level1MonsterBG,
+} from "../../Audio/Audio";
 import { Howl } from "howler";
+
+
+export enum MapNodeType {
+  MONSTER,
+  CHEST,
+  REST,
+  SHOP,
+  EVENT,
+  ELITE,
+}
+
+export const mapNodeTypeToImage = {
+  [MapNodeType.MONSTER]: monster,
+  [MapNodeType.CHEST]: chest,
+  [MapNodeType.REST]: rest,
+  [MapNodeType.SHOP]: shop,
+  [MapNodeType.EVENT]: event,
+  [MapNodeType.ELITE]: elite,
+};
 
 interface IMapNode {
   id: string;
   type: MapNodeType;
   left: number;
   top: number;
-  encounter: MonsterState[];
+  encounter: MonsterState[] | undefined;
 }
 
 interface INodePath {
@@ -144,7 +167,10 @@ export class MapState {
       return range(0, randomNumberOfNodes).map((node, colIndex) => ({
         id: `row=${rowIndex}col=${colIndex}`,
         type: this.generateNodeType(rowIndex),
-        encounter: this.generateEncounter(rowIndex),
+        encounter: this.generateEncounter(
+          rowIndex,
+          this.generateNodeType(rowIndex)
+        ),
         left:
           rowIndex === 0 && colIndex === 0
             ? 500
@@ -222,29 +248,46 @@ export class MapState {
     }, 0);
   });
 
-  generateNodeType = (rowIndex: number) => {
-    return rowIndex === 1 || rowIndex === 13
-      ? MapNodeType.REST
-      : MapNodeType.MONSTER;
+  generateNodeType = (rowIndex: number): MapNodeType => {
+    if (rowIndex === 1 || rowIndex === 13) {
+      return MapNodeType.REST;
+    }
+    if (rowIndex === 3 || rowIndex === 10) {
+      return MapNodeType.ELITE;
+    }
+    return MapNodeType.MONSTER;
   };
 
-  generateEncounter = (rowIndex: number) => {
-    const randomFirstThreeEncounterIndex = random(
-      0,
-      parseInt((mapEncounterType.firstThreeEncounters.length - 1) as any)
-    );
-    const randomNormalEncounterIndex = random(
-      0,
-      parseInt((mapEncounterType.normalEncounters.length - 1) as any)
-    );
+  generateEncounter = (rowIndex: number, nodeType: MapNodeType) => {
+    switch (nodeType) {
+      case MapNodeType.MONSTER:
+        const randomFirstThreeEncounterIndex = random(
+          0,
+          parseInt((mapEncounterType.firstThreeEncounters.length - 1) as any)
+        );
+        const randomNormalEncounterIndex = random(
+          0,
+          parseInt((mapEncounterType.normalEncounters.length - 1) as any)
+        );
 
-    return rowIndex >= 13
-      ? mapEncounterType.firstThreeEncounters[
-          randomFirstThreeEncounterIndex
-        ].map((createMob) => createMob(uniqueId()))
-      : mapEncounterType.normalEncounters[
-          randomNormalEncounterIndex
+        return rowIndex >= 13
+          ? mapEncounterType.firstThreeEncounters[
+              randomFirstThreeEncounterIndex
+            ].map((createMob) => createMob(uniqueId()))
+          : mapEncounterType.normalEncounters[
+              randomNormalEncounterIndex
+            ].map((createMob) => createMob(uniqueId()));
+      case MapNodeType.ELITE:
+        const randomEliteEncounterIndex = random(
+          0,
+          parseInt((mapEncounterType.eliteEncounters.length - 1) as any)
+        );
+        return mapEncounterType.eliteEncounters[
+          randomEliteEncounterIndex
         ].map((createMob) => createMob(uniqueId()));
+      default:
+        break;
+    }
   };
 
   reset = action(() => {
@@ -288,21 +331,3 @@ export class MapState {
     }
   });
 }
-
-export enum MapNodeType {
-  MONSTER,
-  CHEST,
-  REST,
-  SHOP,
-  EVENT,
-  ELITE,
-}
-
-export const mapNodeTypeToImage = {
-  [MapNodeType.MONSTER]: monster,
-  [MapNodeType.CHEST]: chest,
-  [MapNodeType.REST]: rest,
-  [MapNodeType.SHOP]: shop,
-  [MapNodeType.EVENT]: event,
-  [MapNodeType.ELITE]: elite,
-};

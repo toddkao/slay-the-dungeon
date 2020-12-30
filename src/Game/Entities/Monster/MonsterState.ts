@@ -1,7 +1,7 @@
 import { action, computed } from "mobx";
 import Chance from "chance";
 import { EntityState, IEntity } from "../EntityState";
-import { StatusType } from "../../Common/StatusBar";
+import { IStatus } from "../../Common/StatusBar";
 
 export class MonsterState extends EntityState {
   constructor(private monster: IMonster) {
@@ -44,6 +44,7 @@ export class MonsterState extends EntityState {
 export enum IntentType {
   SLEEP,
   ATTACK,
+  ATTACK_DEBUFF,
   SHIELD,
   GAIN_STRENGTH,
   ENRAGE,
@@ -54,6 +55,7 @@ interface IIntent {
   chance: number;
   type: IntentType;
   amount?: number;
+  status?: IStatus;
 }
 
 interface IMonster extends IEntity {

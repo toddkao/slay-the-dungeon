@@ -4,8 +4,9 @@ import { Howl, HowlOptions } from "howler";
 import { BattleState, IBattleState } from "../Battle/BattleState";
 import { isCollidingWithEachOther, playAudioClip } from "../Common/utility";
 import { MonsterState } from "../Entities/Monster/MonsterState";
-import { uniqueId } from "lodash";
+import { maxBy, uniqueId } from "lodash";
 import { cardMap, CardRarity } from "./CardDefinitions";
+import { AppEvent } from "../../Events";
 
 export enum CardEffectType {
   SPECIFIC_ENEMY,
@@ -67,16 +68,20 @@ export class CardState {
     return this.card.damageInstances?.(this.card.upgraded) ?? 1;
   }
   get damage() {
-    return this.card.damage?.({
-      upgraded: this.card.upgraded,
-      selected: BattleState.get().selectedCardId === this.id,
-    }) ?? 0;
+    return (
+      this.card.damage?.({
+        upgraded: this.card.upgraded,
+        selected: BattleState.get().selectedCardId === this.id,
+      }) ?? 0
+    );
   }
   get block() {
-    return this.card.block?.({
-      upgraded: this.card.upgraded,
-      selected: BattleState.get().selectedCardId === this.id,
-    }) ?? 0;
+    return (
+      this.card.block?.({
+        upgraded: this.card.upgraded,
+        selected: BattleState.get().selectedCardId === this.id,
+      }) ?? 0
+    );
   }
   get status() {
     return this.card.status?.(this.card.upgraded) ?? 0;
@@ -102,7 +107,9 @@ export class CardState {
   });
 
   public selectable = () => {
-    return this.card.prerequisite ? this.card.prerequisite(BattleState.get()) : true;
+    return this.card.prerequisite
+      ? this.card.prerequisite(BattleState.get())
+      : true;
   };
 
   public select = () => {
@@ -126,20 +133,33 @@ export class CardState {
   public onDrag = action(() => {
     const battleState = BattleState.get();
     const cardBoundingRect = this.ref?.current?.getBoundingClientRect();
-    if (!cardBoundingRect) {
+
+    if (!cardBoundingRect?.top) {
       return;
     }
-    const { top } = cardBoundingRect;
     const collisions = battleState.monstersWithBoundingRef
       ?.filter((monster) => !battleState.getMonsterById(monster.id)?.dead)
-      .find((monster) =>
-        isCollidingWithEachOther(cardBoundingRect, monster.boundingRect)
-      );
-    if (window.innerHeight / top > 1.7) {
+      .map((monster) => {
+        const collision = isCollidingWithEachOther(
+          cardBoundingRect,
+          monster.boundingRect
+        );
+        if (collision.collides) {
+          return {
+            id: monster.id,
+            amount: collision.amount,
+          };
+        }
+      })
+      .filter((collision) => collision);
+
+    const collision = maxBy(collisions, (collision) => collision?.amount);
+
+    if (window.innerHeight / cardBoundingRect.top > 1.7) {
       switch (this.card.effect) {
         case CardEffectType.SPECIFIC_ENEMY:
-          if (collisions && !battleState.getMonsterById(collisions.id)?.dead) {
-            battleState.selectMonster([collisions.id]);
+          if (collisions && !battleState.getMonsterById(collision?.id || '')?.dead) {
+            battleState.selectMonster([collision?.id || '']);
           } else {
             battleState.selectMonster();
           }
@@ -159,9 +179,15 @@ export class CardState {
     battleState.selectMonster();
   });
 
-  public onReleaseDrag = action(() => {
+  public onReleaseDrag = action((event: any) => {
     const battleState = BattleState.get();
     const cardBoundingRect = this.ref?.current?.getBoundingClientRect();
+
+    // event.button 0 = left click, 2 = right click
+    if (!cardBoundingRect?.top || event.button === 2) {
+      event.preventDefault();
+      return;
+    }
     const { top } = cardBoundingRect;
 
     if (window.innerHeight / top > 1.7) {

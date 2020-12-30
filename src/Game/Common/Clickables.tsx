@@ -8,6 +8,7 @@ import { RelativeWrapper } from "../../Layout/index";
 import cancelButton from "../../Images/cancel-button.png";
 import peekButton from "../../Images/UI/peek_button.png";
 import endTurnButton from "../../Images/UI/endTurnButton.png";
+import endTurnButtonGlow from "../../Images/UI/endTurnButtonGlow.png";
 import { Typography } from "../../Typography";
 
 export const DeckWithNumber = ({
@@ -163,23 +164,32 @@ export const PeekButton = styled(Typography)`
 
 export const EndTurnButton = styled(Typography).attrs({
   fontSize: 25,
-})`
-  background: url(${endTurnButton});
-  background-repeat: no-repeat;
-  background-position: center;
-  z-index: 9;
-  color: white;
-  width: 210px;
-  height: 90px;
-  position: absolute;
-  position: absolute;
-  top: 70%;
-  right: 10%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+})<{ noOptionsLeft?: boolean }>`
   filter: brightness(70%);
   &:hover {
     filter: brightness(100%);
   }
+
+  ${({ noOptionsLeft }) =>
+    noOptionsLeft
+      ? css`
+          background: url(${endTurnButtonGlow});
+          filter: brightness(85%);
+        `
+      : css`
+          background: url(${endTurnButton});
+        `}
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 2;
+  color: white;
+  width: 220px;
+  height: 90px;
+  position: absolute;
+  position: absolute;
+  top: 70%;
+  right: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;

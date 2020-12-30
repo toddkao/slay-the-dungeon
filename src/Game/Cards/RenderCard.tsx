@@ -47,21 +47,23 @@ export const RenderCard = observer(
       ? battleState.selectedCardId === cardState.get.id
       : false;
 
-    const damage =
+    const damage = Math.floor(
       ((cardMap?.[cardState.get.name]?.damage?.({
         selected,
         upgraded,
       }) ?? 0) +
-      (calculateStatusesInCardText ? PlayerState.get().strength : 0)) *
-      (calculateStatusesInCardText ? PlayerState.get().damageMultiplier : 1);
+        (calculateStatusesInCardText ? PlayerState.get().strength : 0)) *
+        (calculateStatusesInCardText ? PlayerState.get().damageMultiplier : 1)
+    );
 
-    const block =
+    const block = Math.floor(
       ((cardMap?.[cardState.get.name]?.block?.({
         selected,
         upgraded,
       }) ?? 0) +
-      (calculateStatusesInCardText ? PlayerState.get().dexterity : 0)) *
-      (calculateStatusesInCardText ? PlayerState.get().blockMultiplier : 1);
+        (calculateStatusesInCardText ? PlayerState.get().dexterity : 0)) *
+        (calculateStatusesInCardText ? PlayerState.get().blockMultiplier : 1)
+    );
 
     return (
       <CardWrapper

@@ -72,7 +72,15 @@ export const RenderBattle = observer(() => {
               />
             ))}
           </CurrentHandContainer>
-          <EndTurnButton onClick={() => battleState.endTurn()}>
+          <EndTurnButton
+            onClick={() => battleState.endTurn()}
+            noOptionsLeft={
+              battleState.currentMana === 0 ||
+              battleState.currentHand.every(
+                (card) => card.manaCost > battleState.currentMana
+              ) || battleState.currentHand.length === 0
+            }
+          >
             End Turn
           </EndTurnButton>
           <ManaAmount notEnoughMana={battleState.currentMana === 0}>

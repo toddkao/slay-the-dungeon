@@ -21,14 +21,30 @@ export const isCollidingWithEachOther = (
     b?.height &&
     b?.width
   ) {
-    return !(
-      a.y + a.height < b.y ||
-      a.y > b.y + b.height ||
-      a.x + a.width < b.x ||
-      a.x > b.x + b.width
+    const height = Math.min(
+      Math.abs(a.y + a.height - b.y),
+      Math.abs(a.y - (b.y + b.height))
     );
+
+    const width = Math.min(
+      Math.abs(a.x + a.width - b.x),
+      Math.abs(a.x - (b.x + b.width))
+    );
+
+    return {
+      collides: !(
+        a.y + a.height < b.y ||
+        a.y > b.y + b.height ||
+        a.x + a.width < b.x ||
+        a.x > b.x + b.width
+      ),
+      amount: height * width,
+    };
   }
-  return false;
+  return {
+    collides: false,
+    amount: 0,
+  };
 };
 
 export const playAudioClip = (src?: string, options?: HowlOptions) => {

@@ -8,13 +8,12 @@ interface IMapEncounterType {
 
 export const mapEncounterType: IMapEncounterType = {
   firstThreeEncounters: [
-    // [monsterMap.louse, monsterMap.louse],
-    // [monsterMap.jawWorm],
-    [monsterMap.gremlinNob]
+    [monsterMap.louse, monsterMap.louse],
+    [monsterMap.jawWorm],
   ],
   normalEncounters: [
     [monsterMap.louse, monsterMap.louse, monsterMap.louse],
     [monsterMap.jawWorm, monsterMap.jawWorm],
   ],
-  eliteEncounters: [[monsterMap.jawWorm, monsterMap.jawWorm]],
+  eliteEncounters: [[monsterMap.gremlinNob]],
 };

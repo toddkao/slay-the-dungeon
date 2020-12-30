@@ -4,6 +4,7 @@ import { createEventBus } from "ts-event-bus";
 
 export const Events = {
   cardPlayed: slot<{card: CardState}, void>(),
+  cancelDrag: slot(),
 }
 
 export const AppEvent = createEventBus({
