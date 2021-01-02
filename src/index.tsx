@@ -1,8 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { MyRouter } from "./Router";
+import { AppHistory, MyRouter } from "./Router";
 import { createGlobalStyle } from "styled-components";
 import cursor from "./Images/cursor.png";
+import { MapState } from "./Game/Map/MapState";
 
 const GlobalStyle = createGlobalStyle`
   @font-face {
@@ -36,6 +37,11 @@ const GlobalStyle = createGlobalStyle`
     user-select: none;
   }
 `;
+
+const mapState = MapState.get();
+if (!mapState.currentNode) {
+  AppHistory.push("/");
+}
 
 ReactDOM.render(
   <>

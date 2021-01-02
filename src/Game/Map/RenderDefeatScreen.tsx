@@ -13,7 +13,7 @@ export const RenderDefeatScreen = () => {
     MapState.get().reset();
     const battleState = BattleState.get();
     battleState.battleReactionDisposer?.();
-    battleState.setMonsters(undefined);
+    battleState.setMonsters();
     battleState.setCardsToShow();
     PlayerState.get().reset();
     AppHistory.push('/');

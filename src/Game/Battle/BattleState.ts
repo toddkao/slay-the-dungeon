@@ -75,6 +75,7 @@ export class BattleState {
   @observable
   endCombatActions: (() => void)[] = [
     () => MapState.get().battleBgMusic?.stop(),
+    () => MapState.get().eliteBgMusic?.stop(),
   ];
 
   @observable
@@ -569,6 +570,7 @@ export class BattleState {
       // Ensure a card is selected
       !this.selectedCardId ||
       !this.selectedCard ||
+      (this.selectedMonsters?.length === 0 && !this.selectedSelf) ||
       // Ensure you have enough mana to cast the card
       this.selectedCardManaCost > this.currentMana ||
       // Make sure previous card isn't in the process of resolving

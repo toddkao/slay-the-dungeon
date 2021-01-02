@@ -20,7 +20,7 @@ export class PlayerState extends EntityState {
       health: 80,
       maxHealth: 80,
       statuses: [],
-      maxMana: 9,
+      maxMana: 3,
       class: PlayerClass.IRONCLAD,
       deck: [],
       block: 0,
@@ -61,11 +61,11 @@ export class PlayerState extends EntityState {
     //   range(0, 5).forEach(() =>
     //   stats.deck.push(new Card({ ...cardMap.swordBoomerang, id: uniqueId() }))
     // );
-    range(0, 4).forEach(() => stats.deck.push({...cardMap["Bash"], id: uniqueId()}));
+    range(0, 5).forEach(() => stats.deck.push({...cardMap["Strike"], id: uniqueId()}));
 
-    range(0, 4).forEach(() => stats.deck.push({...cardMap["Flex"], id: uniqueId()}));
+    range(0, 4).forEach(() => stats.deck.push({...cardMap["Defend"], id: uniqueId()}));
 
-    stats.deck.push({...cardMap["Armament"], id: uniqueId()});
+    stats.deck.push({...cardMap["Bash"], id: uniqueId()});
     // range(0, 5).forEach(() =>
     //   stats.deck.push(new Card({ ...cardMap.clothesline, id: uniqueId() }))
     // );

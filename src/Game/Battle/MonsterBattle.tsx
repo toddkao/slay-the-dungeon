@@ -27,13 +27,6 @@ export const RenderBattle = observer(() => {
   const playerState = PlayerState.get();
   const mapState = MapState.get();
 
-  useEffect(() => {
-    const mapState = MapState.get();
-    if (!mapState.currentNode) {
-      AppHistory.push("/");
-    }
-  }, []);
-
   const onRightClick = (e: { preventDefault: () => void }) => {
     // TODO Move logic onto onReleaseDrag on card
     e.preventDefault();

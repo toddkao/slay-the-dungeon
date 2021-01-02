@@ -55,7 +55,7 @@ export const playAudioClip = (src?: string, options?: HowlOptions) => {
     src: [src],
     ...{
       ...options,
-      volume: 0.5,
+      volume: 0.2,
     },
   });
 
