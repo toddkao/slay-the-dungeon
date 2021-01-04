@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { AppHistory, MyRouter } from "./Router";
 import { createGlobalStyle } from "styled-components";
-import cursor from "./Images/cursor.png";
+import customCursorImage from "./Images/cursor.png";
 import { MapState } from "./Game/Map/MapState";
 
 const GlobalStyle = createGlobalStyle`
@@ -16,10 +16,23 @@ const GlobalStyle = createGlobalStyle`
 
   body, html {
     margin: 0;
-    cursor: url(${cursor}), default;
   }
-  
+
+  #customCursor {
+    width: 64px;
+    height: 64px;
+    background: url(${customCursorImage});
+    background-position: center;
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+  }
+  #customCursor.mouse-down {
+    transform: rotate(-10deg);
+  }
+
   * {
+    cursor: none !important;
     font-family: 'Kreon, serif';
     -moz-user-select: -moz-none;
     -khtml-user-select: none;
@@ -27,13 +40,6 @@ const GlobalStyle = createGlobalStyle`
     ::-webkit-scrollbar {
       display: none;
     }
-    -ms-overflow-style: none;
-
-    /*
-      Introduced in IE 10.
-      See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
-    */
-    -ms-user-select: none;
     user-select: none;
   }
 `;
@@ -43,8 +49,32 @@ if (!mapState.currentNode) {
   AppHistory.push("/");
 }
 
+const cursor = (e: any) => {
+  const mouseCursor: any = document.getElementById("customCursor");
+  if (!mouseCursor?.style) {
+    return;
+  }
+  mouseCursor.style.top = e.pageY + "px";
+  mouseCursor.style.left = e.pageX + "px";
+};
+
+const handleMouseDown = (e: any) => {
+  const mouseCursor: any = document.getElementById("customCursor");
+  mouseCursor.classList = ['mouse-down'];
+}
+
+const handleMouseUp = (e: any) => {
+  const mouseCursor: any = document.getElementById("customCursor");
+  mouseCursor.classList = [];
+}
+
+window.addEventListener("mousemove", cursor);
+window.addEventListener("mousedown", handleMouseDown);
+window.addEventListener("mouseup", handleMouseUp);
+
 ReactDOM.render(
   <>
+    <div id="customCursor" />
     <GlobalStyle />
     <MyRouter />
   </>,
