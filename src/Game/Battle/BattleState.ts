@@ -67,7 +67,7 @@ export class BattleState {
   ) {}
 
   @observable
-  currentTurn: number = 1;
+  currentTurn: number = 0;
 
   @observable
   cardResolveQueue: (() => void)[] = [];
@@ -545,11 +545,16 @@ export class BattleState {
       () => this.resolveCardEffect(this.selectedCard as CardState),
       () => {
         this.cardsPlayed.push(this.selectedCard as CardState);
-        AppEvent.cardPlayed({ card: this.selectedCard as CardState });
         this.moveCards({
           cards: [this.selectedCard as CardState],
           from: PileOfCards.HAND,
           to: PileOfCards.DISCARD,
+        });
+        this.callNextAction();
+      },
+      () => {
+        this.monsters?.find(monster => {
+          monster.get.onCardPlayed?.(this.selectedCard as CardState);
         });
         this.callNextAction();
       },
@@ -599,6 +604,11 @@ export class BattleState {
   public initialize = action(() => {
     PlayerState.get().initializeBattle();
     this.initializeMonsters();
+    this.monsters?.forEach(monster => {
+      monster.get.onStartingBattleEvents?.()?.forEach(unsubscribe => {
+        this.endCombatActions.push(unsubscribe);
+      })
+    })
     this.initializeHand();
     this.battleState.cardsToShow = undefined;
     this.battleState.currentMana = PlayerState.get().maxMana;

@@ -3,8 +3,9 @@ import { CardState } from '../Game/Cards/CardState'
 import { createEventBus } from "ts-event-bus";
 
 export const Events = {
-  cardPlayed: slot<{card: CardState}, void>(),
+  cardPlayed: slot<{card: CardState}>(),
   cancelDrag: slot(),
+  healthAtOrBelowHalf: slot(),
 }
 
 export const AppEvent = createEventBus({

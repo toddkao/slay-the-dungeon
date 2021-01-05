@@ -2,6 +2,8 @@ import { action, computed } from "mobx";
 import Chance from "chance";
 import { EntityState, IEntity } from "../EntityState";
 import { IStatus } from "../../Common/StatusBar";
+import { Unsubscribe } from "ts-event-bus/build/Slot";
+import { CardState } from "../../Cards/CardState";
 
 export class MonsterState extends EntityState {
   constructor(private monster: IMonster) {
@@ -48,6 +50,9 @@ export enum IntentType {
   SHIELD,
   GAIN_STRENGTH,
   ENRAGE,
+  GOOP_SPRAY,
+  NOTHING,
+  SPLIT,
 }
 
 interface IIntent {
@@ -70,4 +75,6 @@ interface IMonster extends IEntity {
   effect?: any;
   ref?: React.MutableRefObject<any>;
   dead?: boolean;
+  onStartingBattleEvents?: () => Unsubscribe[];
+  onCardPlayed?: (card: CardState) => void;
 }
