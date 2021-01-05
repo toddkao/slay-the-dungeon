@@ -6,6 +6,8 @@ import louseImage from "../../../Images/louse.png";
 import jawWormImage from "../../../Images/jawworm.png";
 import gremlinNobImage from "../../../Images/gremlin-nob.png";
 import slimeBossImage from "../../../Images/slime-boss.png";
+import acidSlimeLImage from "../../../Images/acid-slime-l.png";
+import spikeSlimeLImage from "../../../Images/spike-slime-l.png";
 
 import attackIntent from "../../../Images/attack-intent.png";
 import spellIntent from "../../../Images/spell-intent.png";
@@ -137,6 +139,136 @@ const gremlinNob = (id: string) => {
   );
 };
 
+const acidSlimeL = (id: string) => {
+  const health = random(65, 69);
+
+  return new MonsterState(
+    observable({
+      id,
+      name: "Acid Slime (L)",
+      health,
+      block: 0,
+      maxHealth: health,
+      statuses: [],
+      image: {
+        src: acidSlimeLImage,
+        height: 300,
+      },
+      onStartingBattleEvents: () => {
+        const monster = BattleState.get().monsters?.find(
+          (monster) => monster.id === id
+        );
+
+        return [
+          AppEvent.healthAtOrBelowHalf.on(() => {
+            console.log('update intent');
+            monster?.setCurrentIntent({
+              type: IntentType.SPLIT,
+              intentImage: unknown,
+              amount: 2,
+              chance: 1,
+            });
+          }),
+        ];
+      },
+      onCardPlayed: () => {
+        const acidSlime = BattleState.get().monstersAlive?.find(monster => monster.get.name === 'Acid Slime (L)');
+
+        if (acidSlime && acidSlime.health <= acidSlime.maxHealth * 0.5) {
+          AppEvent.healthAtOrBelowHalf({ monsterId: acidSlime.id});
+        }
+      },
+      intent: () => {
+        return [
+          {
+            type: IntentType.ATTACK_DEBUFF,
+            intentImage: attackDebuff,
+            amount: 35,
+            chance: 30,
+          },
+          {
+            type: IntentType.DEBUFF,
+            intentImage: debuff,
+            amount: 35,
+            chance: 30,
+          },
+          {
+            type: IntentType.ATTACK,
+            intentImage: debuff,
+            amount: 35,
+            chance: 30,
+          },
+        ];
+      },
+    })
+  );
+};
+
+const spikeSlimeL = (id: string) => {
+  const health = random(65, 69);
+
+  return new MonsterState(
+    observable({
+      id,
+      name: "Spike Slime (L)",
+      health,
+      block: 0,
+      maxHealth: health,
+      statuses: [],
+      image: {
+        src: spikeSlimeLImage,
+        height: 300,
+      },
+      onStartingBattleEvents: () => {
+        const monster = BattleState.get().monsters?.find(
+          (monster) => monster.id === id
+        );
+
+        return [
+          AppEvent.healthAtOrBelowHalf.on(() => {
+            console.log('update intent');
+            monster?.setCurrentIntent({
+              type: IntentType.SPLIT,
+              intentImage: unknown,
+              amount: 2,
+              chance: 1,
+            });
+          }),
+        ];
+      },
+      onCardPlayed: () => {
+        const acidSlime = BattleState.get().monstersAlive?.find(monster => monster.get.name === 'Acid Slime (L)');
+
+        if (acidSlime && acidSlime.health <= acidSlime.maxHealth * 0.5) {
+          AppEvent.healthAtOrBelowHalf({ monsterId: acidSlime.id});
+        }
+      },
+      intent: () => {
+        return [
+          {
+            type: IntentType.ATTACK_DEBUFF,
+            intentImage: attackDebuff,
+            amount: 35,
+            chance: 30,
+          },
+          {
+            type: IntentType.DEBUFF,
+            intentImage: debuff,
+            amount: 35,
+            chance: 30,
+          },
+          {
+            type: IntentType.ATTACK,
+            intentImage: debuff,
+            amount: 35,
+            chance: 30,
+          },
+        ];
+      },
+    })
+  );
+};
+
 const slimeBoss = (id: string) => {
   const health = 140;
 
@@ -170,10 +302,10 @@ const slimeBoss = (id: string) => {
         ];
       },
       onCardPlayed: () => {
-        const slimeBoss = BattleState.get().monsters?.find(monster => monster.get.name === 'Slime Boss');
+        const slimeBoss = BattleState.get().monstersAlive?.find(monster => monster.get.name === 'Slime Boss');
 
         if (slimeBoss && slimeBoss.health <= slimeBoss.maxHealth * 0.5) {
-          AppEvent.healthAtOrBelowHalf();
+          AppEvent.healthAtOrBelowHalf({ monsterId: slimeBoss.id});
         }
       },
       intent: () => {
@@ -214,4 +346,6 @@ export const monsterMap = {
   jawWorm,
   gremlinNob,
   slimeBoss,
+  acidSlimeL,
+  spikeSlimeL,
 };

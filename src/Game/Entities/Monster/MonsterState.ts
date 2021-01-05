@@ -43,6 +43,7 @@ export class MonsterState extends EntityState {
   });
 }
 
+
 export enum IntentType {
   SLEEP,
   ATTACK,
@@ -53,6 +54,7 @@ export enum IntentType {
   GOOP_SPRAY,
   NOTHING,
   SPLIT,
+  DEBUFF,
 }
 
 interface IIntent {
