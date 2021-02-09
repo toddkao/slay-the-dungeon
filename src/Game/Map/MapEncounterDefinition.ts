@@ -8,9 +8,9 @@ interface IMapEncounterType {
 
 export const mapEncounterType: IMapEncounterType = {
   firstThreeEncounters: [
-    [monsterMap.slimeBoss],
-    // [monsterMap.louse, monsterMap.louse],
-    // [monsterMap.jawWorm],
+    // [monsterMap.slimeBoss],
+    [monsterMap.louse, monsterMap.louse],
+    [monsterMap.jawWorm],
   ],
   normalEncounters: [
     [monsterMap.louse, monsterMap.louse, monsterMap.louse],

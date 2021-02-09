@@ -1,4 +1,7 @@
 import { Howl, HowlOptions } from "howler";
+import { DeepPartial } from 'utility-types/dist/mapped-types';
+
+export declare function buildProto<T>(partial:DeepPartial<T>): T;
 
 interface IBoundingRect {
   x: number;
