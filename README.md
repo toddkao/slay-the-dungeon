@@ -1,3 +1,5 @@
+Built for 1080x1920 resolution, **Not responsive whatsoever**
+
 SPECIAL THANKS TO:
 avariicee
 
