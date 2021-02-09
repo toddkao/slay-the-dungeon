@@ -230,7 +230,7 @@ export interface ICard {
         selectCards: (cards: CardState[]) => void;
       }
     | undefined;
-  specialEffect?: Function;
+  specialEffect?: (args?: any) => any;
   rarity: CardRarity;
   // assets
   image: {

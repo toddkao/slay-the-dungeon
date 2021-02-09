@@ -58,7 +58,7 @@ const getImage = ({
   sheetNumber: number;
   position: [number, number];
 }) => {
-  let src = "cards" + sheetNumber;
+  const src = "cards" + sheetNumber;
   let path;
   switch (sheetNumber) {
     case 1:
@@ -318,9 +318,9 @@ export const cardMap: ICardMap = {
     manaCost: () => 1,
     image: getImage({ sheetNumber: 2, position: [2, 10] }),
     specialEffect: () => {
-      let battle = BattleState.get();
+      const battle = BattleState.get();
       if (battle.drawPile.length + battle.discardPile.length >= 1) {
-        let nextCard = battle.draw(1);
+        const nextCard = battle.draw(1);
         battle.resolveCardEffect(nextCard[0]);
         battle.exhaustCards(nextCard);
       }

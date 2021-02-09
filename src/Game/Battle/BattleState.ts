@@ -38,7 +38,7 @@ export interface IBattleState {
   drawPile: CardState[];
   discardPile: CardState[];
   exhaustPile: CardState[];
-  endTurnActions: Function[];
+  endTurnActions: (() => any)[];
   cardsToShow?: CardState[];
 }
 export class BattleState {
@@ -346,7 +346,7 @@ export class BattleState {
         }
         break;
       case CardEffectType.RANDOM:
-        for (const _damageInstance of range(0, card.damageInstances)) {
+        for (const _ignored of range(0, card.damageInstances)) {
           if ((this.monstersAlive?.length ?? 0) > 0) {
             await new Promise((resolve) =>
               setTimeout(() => {
