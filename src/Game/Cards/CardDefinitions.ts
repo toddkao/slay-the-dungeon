@@ -436,7 +436,7 @@ export const cardMap: ICardMap = {
     upgraded: false,
     manaCost: () => 1,
     image: getImage({ sheetNumber: 5, position: [0, 0] }),
-    damage: ({ upgraded, includeStatuses }: IEvaluatedCardProperty) =>
+    damage: ({ upgraded }: IEvaluatedCardProperty) =>
       upgraded ? 10 : 9,
     specialEffect: (upgraded = false) => {
       BattleState.get().draw(upgraded ? 2 : 1);
@@ -456,7 +456,7 @@ export const cardMap: ICardMap = {
     upgraded: false,
     manaCost: () => 1,
     image: getImage({ sheetNumber: 2, position: [3, 2] }),
-    block: ({ upgraded, includeStatuses }: IEvaluatedCardProperty) =>
+    block: ({ upgraded }: IEvaluatedCardProperty) =>
       upgraded ? 11 : 8,
     specialEffect: () => BattleState.get().draw(1),
     type: CardType.SKILL,

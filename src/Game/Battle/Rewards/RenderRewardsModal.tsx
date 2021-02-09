@@ -1,4 +1,4 @@
-import { clone, range, sample, uniqueId } from "lodash";
+import { range, sample, uniqueId } from "lodash";
 import { observer } from "mobx-react";
 import React, { useState } from "react";
 import { cardsByRarity, rarityChance } from "../../Cards/CardDefinitions";
@@ -21,7 +21,7 @@ import { IReward, RewardTypes } from "./RewardDefinition";
 import takeAll from "../../../Images/UI/reward/takeAll.png";
 import { PlayerState } from "../../Entities/Player/PlayerState";
 import proceedButton from "../../../Images/UI/reward/proceedButton.png";
-import { CardState, ICard } from "../../Cards/CardState";
+import { CardState } from "../../Cards/CardState";
 
 import { Chance } from "chance";
 

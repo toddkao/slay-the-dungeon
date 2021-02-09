@@ -5,7 +5,6 @@ import { Modal } from "../Common/Modal";
 import Xarrow from "react-xarrows";
 import { MapNodeType, mapNodeTypeToImage, MapState } from "./MapState";
 import { observer } from "mobx-react";
-import { BattleState } from "../Battle/BattleState";
 import { ReturnButton } from "../Common/Clickables";
 
 export const RenderMap = observer(

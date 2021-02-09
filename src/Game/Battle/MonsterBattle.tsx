@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 import { horizontalCenterAbsolute, Row } from "../../Layout";
 import { BattleState } from "./BattleState";
@@ -20,7 +20,6 @@ import { RenderMap } from "../Map/RenderMap";
 import { MapState } from "../Map/MapState";
 import { RenderRewardsModal } from "./Rewards/RenderRewardsModal";
 import { PlayerState } from "../Entities/Player/PlayerState";
-import { AppHistory } from "../../Router";
 
 export const RenderBattle = observer(() => {
   const battleState = BattleState.get();

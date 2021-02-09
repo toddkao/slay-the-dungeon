@@ -24,7 +24,7 @@ export const PullRelease = React.forwardRef(
           set({ x: down ? mx : 0, y: down ? my : 0 });
           onDrag?.();
         },
-        onDragStart: ({ event, ...sharedState }) => onDragStart?.(),
+        onDragStart: ({ event, ..._sharedState }) => onDragStart?.(),
       }
     );
 

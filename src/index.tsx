@@ -58,12 +58,12 @@ const cursor = (e: any) => {
   mouseCursor.style.left = e.pageX + "px";
 };
 
-const handleMouseDown = (e: any) => {
+const handleMouseDown = () => {
   const mouseCursor: any = document.getElementById("customCursor");
   mouseCursor.classList = ['mouse-down'];
 }
 
-const handleMouseUp = (e: any) => {
+const handleMouseUp = () => {
   const mouseCursor: any = document.getElementById("customCursor");
   mouseCursor.classList = [];
 }

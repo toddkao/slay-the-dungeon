@@ -11,7 +11,6 @@ import { BattleState } from "../Battle/BattleState";
 import { MonsterState } from "../Entities/Monster/MonsterState";
 import { mapEncounterType } from "./MapEncounterDefinition";
 import { AppHistory } from "../../Router";
-import { playAudioClip } from "../Common/utility";
 import {
   level1AmbienceBG,
   level1EliteBG,

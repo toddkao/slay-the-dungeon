@@ -1,6 +1,5 @@
 import { clone } from "lodash";
 import { action, computed, observable } from "mobx";
-import { CardState } from "../Cards/CardState";
 import { IStatus, StatusType, StatusTypeToIStatus } from "../Common/StatusBar";
 import { playAudioClip } from "../Common/utility";
 

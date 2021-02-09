@@ -1,4 +1,4 @@
-import { clone, random, range, sampleSize, shuffle, uniqueId } from "lodash";
+import { clone, random, range, sampleSize, shuffle } from "lodash";
 import {
   action,
   computed,
@@ -346,7 +346,7 @@ export class BattleState {
         }
         break;
       case CardEffectType.RANDOM:
-        for (const _instance of range(0, card.damageInstances)) {
+        for (const _damageInstance of range(0, card.damageInstances)) {
           if ((this.monstersAlive?.length ?? 0) > 0) {
             await new Promise((resolve) =>
               setTimeout(() => {
@@ -553,7 +553,7 @@ export class BattleState {
         this.callNextAction();
       },
       () => {
-        this.monsters?.find(monster => {
+        this.monsters?.forEach(monster => {
           monster.get.onCardPlayed?.(this.selectedCard as CardState);
         });
         this.callNextAction();

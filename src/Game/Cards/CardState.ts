@@ -1,12 +1,10 @@
 import { action, computed, makeObservable, observable } from "mobx";
 import { IStatus } from "../Common/StatusBar";
-import { Howl, HowlOptions } from "howler";
 import { BattleState, IBattleState } from "../Battle/BattleState";
 import { isCollidingWithEachOther, playAudioClip } from "../Common/utility";
 import { MonsterState } from "../Entities/Monster/MonsterState";
-import { maxBy, uniqueId } from "lodash";
+import { maxBy } from "lodash";
 import { cardMap, CardRarity } from "./CardDefinitions";
-import { AppEvent } from "../../Events";
 
 export enum CardEffectType {
   SPECIFIC_ENEMY,
@@ -150,6 +148,7 @@ export class CardState {
             amount: collision.amount,
           };
         }
+        return undefined;
       })
       .filter((collision) => collision);
 

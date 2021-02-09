@@ -16,6 +16,7 @@
     "@types/react-router-dom": "^5.1.6",
     "@types/styled-components": "^5.1.7",
     "chance": "^1.1.7",
+    "gh-pages": "^3.1.0",
     "history": "4.10.1",
     "howler": "^2.2.1",
     "lodash": "^4.17.20",
@@ -42,13 +43,23 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "react-scripts build && gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+      "@typescript-eslint/no-unused-vars": [
+        1,
+        {
+          "argsIgnorePattern": "^_",
+          "ignoreRestSiblings": true
+        }
+      ]
+    }
   },
   "browserslist": {
     "production": [
