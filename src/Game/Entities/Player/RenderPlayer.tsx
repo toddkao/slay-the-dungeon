@@ -1,5 +1,5 @@
 import React from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { Column, Spacer } from "../../../Layout";
 import { PlayerState } from "./PlayerState";
 import ironclad from "../../../Images/ironclad.png";
