@@ -27,7 +27,6 @@ export enum CardRarity {
 interface ISpriteToCardSize {
   [index: string]: { CARD_WIDTH: number; CARD_HEIGHT: number };
 }
-// test
 
 export const spriteToCardSize: ISpriteToCardSize = {
   cards1: {

@@ -18,7 +18,6 @@ export const RenderPlayer = observer(() => {
   }
   return (
     <PlayerWrapper
-      disable={battleState.targetSelf}
       onClick={() => {
         if (battleState.targetSelf) {
           battleState.playSelectedCard();
@@ -38,12 +37,4 @@ export const RenderPlayer = observer(() => {
 const PlayerWrapper = styled(Column)<{ disable: boolean }>`
   position: relative;
   z-index: 0;
-  ${({ disable }) =>
-    disable
-      ? ""
-      : css`
-          &:hover {
-            outline: 2px solid green;
-          }
-        `}
 `;
