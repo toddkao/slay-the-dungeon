@@ -32,7 +32,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   * {
-    cursor: none !important;
+    /* cursor: none !important; */
     font-family: 'Kreon, serif';
     -moz-user-select: -moz-none;
     -khtml-user-select: none;
@@ -49,32 +49,32 @@ if (!mapState.currentNode) {
   AppHistory.push("/");
 }
 
-const cursor = (e: any) => {
-  const mouseCursor: any = document.getElementById("customCursor");
-  if (!mouseCursor?.style) {
-    return;
-  }
-  mouseCursor.style.top = e.pageY + "px";
-  mouseCursor.style.left = e.pageX + "px";
-};
+// const cursor = (e: any) => {
+//   const mouseCursor: any = document.getElementById("customCursor");
+//   if (!mouseCursor?.style) {
+//     return;
+//   }
+//   mouseCursor.style.top = e.pageY + "px";
+//   mouseCursor.style.left = e.pageX + "px";
+// };
 
-const handleMouseDown = () => {
-  const mouseCursor: any = document.getElementById("customCursor");
-  mouseCursor.classList = ['mouse-down'];
-}
+// const handleMouseDown = () => {
+//   const mouseCursor: any = document.getElementById("customCursor");
+//   mouseCursor.classList = ['mouse-down'];
+// }
 
-const handleMouseUp = () => {
-  const mouseCursor: any = document.getElementById("customCursor");
-  mouseCursor.classList = [];
-}
+// const handleMouseUp = () => {
+//   const mouseCursor: any = document.getElementById("customCursor");
+//   mouseCursor.classList = [];
+// }
 
-window.addEventListener("mousemove", cursor);
-window.addEventListener("mousedown", handleMouseDown);
-window.addEventListener("mouseup", handleMouseUp);
+// window.addEventListener("mousemove", cursor);
+// window.addEventListener("mousedown", handleMouseDown);
+// window.addEventListener("mouseup", handleMouseUp);
 
 ReactDOM.render(
   <>
-    <div id="customCursor" />
+    {/* <div id="customCursor" /> */}
     <GlobalStyle />
     <MyRouter />
   </>,
