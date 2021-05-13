@@ -34,7 +34,7 @@ export const RenderPlayer = observer(() => {
   );
 });
 
-const PlayerWrapper = styled(Column)<{ disable: boolean }>`
+const PlayerWrapper = styled(Column)`
   position: relative;
   z-index: 0;
 `;
