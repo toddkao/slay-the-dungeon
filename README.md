@@ -13,22 +13,19 @@ Drag and drop to use cards
 Viewing Draw pile, Discard pile, exhaust pile
 
 Reward Modal, Ability to pick a card to add to your deck:
+![sts-2](https://github.com/toddkao/slay-the-dungeon/assets/10605836/54fce961-3b06-44fe-8900-3b35d539794f)
 
-![alt text](https://cdn.discordapp.com/attachments/714974611216793745/795687234690613278/unknown.png)
-
-![alt text](https://cdn.discordapp.com/attachments/714974611216793745/795687270728204328/unknown.png)
+![sts-6](https://github.com/toddkao/slay-the-dungeon/assets/10605836/703988c2-a7e4-4879-9f16-90882c287dfe)
 
 Basic Map/Dungeon Traversal:
-![alt text](https://cdn.discordapp.com/attachments/714974611216793745/795686699375919134/unknown.png)
+![sts-5](https://github.com/toddkao/slay-the-dungeon/assets/10605836/9e4f1a65-373d-4026-b70b-473bb8ae7114)
 
 Normal monster encounter:
-![alt text](https://cdn.discordapp.com/attachments/714974611216793745/795685717942599711/unknown.png)
+![sts-1](https://github.com/toddkao/slay-the-dungeon/assets/10605836/4c46479c-4bb2-437d-b09c-ffca5f65b2f4)
 
 Gremlin Nob (Elite):
 ![alt text](https://cdn.discordapp.com/attachments/714974611216793745/795685631819907132/unknown.png)
 
-Healing at rest site:
-![alt text](https://cdn.discordapp.com/attachments/714974611216793745/795685906194628618/unknown.png)
+Healing/Upgrading a card at rest site:
+![sts-4](https://github.com/toddkao/slay-the-dungeon/assets/10605836/d977f0a6-7a11-4180-87fd-1944c4b9ee5c)
 
-Upgrading at rest site:
-![alt text](https://cdn.discordapp.com/attachments/714974611216793745/795685987245752320/unknown.png)
