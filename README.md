@@ -24,7 +24,7 @@ Normal monster encounter:
 ![sts-1](https://github.com/toddkao/slay-the-dungeon/assets/10605836/4c46479c-4bb2-437d-b09c-ffca5f65b2f4)
 
 Gremlin Nob (Elite):
-![alt text](https://cdn.discordapp.com/attachments/714974611216793745/795685631819907132/unknown.png)
+![sts-7](https://github.com/toddkao/slay-the-dungeon/assets/10605836/ee207e84-3b51-4105-bc40-564dcc80c3c3)
 
 Healing/Upgrading a card at rest site:
 ![sts-4](https://github.com/toddkao/slay-the-dungeon/assets/10605836/d977f0a6-7a11-4180-87fd-1944c4b9ee5c)
