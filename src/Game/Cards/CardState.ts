@@ -31,14 +31,6 @@ export class CardState {
       id,
       upgraded,
     };
-
-    makeObservable(this, {
-      manaCost: computed,
-      damageInstances: computed,
-      damage: computed,
-      ref: computed,
-      upgraded: computed,
-    });
   }
 
   @computed
@@ -59,12 +51,17 @@ export class CardState {
     };
   }
 
+  @computed
   get manaCost() {
     return this.card.manaCost?.(this.card.upgraded) ?? 0;
   }
+
+  @computed
   get damageInstances() {
     return this.card.damageInstances?.(this.card.upgraded) ?? 1;
   }
+
+  @computed
   get damage() {
     return (
       this.card.damage?.({
@@ -85,6 +82,7 @@ export class CardState {
     return this.card.status?.(this.card.upgraded) ?? 0;
   }
 
+  @computed
   get ref(): React.MutableRefObject<any> | undefined {
     return this.card.ref;
   }
@@ -96,6 +94,7 @@ export class CardState {
     return this.card.cardSelection?.(this.card.upgraded);
   }
 
+  @computed
   get upgraded() {
     return this.card.upgraded;
   }
