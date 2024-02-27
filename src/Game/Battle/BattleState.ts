@@ -586,6 +586,8 @@ export class BattleState {
       // re-designed to be attached to card themselves instead of battleState
       this.cardResolveQueue.length !== 0
     ) {
+      this.battleState.selectedSelf = false;
+      this.battleState.selectedCardId = undefined;
       return;
     }
     this.initializeCardResolveQueue();
