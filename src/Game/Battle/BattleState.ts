@@ -448,13 +448,12 @@ export class BattleState {
 
   private resolveMonsterActions = action(() => {
     this.monstersAlive?.forEach((monster) => {
-      const { strength } = monster;
-      const { currentIntent } = monster.get;
+      const { currentIntent } = monster;
       switch (currentIntent?.type) {
         case IntentType.ATTACK_DEBUFF:
           PlayerState.get().takeDamage(
             BattleState.calculateDamage({
-              damage: (currentIntent.amount ?? 0) + strength,
+              damage: (currentIntent.amount ?? 0),
               target: PlayerState.get(),
             })
           );
@@ -469,7 +468,7 @@ export class BattleState {
         case IntentType.ATTACK:
           PlayerState.get().takeDamage(
             BattleState.calculateDamage({
-              damage: (currentIntent.amount ?? 0) + strength,
+              damage: (currentIntent.amount ?? 0),
               target: PlayerState.get(),
             })
           );

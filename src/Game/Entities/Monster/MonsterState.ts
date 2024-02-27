@@ -29,6 +29,23 @@ export class MonsterState extends EntityState {
     return this.monster;
   }
 
+  @computed
+  public get currentIntent() {
+    if (this.monster.currentIntent?.type === IntentType.ATTACK) {
+      return {
+        ...this.monster.currentIntent,
+        amount: Math.floor((this.monster.currentIntent?.amount ?? 0) + this.strength * this.damageMultiplier)
+      };
+    }
+    if (this.monster.currentIntent?.type === IntentType.SHIELD) {
+      return {
+        ...this.monster.currentIntent,
+        amount: Math.floor((this.monster.currentIntent?.amount ?? 0) + this.dexterity)
+      };
+    }
+    return this.monster.currentIntent;
+  }
+
   public pickRandomIntent = action(() => {
     const chance = new Chance();
     const intent: IIntent = chance.weighted(

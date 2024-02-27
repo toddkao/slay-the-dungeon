@@ -16,13 +16,12 @@ export const RenderMonster = observer(
     const {
       get: {
         id,
-        currentIntent,
         image: { src, height },
       },
+      currentIntent,
       statuses,
       health,
       maxHealth,
-      strength,
       dead,
     } = monsterState;
     const monsterRef = useRef(null);
@@ -32,9 +31,8 @@ export const RenderMonster = observer(
       switch (currentIntent?.type) {
         case IntentType.ATTACK:
           return (
-            // TODO: update this to multiply (damage + extra damage) by modifier (eg. weak)
             <IntentNumber>
-              {(currentIntent?.amount ?? 0) + strength}
+              {currentIntent?.amount ?? 0}
             </IntentNumber>
           );
         default:
