@@ -29,3 +29,7 @@ Gremlin Nob (Elite):
 Healing/Upgrading a card at rest site:
 ![sts-4](https://github.com/toddkao/slay-the-dungeon/assets/10605836/d977f0a6-7a11-4180-87fd-1944c4b9ee5c)
 
+
+## Jotai Migration
+
+This project previously used MobX with classes. State is being migrated to [Jotai](https://jotai.org) and the `playerAtom` lives under `src/Game/Entities/Player/playerAtom.ts`.

@@ -4,7 +4,8 @@ import corpse from "../../Images/corpse.png";
 import { Row } from "../../Layout";
 import { AppHistory } from "../../Router";
 import { Typography } from "../../Typography";
-import { PlayerState } from "../Entities/Player/PlayerState";
+import { getDefaultStore } from "jotai";
+import { playerAtom, initialPlayerState } from "../Entities/Player/playerAtom";
 import { MapState } from "./MapState";
 import { BattleState } from "../Battle/BattleState";
 
@@ -15,7 +16,8 @@ export const RenderDefeatScreen = () => {
     battleState.battleReactionDisposer?.();
     battleState.setMonsters();
     battleState.setCardsToShow();
-    PlayerState.get().reset();
+    const store = getDefaultStore();
+    store.set(playerAtom, initialPlayerState);
     AppHistory.push('/');
   }
   return (

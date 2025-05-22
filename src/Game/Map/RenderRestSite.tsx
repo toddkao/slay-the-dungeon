@@ -5,7 +5,8 @@ import smith from "../../Images/restsite/smith.png";
 import overShoulder from "../../Images/restsite/shoulder.png";
 import { Column, Row } from "../../Layout";
 import { Typography } from "../../Typography";
-import { PlayerState } from "../Entities/Player/PlayerState";
+import { useAtomValue, getDefaultStore } from "jotai";
+import { playerAtom, playerActions } from "../Entities/Player/playerAtom";
 import { useState } from "react";
 import {
   ProceedButtonWrapper,
@@ -14,7 +15,6 @@ import {
 import proceedButton from "../../Images/UI/reward/proceedButton.png";
 import { RenderMap } from "./RenderMap";
 import { MapState } from "./MapState";
-import { observer } from "mobx-react";
 import { ShowCardsModal } from "../Common/ShowCardsModal";
 import { CardState } from "../Cards/CardState";
 import { playAudioClip } from "../Common/utility";
@@ -32,7 +32,7 @@ interface IRestSiteOption {
   onClick: () => void;
 }
 
-export const RenderRestSite = observer(() => {
+export const RenderRestSite = () => {
   const restSiteOptions: IRestSiteOption[] = [
     {
       type: RestSiteOptionType.SLEEP,
@@ -66,7 +66,8 @@ export const RenderRestSite = observer(() => {
   const [showDeck, setShowDeck] = useState(false);
 
   const mapState = MapState.get();
-  const playerState = PlayerState.get();
+  const store = getDefaultStore();
+  const playerState = useAtomValue(playerAtom);
 
   const thirtyPercentMaxHp = playerState.get.maxHealth * 0.3;
 
@@ -75,16 +76,17 @@ export const RenderRestSite = observer(() => {
       <Column style={{ width: "100vw" }} align="center">
         {showDeck && !optionUsed ? (
           <ShowCardsModal
-            cards={PlayerState.get().deck.map((card) => new CardState(card))}
+            cards={playerState.deck.map((card) => new CardState(card))}
             onClose={() => setShowDeck(false)}
             cardsToSelect={1}
             onFinishSelectingCards={(cards: CardState[]) => {
-              PlayerState.get().deck = PlayerState.get().deck.map((card) => {
+              const updatedDeck = playerState.deck.map((card) => {
                 if (card.id === cards[0].id) {
                   card.upgraded = true;
                 }
                 return card;
               });
+              store.set(playerAtom, { ...playerState, deck: updatedDeck });
               setShowDeck(false);
               setOptionUsed(true);
               playAudioClip(upgradeCard);

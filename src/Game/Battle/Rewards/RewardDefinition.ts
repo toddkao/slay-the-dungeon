@@ -4,11 +4,14 @@ export interface IReward {
   id: string;
   type: RewardTypes;
   cards: CardState[];
-  // TODO add more reward types
+  gold?: number;
+  potion?: string;
 }
 
 export enum RewardTypes {
   CARD,
   POTION,
   GOLD,
+  RELIC,
+  HEALTH,
 }

@@ -13,9 +13,12 @@ import {
 import { StatusType } from "../Common/StatusBar";
 import { BattleState, IBattleState, PileOfCards } from "../Battle/BattleState";
 import { groupBy, uniqueId } from "lodash";
-import { PlayerState } from "../Entities/Player/PlayerState";
+import { getDefaultStore } from "jotai";
+import { playerAtom, playerActions } from "../Entities/Player/playerAtom";
 import { addBlock, fastAtk, heavyAtk, upgradeCard } from "../../Audio/Audio";
 import { playAudioClip } from "../Common/utility";
+
+const store = getDefaultStore();
 
 export enum CardRarity {
   STARTER,
@@ -172,7 +175,7 @@ export const cardMap: ICardMap = {
         props.damage ?? 0,
         props.selected
       )} damage.\nAdd a copy of this card\ninto your discard pile.`,
-    audio: [heavyAtk], //TODO: sound effect
+    audio: [heavyAtk],
   },
   Armament: {
     name: "Armament",
@@ -218,19 +221,19 @@ export const cardMap: ICardMap = {
       `Gain ${props.block} Block.\nUpgrade ${
         props.upgraded ? "all cards" : "a card"
       } in your\nhand for the rest of \nthe combat.`,
-    audio: [addBlock], //TODO: sound effect
+    audio: [addBlock]
   },
   "Body Slam": {
     name: "Body Slam",
     rarity: CardRarity.COMMON,
     upgraded: false,
     manaCost: (upgraded = false) => (upgraded ? 0 : 1),
-    damage: () => PlayerState.get().block,
+    damage: () => store.get(playerAtom).block,
     image: getImage({ sheetNumber: 3, position: [5, 2] }),
     type: CardType.ATTACK,
     effect: CardEffectType.SPECIFIC_ENEMY,
     description: () => `Deal damage equal to\nyour block`,
-    audio: [heavyAtk], //TODO: sound effect
+    audio: [heavyAtk]
   },
   Clash: {
     name: "Clash",
@@ -251,7 +254,7 @@ export const cardMap: ICardMap = {
         props.damage ?? 0,
         props.selected
       )} damage.`,
-    audio: [heavyAtk], //TODO: sound effect
+    audio: [heavyAtk]
   },
   Cleave: {
     name: "Cleave",
@@ -264,7 +267,7 @@ export const cardMap: ICardMap = {
     effect: CardEffectType.ALL_ENEMIES,
     description: (props: IEvaluatedCardProperty) =>
       `Deal ${props.damage} damage to ALL\n enemies.`,
-    audio: [heavyAtk], //TODO: sound effect
+    audio: [heavyAtk]
   },
   Clothesline: {
     name: "Clothesline",
@@ -288,7 +291,7 @@ export const cardMap: ICardMap = {
       )} damage.\nApply ${
         cardMap["Clothesline"].status?.(props.upgraded).amount
       } Weak.`,
-    audio: [heavyAtk], //TODO: sound effect
+    audio: [heavyAtk]
   },
   Flex: {
     name: "Flex",
@@ -297,10 +300,20 @@ export const cardMap: ICardMap = {
     manaCost: () => 0,
     image: getImage({ sheetNumber: 1, position: [0, 0] }),
     specialEffect: (upgraded = false) => {
-      PlayerState.get().addStatus(StatusType.STRENGTH, upgraded ? 4 : 2);
-      PlayerState.get().addStatus(StatusType.STRENGTH_DOWN, upgraded ? 4 : 2);
+      const storePlayer = store.get(playerAtom);
+      playerActions.addStatus(StatusType.STRENGTH, upgraded ? 4 : 2)(
+        () => storePlayer,
+        (v) => store.set(playerAtom, v)
+      );
+      playerActions.addStatus(StatusType.STRENGTH_DOWN, upgraded ? 4 : 2)(
+        () => storePlayer,
+        (v) => store.set(playerAtom, v)
+      );
       BattleState.get().endTurnActions.push(() => {
-        PlayerState.get().removeStatus(StatusType.STRENGTH, upgraded ? 4 : 2);
+        playerActions.addStatus(StatusType.STRENGTH, -(upgraded ? 4 : 2))(
+          () => store.get(playerAtom),
+          (v) => store.set(playerAtom, v)
+        );
       });
     },
     type: CardType.SKILL,
@@ -309,7 +322,7 @@ export const cardMap: ICardMap = {
       `Gain ${upgraded ? 4 : 2} Strength.\nAt the end of this turn,\nlose ${
         upgraded ? 4 : 2
       } Strength.`,
-    audio: [heavyAtk], //TODO: sound effect
+    audio: [heavyAtk]
   },
   Havoc: {
     name: "Havoc",
@@ -328,7 +341,7 @@ export const cardMap: ICardMap = {
     type: CardType.SKILL,
     effect: CardEffectType.SELF,
     description: () => `Play the top card of\nyour draw pile and\nExhaust it.`,
-    audio: [heavyAtk], //TODO: sound effect
+    audio: [heavyAtk]
   },
   Headbutt: {
     name: "Headbutt",
@@ -361,7 +374,7 @@ export const cardMap: ICardMap = {
         props.damage ?? 0,
         props.selected
       )} damage.\nPut a card from your\ndiscard pile on top of\nyour draw pile.`,
-    audio: [heavyAtk], //TODO: sound effect
+    audio: [heavyAtk]
   },
   "Heavy Blade": {
     name: "Heavy Blade",
@@ -372,7 +385,7 @@ export const cardMap: ICardMap = {
     damage: ({ upgraded, includeStatuses }: IEvaluatedCardProperty) => {
       return (
         14 +
-        (upgraded ? 5 : 3) * (includeStatuses ? PlayerState.get().strength : 0)
+        (upgraded ? 5 : 3) * (includeStatuses ? store.get(playerAtom).strength : 0)
       );
     },
     type: CardType.ATTACK,
@@ -384,7 +397,7 @@ export const cardMap: ICardMap = {
       )} damage.\nStrength affects this\n card ${
         props.upgraded ? 5 : 3
       } times.`,
-    audio: [heavyAtk], //TODO: sound effect
+    audio: [heavyAtk]
   },
   "Iron Wave": {
     name: "Iron Wave",
@@ -412,11 +425,12 @@ export const cardMap: ICardMap = {
     damage: ({ upgraded, includeStatuses }: IEvaluatedCardProperty) => {
       return (
         6 +
-        PlayerState.get().deck.filter((card) =>
-          card.name.toLowerCase().includes("strike")
-        ).length *
+        store
+          .get(playerAtom)
+          .deck.filter((card) => card.name.toLowerCase().includes("strike"))
+          .length *
           (upgraded ? 3 : 2) +
-        (includeStatuses ? PlayerState.get().strength : 0)
+        (includeStatuses ? store.get(playerAtom).strength : 0)
       );
     },
     type: CardType.ATTACK,
@@ -428,7 +442,7 @@ export const cardMap: ICardMap = {
       )} damage.\n Deals an additional\n${
         props.upgraded ? 3 : 2
       } damage for ALL of your\ncards containing\n"Strike".`,
-    audio: [heavyAtk], //TODO: sound effect
+    audio: [heavyAtk]
   },
   "Pommel Strike": {
     name: "Pommel Strike",
@@ -448,7 +462,7 @@ export const cardMap: ICardMap = {
         props.damage ?? 0,
         props.selected
       )} damage.\nDraw ${props.upgraded ? 2 : 1} card.`,
-    audio: [heavyAtk], //TODO: sound effect
+    audio: [heavyAtk]
   },
   "Shrug It Off": {
     name: "Shrug It Off",
@@ -501,7 +515,7 @@ export const cardMap: ICardMap = {
         props.damage ?? 0,
         props.selected
       )} damage and\napply 1 Vulnerable to\nALL enemies.`,
-    audio: [heavyAtk], //TODO: sound effect
+    audio: [heavyAtk]
   },
 };
 
