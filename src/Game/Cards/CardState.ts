@@ -1,4 +1,5 @@
 import { action, computed, makeObservable, observable } from "mobx";
+import { Howl } from "howler";
 import { IStatus } from "../Common/StatusBar";
 import { BattleState, IBattleState } from "../Battle/BattleState";
 import { isCollidingWithEachOther, playAudioClip } from "../Common/utility";
@@ -117,12 +118,17 @@ export class CardState {
     }
   };
 
+  private currentSound?: Howl;
+
   public playAudioClips = async () => {
-    // TODO stop currently playing audio clips when beginning
-    // to play a new set of audio clips
+    if (this.currentSound) {
+      this.currentSound.stop();
+      this.currentSound = undefined;
+    }
     if (this.get.audio !== undefined) {
       for (const audioClip of this.get.audio) {
-        await playAudioClip(audioClip);
+        const sound = await playAudioClip(audioClip);
+        this.currentSound = sound as any;
       }
     }
   };
@@ -248,6 +254,7 @@ export interface ICard {
   damage?: (prop: IEvaluatedCardProperty) => number;
   block?: (prop: IEvaluatedCardProperty) => number;
   description: (prop: IEvaluatedCardProperty) => string;
+  discardBeforeResolve?: boolean;
 }
 
 export interface ICardWithId extends ICard {

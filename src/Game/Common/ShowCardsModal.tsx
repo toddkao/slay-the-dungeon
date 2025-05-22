@@ -1,4 +1,3 @@
-import { observer } from "mobx-react";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Row } from "../../Layout";
@@ -6,7 +5,6 @@ import { CardState } from "../Cards/CardState";
 import { Modal } from "./Modal";
 
 import { RenderCard } from "../Cards/RenderCard";
-import { observable } from "mobx";
 import { PeekButton, ReturnButton } from "./Clickables";
 
 export const CardRow = styled(Row)`
@@ -31,12 +29,7 @@ interface IProps {
   calculateStatusesInCardText?: boolean;
 }
 
-class State {
-  @observable
-  selectedCards: CardState[] = [];
-}
-
-export const ShowCardsModal = observer(
+export const ShowCardsModal = (
   ({
     cards,
     onClose,
@@ -45,17 +38,16 @@ export const ShowCardsModal = observer(
     showReturnButton = true,
     calculateStatusesInCardText = false,
   }: IProps) => {
-    const state = new State();
     const [hideModal, setHideModal] = useState(false);
+    const [selectedCards, setSelectedCards] = useState<CardState[]>([]);
 
     const onSelectCard = (card: CardState) => {
       if (cardsToSelect) {
-        state.selectedCards = [...state.selectedCards, card];
-        console.log("selectedCards");
-        // this is really dumb, maybe i should create a state for this
+        const newSelected = [...selectedCards, card];
+        setSelectedCards(newSelected);
         setTimeout(() => {
-          if (state.selectedCards.length === cardsToSelect) {
-            onFinishSelectingCards?.(state.selectedCards);
+          if (newSelected.length === cardsToSelect) {
+            onFinishSelectingCards?.(newSelected);
           }
         }, 0);
       }

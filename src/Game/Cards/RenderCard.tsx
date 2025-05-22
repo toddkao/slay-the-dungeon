@@ -1,4 +1,3 @@
-import { observer } from "mobx-react";
 import React, { useRef } from "react";
 import styled, { css } from "styled-components";
 import { Typography } from "../../Typography";
@@ -6,7 +5,8 @@ import { BattleState } from "../Battle/BattleState";
 import { CardState } from "./CardState";
 import { ManaCost } from "../Common";
 import cardImage from "../../Images/card.png";
-import { PlayerState } from "../Entities/Player/PlayerState";
+import { useAtomValue } from "jotai";
+import { playerAtom } from "../Entities/Player/playerAtom";
 
 // @ts-ignore
 import { Sprite } from "react-spritesheet";
@@ -14,7 +14,7 @@ import { horizontalCenterAbsolute, Row } from "../../Layout";
 import { PullRelease } from "../Common/Draggable";
 import { cardMap } from "./CardDefinitions";
 
-export const RenderCard = observer(
+export const RenderCard = (
   ({
     cardState,
     onClick,
@@ -47,13 +47,14 @@ export const RenderCard = observer(
       ? battleState.selectedCardId === cardState.get.id
       : false;
 
+    const player = useAtomValue(playerAtom);
     const damage = Math.floor(
       ((cardMap?.[cardState.get.name]?.damage?.({
         selected,
         upgraded,
       }) ?? 0) +
-        (calculateStatusesInCardText ? PlayerState.get().strength : 0)) *
-        (calculateStatusesInCardText ? PlayerState.get().damageMultiplier : 1)
+        (calculateStatusesInCardText ? player.strength : 0)) *
+        (calculateStatusesInCardText ? player.damageMultiplier : 1)
     );
 
     const block = Math.floor(
@@ -61,8 +62,8 @@ export const RenderCard = observer(
         selected,
         upgraded,
       }) ?? 0) +
-        (calculateStatusesInCardText ? PlayerState.get().dexterity : 0)) *
-        (calculateStatusesInCardText ? PlayerState.get().blockMultiplier : 1)
+        (calculateStatusesInCardText ? player.dexterity : 0)) *
+        (calculateStatusesInCardText ? player.blockMultiplier : 1)
     );
 
     return (

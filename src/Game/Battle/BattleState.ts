@@ -535,22 +535,28 @@ export class BattleState {
   });
 
   public initializeCardResolveQueue = action(() => {
-    // TODO
-    // Think about a way to allow cards to decide whether
-    // it shoud move to the discard pile before or after resolving?
     this.cardResolveQueue = [];
+    const discardFirst = this.selectedCard?.get.discardBeforeResolve;
+    const discardAction = () => {
+      this.cardsPlayed.push(this.selectedCard as CardState);
+      this.moveCards({
+        cards: [this.selectedCard as CardState],
+        from: PileOfCards.HAND,
+        to: PileOfCards.DISCARD,
+      });
+      this.callNextAction();
+    };
+    if (discardFirst) {
+      this.cardResolveQueue.push(discardAction);
+    }
     this.cardResolveQueue.push(
       () => this.useMana(this.selectedCardManaCost),
-      () => this.resolveCardEffect(this.selectedCard as CardState),
-      () => {
-        this.cardsPlayed.push(this.selectedCard as CardState);
-        this.moveCards({
-          cards: [this.selectedCard as CardState],
-          from: PileOfCards.HAND,
-          to: PileOfCards.DISCARD,
-        });
-        this.callNextAction();
-      },
+      () => this.resolveCardEffect(this.selectedCard as CardState)
+    );
+    if (!discardFirst) {
+      this.cardResolveQueue.push(discardAction);
+    }
+    this.cardResolveQueue.push(
       () => {
         this.monsters?.forEach(monster => {
           monster.get.onCardPlayed?.(this.selectedCard as CardState);
@@ -579,18 +585,20 @@ export class BattleState {
       this.selectedCardManaCost > this.currentMana ||
       // Make sure previous card isn't in the process of resolving
 
-      // TODO maybe instead just push the new card onto the queue?
-      // need to check in game and think about the best way to handle it
-      // currentlySelectedCard / currentlySelectedMonster would have to be
-      // re-designed to be attached to card themselves instead of battleState
       this.cardResolveQueue.length !== 0
     ) {
       this.battleState.selectedSelf = false;
       this.battleState.selectedCardId = undefined;
       return;
     }
-    this.initializeCardResolveQueue();
-    this.callNextAction();
+    if (this.cardResolveQueue.length === 0) {
+      this.initializeCardResolveQueue();
+      this.callNextAction();
+    } else {
+      const existing = [...this.cardResolveQueue];
+      this.initializeCardResolveQueue();
+      this.cardResolveQueue = [...existing, ...this.cardResolveQueue];
+    }
   });
 
   public endTurn = action(() => {

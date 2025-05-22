@@ -1,4 +1,3 @@
-import { observer } from "mobx-react";
 import React from "react";
 import styled from "styled-components";
 import { horizontalCenterAbsolute, Row } from "../../Layout";
@@ -19,18 +18,18 @@ import { RenderMonster } from "../Entities/Monster/RenderMonster";
 import { RenderMap } from "../Map/RenderMap";
 import { MapState } from "../Map/MapState";
 import { RenderRewardsModal } from "./Rewards/RenderRewardsModal";
-import { PlayerState } from "../Entities/Player/PlayerState";
+import { useAtomValue } from "jotai";
+import { playerAtom } from "../Entities/Player/playerAtom";
 
-export const RenderBattle = observer(() => {
+export const RenderBattle = () => {
   const battleState = BattleState.get();
-  const playerState = PlayerState.get();
+  const playerState = useAtomValue(playerAtom);
   const mapState = MapState.get();
 
   const onRightClick = (e: { preventDefault: () => void }) => {
-    // TODO Move logic onto onReleaseDrag on card
     e.preventDefault();
-    // battleState.selectCard();
-    // battleState.selectedSelf = false;
+    battleState.selectCard();
+    battleState.selectedSelf = false;
   };
 
   return (
