@@ -1,18 +1,17 @@
 import React from "react";
 import styled from "styled-components";
 import { Column, Spacer } from "../../../Layout";
-import { PlayerState } from "./PlayerState";
+import { useAtomValue } from "jotai";
 import ironclad from "../../../Images/ironclad.png";
 import { StatusBar } from "../../Common/StatusBar";
-import { observer } from "mobx-react";
 import { BattleState } from "../../Battle/BattleState";
+import { playerAtom } from "../../../state";
 import { HealthBar } from "../../Common/HealthBar";
 import { ReticleWrapper } from "../../Common/ReticleWrapper";
 
-export const RenderPlayer = observer(() => {
-  const playerState = PlayerState.get();
+export const RenderPlayer = () => {
+  const { health, block, maxHealth, statuses } = useAtomValue(playerAtom);
   const battleState = BattleState.get();
-  const { health, block, maxHealth, statuses } = playerState;
   if (health === 0) {
     return null;
   }
@@ -32,7 +31,7 @@ export const RenderPlayer = observer(() => {
       </ReticleWrapper>
     </PlayerWrapper>
   );
-});
+};
 
 const PlayerWrapper = styled(Column)`
   position: relative;
